@@ -32,7 +32,9 @@ const css = $('style', { text: `
 .h2cc-body{padding:12px 14px;display:grid;gap:10px}.h2cc button.b{background:#0a5c45;color:#f1d16b;border:1px solid #c9a227;border-radius:6px;padding:6px 10px;font:600 13px system-ui;cursor:pointer}.h2cc button.b.alt{background:#fff;color:#0a5c45}.h2cc button.b.bad{background:#fff;color:#8a1c1c;border-color:#8a1c1c}.h2cc button:disabled{opacity:.45;cursor:not-allowed}
 .h2cc textarea{width:100%;min-height:70px;border:1px solid #c9a227;border-radius:6px;padding:6px;font:13px system-ui;background:#fff}.h2cc .row{display:flex;flex-wrap:wrap;gap:6px}.h2cc .note{font-size:12px;color:#4a5a52}
 .h2cc .card{background:#fff;border:1px solid #d9c98f;border-left:5px solid #c9a227;border-radius:6px;padding:8px;display:grid;gap:6px}.h2cc .card.rule{border-left-color:#0a5c45}.h2cc .badge{font:700 11px system-ui;background:#f1d16b;color:#043d2e;padding:2px 6px;border-radius:4px;justify-self:start}.h2cc .badge.r{background:#cfe8dc}.h2cc .warn{color:#8a5a00;font-weight:600}.h2cc .err{color:#8a1c1c;font-weight:600}
-@media(max-width:640px){.h2cc-drawer{width:100vw;top:auto;bottom:0;height:80%;border-left:0;border-top:4px solid #c9a227;transform:translateY(100%)}}
+#h2c-new{margin-left:auto;background:linear-gradient(180deg,#f6dd7a,#c9a227);color:#043d2e;border:2px solid #fff3c4;border-radius:999px;padding:10px 18px;font:700 14px system-ui;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap}#h2c-new:hover{filter:brightness(1.08)}#h2c-new:focus-visible{outline:3px solid #fff;outline-offset:2px}.h2c-mast #h2c-new+.r{margin-left:16px}
+.h2cc-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:10000;background:#043d2e;color:#f1d16b;border:2px solid #c9a227;border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;font:600 14px system-ui;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+@media(max-width:640px){#h2c-new{padding:8px 12px;font-size:13px}.h2cc-drawer{width:100vw;top:auto;bottom:0;height:80%;border-left:0;border-top:4px solid #c9a227;transform:translateY(100%)}}
 `});
 const pill = $('button', { class: 'h2cc-pill', 'aria-label': 'RCA Coach status. Open AI settings', text: 'AI Off' });
 const chip = $('div', { class: 'h2cc-chip' });
@@ -168,7 +170,20 @@ drawer.querySelector('.h2cc-head button').onclick = () => openDrawer(false);
 drawer.querySelector('#h2cc-rule').onclick = ruleCard;
 drawer.querySelector('#h2cc-use').onclick = () => { if (lastField) tgt.value = lastField.value; };
 drawer.querySelector('#h2cc-cancel').onclick = () => svc.cancel();
-drawer.querySelector('#h2cc-reset').onclick = () => { if (confirm('Delete ALL locally stored investigation data and AI notes in this browser? This cannot be undone.')) { localStorage.removeItem(APP_KEY); localStorage.removeItem(NOTES_KEY); location.reload(); } };
+// One shared clear path: used by the masthead "New analysis" button and the drawer's reset. Keeps a 1-step backup so Undo works.
+const BACKUP_KEY = 'h2c-last-cleared-v1', TOAST_KEY = 'h2c-cleared-toast';
+function clearCase(msg) {
+  if (!confirm(msg)) return;
+  try { localStorage.setItem(BACKUP_KEY, JSON.stringify({ app: localStorage.getItem(APP_KEY), notes: localStorage.getItem(NOTES_KEY), at: Date.now() })); sessionStorage.setItem(TOAST_KEY, '1'); } catch {}
+  localStorage.removeItem(APP_KEY); localStorage.removeItem(NOTES_KEY); location.reload();
+}
+function undoClear() { try { const b = JSON.parse(localStorage.getItem(BACKUP_KEY) || 'null'); if (!b) return; if (b.app != null) localStorage.setItem(APP_KEY, b.app); if (b.notes != null) localStorage.setItem(NOTES_KEY, b.notes); localStorage.removeItem(BACKUP_KEY); } catch {} location.reload(); }
+drawer.querySelector('#h2cc-reset').onclick = () => clearCase('Delete ALL locally stored investigation data and AI notes in this browser? You can undo right after.');
+const newBtn = $('button', { type: 'button', id: 'h2c-new', class: 'h2c-new', 'aria-label': 'New analysis: clear the current analysis and start a new one', text: '＋ New analysis' });
+newBtn.onclick = () => clearCase('Clear analysis and start new?\n\nThe current case is removed from this browser. You can undo right after. Use Export case first if you want a file copy.');
+const mountNew = () => { const m = document.querySelector('.h2c-mast'); if (m && !m.contains(newBtn)) { const r = m.querySelector('.r'); m.insertBefore(newBtn, r || null); } };
+mountNew(); new MutationObserver(mountNew).observe(document.documentElement, { childList: true, subtree: true });
+if (sessionStorage.getItem(TOAST_KEY)) { sessionStorage.removeItem(TOAST_KEY); const t = $('div', { class: 'h2cc-toast', role: 'status' }, $('span', { text: 'Analysis cleared. Starting fresh.' }), $('button', { type: 'button', class: 'b', text: 'Undo', onclick: 'void 0' })); t.querySelector('button').onclick = undoClear; root.append(t); setTimeout(() => t.remove(), 20000); }
 const openDrawer = (o) => { drawer.classList.toggle('open', o); if (o) drawer.querySelector('.h2cc-head button').focus(); else pill.focus(); };
 pill.onclick = () => openDrawer(!drawer.classList.contains('open'));
 drawer.setAttribute('role', 'dialog'); drawer.setAttribute('aria-modal', 'false');

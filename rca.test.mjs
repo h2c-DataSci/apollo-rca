@@ -76,3 +76,8 @@ test('privacy: no third-party hosts referenced in index.html or app code (except
 test('privacy: no third-party hosts, manifest or Grok references in the bundle head config', () => { const j = readFileSync(new URL('./index-v12.js', import.meta.url), 'utf8'); assert.ok(!j.includes('fonts.googleapis.com') && !j.includes('.grok.me')); });
 test('no /assets/ root-absolute URLs anywhere in index.html (router manifest preloads)', () => assert.ok(!readFileSync(new URL('./index.html', import.meta.url), 'utf8').includes('"/assets/')));
 test('vite preload helper resolves under /apollo-rca/ (no /assets/ 404s)', () => { const j = readFileSync(new URL('./index-v12.js', import.meta.url), 'utf8'); assert.ok(j.includes('return`/apollo-rca/`+e') && !j.includes('"assets/routes')); });
+test('one-click New analysis: shared clear path with confirm + undo backup, visible without AI', () => {
+  const s = readFileSync(new URL('./coach-ui.js', import.meta.url), 'utf8');
+  assert.ok(s.includes('id: \'h2c-new\'') && s.includes('Clear analysis and start new?') && s.includes('BACKUP_KEY') && s.includes('undoClear'));
+  assert.equal((s.match(/removeItem\(APP_KEY\)/g) || []).length, 1, 'single clear implementation');
+});
