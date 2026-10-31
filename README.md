@@ -22,3 +22,9 @@ Built by **h2c_Creates**. Live: https://h2c-datasci.github.io/apollo-rca/
 `coach-ui.js`, `ai-*.js`, `rca-*.js`, `case-io.js`, `*.test.mjs`, `golden-*.json`, `index-v12.js`, `routes-v12.js`, `styles-v11.css` belong to the earlier overlay build. They are no longer loaded by `index.html`. The rules and adversarial tests remain as a reference for methodology checks.
 
 Investigator remains responsible for all findings. Not affiliated with Reality Charting or ARMS Reliability.
+
+## QA notes (independent QA pass, Oct 31 2026)
+- Measured model download: `onnx/model_q4.onnx` is 786 MB (not 400 MB). The in-app notice now says about 790 MB.
+- Production in-app engine = Grok Build core. The old overlay engine files (`rca-*.js`, `ai-*.js`) and their tests are **not loaded** in production; passing tests there do not prove the production engine.
+- Verified in production without AI: P05/P01/P14 BLOCK with Accept disabled for blame/person/injection wording.
+- A real in-browser model download/inference was not completed in the QA sandbox (stalled at 0%). Full AI path is unverified.
