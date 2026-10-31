@@ -36,7 +36,7 @@ A 0.5B local model is small: it can miss issues, produce weak wording, or fail t
 ## Known limitations / backlog
 - Only the compiled bundle exists, so AI controls are an overlay (floating chip + drawer) rather than native React components; "Check evidence gap", "Review cause alignment" and "Draft narrative" are in the drawer instead of inline.
 - No GitHub Actions workflow yet (Pages serves the static files directly). Backlog: Vite source project, Actions deploy, Playwright E2E, richer undo history, model self-hosting evaluation.
-- The bundled router expects to run at `/`, so `index.html` temporarily rewrites the address to `/` while the app starts, then restores `/apollo-rca/`. `404.html` redirects stray paths to the app. Deep links inside the app are not supported.
+- The compiled router is configured with `basepath: /apollo-rca` (patched in the bundle), so reloads and the address bar stay on `/apollo-rca/`. `404.html` redirects stray paths. Deep links inside the app are not supported.
 
 ## Licenses
 App bundle: generated with Grok Build for h2c_Creates. Qwen2.5-0.5B-Instruct: Apache-2.0 (Alibaba Qwen team). Transformers.js: Apache-2.0 (Hugging Face). ONNX Runtime Web: MIT.

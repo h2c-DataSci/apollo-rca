@@ -3,6 +3,9 @@ import { MODEL_CONFIG, AI_VERSION } from './ai-config.js';
 import { AIService, TASK_NAMES } from './ai-service.js';
 import { WorkerTransport } from './ai-transport.js';
 import * as R from './rca-rules.js';
+import { review as detReview, mergeReview, evidenceRegistry } from './rca-integrity.js';
+import { VERSIONS } from './rca-principles.js';
+import { exportCase, validateImport } from './case-io.js';
 
 const APP_KEY = 'realitychart-intake-v1', NOTES_KEY = 'h2c-coach-notes-v1', PREF_KEY = 'h2c-coach-pref-v1';
 const svc = new AIService(new WorkerTransport());
@@ -62,66 +65,93 @@ svc.on(renderStatus);
 function card(kind, title, ...kids) { return $('div', { class: 'card ' + (kind === 'rule' ? 'rule' : '') }, $('span', { class: 'badge ' + (kind === 'rule' ? 'r' : ''), text: kind === 'rule' ? 'Rule check (deterministic)' : 'AI suggestion — investigator validation required' }), title && $('strong', { text: title }), kids); }
 function addResult(c) { results.prepend(c); }
 
-// Accept / Modify / Reject card for one suggestion
-function suggestion(task, label, text, mode, extra = {}) {
-  const body = $('div', { text }); let ta = null;
-  const c = card('ai', `${task} · ${label}`, body);
-  const mod = $('button', { class: 'b alt', type: 'button', text: 'Modify' }), acc = $('button', { class: 'b', type: 'button', text: 'Accept' }), rej = $('button', { class: 'b bad', type: 'button', text: 'Reject' });
-  mod.onclick = () => { if (ta) return; ta = $('textarea', { 'aria-label': 'Edit suggestion before accepting' }); ta.value = text; body.replaceChildren(ta); ta.focus(); };
-  rej.onclick = () => c.remove();
-  acc.onclick = () => { const v = ta ? ta.value : text; if (applyAccepted(task, mode, v, extra)) { c.querySelector('.badge').textContent = (ta ? 'Accepted (AI-assisted, modified)' : 'Accepted (AI-assisted)'); body.textContent = v; [mod, acc, rej].forEach((x) => x.remove()); c.append($('div', { class: 'note', text: mode === 'field' ? 'Applied to the field. Use Undo in this panel to revert.' : mode === 'timeline' ? 'Added as a timeline row. Verify against evidence.' : 'Saved to AI-assisted notes (not part of validated findings).' })); } };
-  c.append($('div', { class: 'row' }, acc, mod, rej)); return c;
+// Accept / Modify / Reject card. BLOCK can never be accepted; every Accept re-reviews the CURRENT text (no bypass via DOM edits).
+const ICON = { PASS: '✔ PASS', WARN: '⚠ WARN', BLOCK: '⛔ BLOCK' };
+function reviewBox(rev) {
+  if (!rev) return null; const r = rev.review || rev;
+  return $('div', { class: 'note', role: 'group', 'aria-label': `Integrity review result ${r.decision}` }, $('strong', { class: r.decision === 'BLOCK' ? 'err' : r.decision === 'WARN' ? 'warn' : '', text: `${ICON[r.decision]} · Integrity review${r.principleIds.length ? ' · ' + r.principleIds.join(', ') : ''}${r.abstained ? ' · abstained (acceptable)' : ''}` }), ...r.findings.map((f) => $('div', { text: `${f.principle}${f.hard ? ' (hard)' : ''}: ${f.message}` })), r.decision === 'BLOCK' ? $('div', { class: 'err', text: 'Direct acceptance is disabled. Modify the text, regenerate, or reject.' }) : null);
 }
+function suggestion(task, label, text, mode, extra = {}) {
+  const body = $('div', { text }); let ta = null; let rev = extra.review || null; const revHost = $('div');
+  const draw = () => { revHost.replaceChildren(reviewBox(rev) || ''); acc.disabled = !!(rev && rev.review.decision === 'BLOCK'); acc.setAttribute('aria-disabled', String(acc.disabled)); live.textContent = rev ? `Integrity review ${rev.review.decision}` : ''; };
+  const c = card('ai', `${task} · ${label}`, body, revHost);
+  const mod = $('button', { class: 'b alt', type: 'button', text: 'Modify' }), acc = $('button', { class: 'b', type: 'button', text: 'Accept' }), rej = $('button', { class: 'b bad', type: 'button', text: 'Reject' }), rr = $('button', { class: 'b alt', type: 'button', text: 'Re-review', style: 'display:none' });
+  const current = () => (ta ? ta.value : text);
+  const rereview = () => { if (extra.ctx) { rev = { text: current(), review: detReview(current(), { ...extra.ctx, state: appState(), registry: evidenceRegistry(appState()) }) }; draw(); } };
+  mod.onclick = () => { if (ta) return; ta = $('textarea', { 'aria-label': 'Edit suggestion before accepting' }); ta.value = text; body.replaceChildren(ta); rr.style.display = ''; ta.focus(); ta.addEventListener('input', () => { acc.disabled = true; }); };
+  rr.onclick = rereview;
+  rej.onclick = () => { logDecision(task, 'reject', current(), rev, extra); c.remove(); };
+  acc.onclick = () => {
+    const v = current(); if (extra.ctx) rereview(); // re-validate exactly what would be stored
+    if (rev && rev.review.decision === 'BLOCK') { live.textContent = 'Blocked: cannot accept'; return; }
+    if (rev && rev.review.decision === 'WARN' && !confirm('Integrity review raised warnings (' + rev.review.principleIds.join(', ') + '). Accept anyway as AI-assisted, unvalidated content?')) return;
+    if (applyAccepted(task, mode, v, { ...extra, userAction: ta ? 'modify-accept' : 'accept', rev })) { c.querySelector('.badge').textContent = ta ? 'Accepted (AI-assisted, modified)' : 'Accepted (AI-assisted)'; body.textContent = v; [mod, acc, rej, rr].forEach((x) => x.remove()); c.append($('div', { class: 'note', text: mode === 'field' ? 'Applied to the field. Use Undo in this panel to revert.' : mode === 'timeline' ? 'Added as a timeline row. Verify against evidence.' : mode === 'hypothesis' ? 'Saved as a HYPOTHESIS note (not a finding).' : 'Saved to AI-assisted notes (not part of validated findings).' })); }
+  };
+  c.append($('div', { class: 'row' }, acc, mod, rr, rej)); draw(); return c;
+}
+function logDecision(task, action, text, rev, extra) { const n = notes(); n.push({ task, text: '', origin: 'ai-assisted', status: 'rejected', userAction: action, at: new Date().toISOString() }); /* rejections are logged for audit but never shown as findings */ saveNotes(n.slice(-200)); }
 function applyAccepted(task, mode, v, extra) {
+  if (extra.rev && extra.rev.review.decision === 'BLOCK') return false;
+  const prov = (extra.rev && extra.provenance) ? extra.provenance : null;
+  const record = (status) => { const n = notes(); n.push({ task, text: v, origin: 'ai-assisted', status, userAction: extra.userAction, at: new Date().toISOString(), sourceIds: extra.sourceIds || [], provenance: prov, reviewerDecision: extra.rev ? extra.rev.review.decision : 'n/a', principleIds: extra.rev ? extra.rev.review.principleIds : [] }); saveNotes(n); renderNotes(); };
   if (mode === 'field') {
     const el = extra.el && document.contains(extra.el) ? extra.el : lastField; if (!el) { alert('Click the field in the app that should receive this text, then Accept again.'); return false; }
-    undoStack.push({ el, prev: el.value }); setNative(el, v); refreshUndo(); return true;
+    undoStack.push({ el, prev: el.value }); setNative(el, v); refreshUndo(); record('ai-assisted'); return true;
   }
   if (mode === 'timeline') {
     const add = [...document.querySelectorAll('main button')].find((b) => /^\s*Row\s*$/.test(b.textContent)); if (!add) { alert('Timeline "Row" button not found in this view.'); return false; }
     add.click();
     setTimeout(() => { const t = [...document.querySelectorAll('main input[placeholder="14:32"]')].pop(); if (!t) return; const e = t.parentElement.querySelector('input:not([placeholder="14:32"])'); const tm = R.parseTimeHHMM(extra.time || ''); if (tm) setNative(t, tm); if (e) setNative(e, v); const del = t.parentElement.querySelector('button'); undoStack.push({ del, el: null }); refreshUndo(); }, 60);
-    return true;
+    record('ai-assisted'); return true;
   }
-  const n = notes(); n.push({ task, text: v, origin: 'ai-assisted', at: new Date().toISOString() }); saveNotes(n); renderNotes(); return true;
+  record(mode === 'hypothesis' ? 'hypothesis' : 'ai-assisted'); return true;
 }
 const undoBtn = $('button', { class: 'b alt', type: 'button', text: 'Undo last AI insertion', disabled: '' });
 function refreshUndo() { undoBtn.disabled = !undoStack.length; }
 undoBtn.onclick = () => { const u = undoStack.pop(); if (u) { if (u.el) setNative(u.el, u.prev); else if (u.del && document.contains(u.del)) u.del.click(); } refreshUndo(); };
-function renderNotes() { const n = notes(); notesBox.replaceChildren($('strong', { text: `AI-assisted notes (${n.length}) — not validated findings` }), ...n.slice(-5).reverse().map((x) => $('div', { class: 'note', text: `[${x.task}] ${x.text}` })), $('div', { class: 'row' }, $('button', { class: 'b alt', type: 'button', text: 'Copy notes', onclick: 'void 0' }))); notesBox.querySelector('button').onclick = () => navigator.clipboard && navigator.clipboard.writeText(notes().map((x) => `[${x.task}] ${x.text}`).join('\n\n')); }
+function renderNotes() { const n = notes().filter((x) => x.status !== 'rejected'); notesBox.replaceChildren($('strong', { text: `AI-assisted notes (${n.length}) — not validated findings` }), ...n.slice(-5).reverse().map((x) => $('div', { class: 'note', text: `[${x.task}${x.status === 'hypothesis' ? ' · HYPOTHESIS' : ''}] ${x.text}` })), $('div', { class: 'row' }, $('button', { class: 'b alt', type: 'button', text: 'Copy notes' }))); notesBox.querySelector('button').onclick = () => navigator.clipboard && navigator.clipboard.writeText(n.map((x) => `[${x.task}${x.status === 'hypothesis' ? ' · HYPOTHESIS' : ''}] ${x.text}`).join('\n\n')); }
 
-// Layer A output
+// Layer A output (works without AI)
+const evItems = () => evidenceRegistry(appState()).items;
 function ruleCard() {
-  const t = tgt.value; const label = lastField ? fieldLabel(lastField) : '';
-  const isPE = /^what$/i.test(label); const rr = isPE ? R.reviewPrimaryEffect(t) : R.reviewCause(t, evidenceList());
-  const lines = rr.issues.length ? rr.issues.map((i) => $('div', { class: i.severity === 'warn' ? 'warn' : '', text: (i.severity === 'warn' ? '⚠ ' : 'ℹ ') + i.message })) : [$('div', { text: '✓ No rule concerns found.' })];
-  if (!isPE) lines.push($('div', { class: 'note', text: `Evidence support (keyword match against your entries): ${rr.evidenceSupport}. This is a rough rule check, not validation.` }));
-  addResult(card('rule', isPE ? `Primary effect check · ${rr.wordCount} words` : 'Cause statement check', lines));
+  const t = tgt.value; const label = lastField ? fieldLabel(lastField) : ''; const isPE = /^what$/i.test(label);
+  const st = appState(); const rev = isPE ? null : detReview(t, { kind: 'cause', origin: 'user', state: st });
+  const rr = isPE ? R.reviewPrimaryEffect(t) : null;
+  const lines = [];
+  if (rr) { rr.issues.forEach((i) => lines.push($('div', { class: i.severity === 'warn' ? 'warn' : '', text: (i.severity === 'warn' ? '⚠ ' : 'ℹ ') + i.message }))); if (!rr.issues.length) lines.push($('div', { text: '✓ No rule concerns found.' })); }
+  if (rev) lines.push(reviewBox({ review: rev }), $('div', { class: 'note', text: `Evidence refs available: ${evItems().map((e) => e.id).join(', ') || 'none'}. Raw notes are unrestricted; this applies to analytical findings.` }));
+  addResult(card('rule', isPE ? `Primary effect check · ${rr.wordCount} words` : 'Cause statement check (principles ' + VERSIONS.principleSet + ')', lines));
 }
 
 // AI tasks
+const INTEGRITY_TASKS = ['reviewAnalysisIntegrity', 'reviewNarrativeIntegrity', 'detectContradictions', 'detectUnsupportedClaims'];
 async function runTask(task) {
   const t = tgt.value.trim(); if (!t && !['summarizeInvestigation', 'draftInvestigationNarrative'].includes(task)) { alert('Enter or pick some text first.'); return; }
+  const st = appState(); const ev = evItems().map((e) => ({ id: e.id, text: e.text })); const tl = (st.timeline || []).filter((x) => x && x.time).map((x) => ({ id: x.id, time: x.time, description: x.description }));
   const ctx = contextText(); const el = lastField;
-  const input = { text: t, context: ctx, evidence: evidenceList(), cause: t, action: t };
+  const input = { text: t, context: ctx, evidence: ev, timeline: tl, cause: t, action: t, state: st, candidate: t, source: t };
   if (task === 'summarizeInvestigation' || task === 'draftInvestigationNarrative') input.text = ctx;
   if (task === 'reviewCorrectiveActionAlignment') { input.cause = prompt('Accepted cause this action should address:', '') || ''; }
   try {
-    const { value: v } = await svc.run(task, input);
-    const S = (l, a) => a && a.length && a.forEach((x) => addResult(suggestion(task, l, x, 'note')));
-    if (task === 'reviewPrimaryEffect' || task === 'rewritePrimaryEffect') { (v.rewrites || []).forEach((x) => addResult(suggestion(task, 'rewrite', x, 'field', { el }))); if (v.explanation || v.rationale) addResult(card('ai', task, $('div', { text: v.explanation || v.rationale }), $('div', { class: 'note', text: (v.issues || []).join(' · ') }))); S('question', v.questions); }
-    else if (task === 'extractTimelineCandidates') v.events.forEach((x) => addResult(suggestion(task, `${x.dateTimeText || 'time unknown'} · ${x.certainty}`, x.event, 'timeline', { time: x.dateTimeText })));
-    else if (task === 'reviewCauseStatement') { addResult(card('ai', 'Cause Quality Check', $('div', { text: `Observable: ${v.observable ? 'yes' : 'concern'} · Evidence support: ${v.evidenceSupport} · Blame: ${v.blameRisk} · Assumption risk: ${v.assumptionRisk}` }), $('div', { class: 'note', text: [v.ambiguity, v.causalLinkConcern].filter(Boolean).join(' · ') }))); if (v.suggestedRevision) addResult(suggestion(task, 'suggested revision', v.suggestedRevision, 'field', { el })); S('follow-up', v.questions); }
+    if (INTEGRITY_TASKS.includes(task)) {
+      const det = detReview(t, { kind: 'finding', origin: 'ai', state: st, timeline: tl });
+      let air = { unavailable: true }; try { const out = await svc.run(task, input); air = out.value.decision ? out.value : air; if (task === 'detectContradictions') addResult(card('ai', 'Contradictions (not resolved)', $('div', { text: out.value.contradictions.map((x) => `${x.claim} ↔ ${x.conflictsWith}`).join('; ') || 'None found by AI' }))); if (task === 'detectUnsupportedClaims') addResult(card('ai', 'Unsupported claims', $('div', { text: out.value.claims.map((x) => `${x.claim}: ${x.issue}`).join('; ') || 'None found by AI' }))); } catch {}
+      addResult(card('rule', ({ reviewAnalysisIntegrity: 'Integrity review', reviewNarrativeIntegrity: 'Narrative integrity review', detectContradictions: 'Contradiction check', detectUnsupportedClaims: 'Unsupported-claims check' })[task], reviewBox({ review: mergeReview(det, air) }))); return;
+    }
+    const out = await svc.run(task, input); const v = out.value; const revs = out.reviews || []; const R0 = (i) => revs[i];
+    const S = (l, a, mode = 'note') => a && a.length && a.forEach((x) => addResult(suggestion(task, l, x, mode, { provenance: out.provenance })));
+    if (task === 'reviewPrimaryEffect' || task === 'rewritePrimaryEffect') { (v.rewrites || []).forEach((x, i) => addResult(suggestion(task, 'rewrite', x, 'field', { el, review: R0(i), ctx: revs[i] && { kind: 'rewrite', origin: 'ai', sourceText: t }, provenance: out.provenance, sourceIds: [] }))); if (v.explanation || v.rationale) addResult(card('ai', task, $('div', { text: v.explanation || v.rationale }), $('div', { class: 'note', text: (v.issues || []).join(' · ') }))); S('question', v.questions); }
+    else if (task === 'extractTimelineCandidates') v.events.forEach((x, i) => addResult(suggestion(task, `${x.dateTimeText || 'time unknown'} · ${x.certainty}`, x.event, 'timeline', { time: x.dateTimeText, review: R0(i), ctx: { kind: 'summary', origin: 'ai', sourceText: x.sourceText || t, context: t }, provenance: out.provenance })));
+    else if (task === 'reviewCauseStatement') { addResult(card('ai', 'Cause Quality Check', $('div', { text: `Observable: ${v.observable ? 'yes' : 'concern'} · Evidence support: ${v.evidenceSupport} · Blame: ${v.blameRisk} · Assumption risk: ${v.assumptionRisk}` }), $('div', { class: 'note', text: [v.ambiguity, v.causalLinkConcern].filter(Boolean).join(' · ') }))); if (v.suggestedRevision) addResult(suggestion(task, 'suggested revision', v.suggestedRevision, 'field', { el, review: R0(0), ctx: { kind: 'cause', origin: 'ai', sourceText: t }, provenance: out.provenance, sourceIds: v.evidenceIds })); S('follow-up', v.questions); }
     else if (task === 'identifyEvidenceGaps') { S('gap', v.gaps); S('contradiction', v.contradictions); S('evidence to seek (category)', v.evidenceToSeek); }
     else if (task === 'generateClarifyingQuestions') S('question', v.questions);
-    else if (task === 'suggestHypothesisBranches') v.hypotheses.forEach((h) => addResult(suggestion(task, 'Hypothesis — requires evidence and investigator validation', `${h.statement}\nWhy relevant: ${h.relevance}\nEvidence required: ${h.evidenceRequired}\nDisconfirmed by: ${h.disconfirmedBy}`, 'note')));
-    else if (task === 'reviewCorrectiveActionAlignment') addResult(suggestion(task, `alignment: ${v.rating} (addresses ${v.addresses})`, `${v.rationale} ${v.residualQuestion}`.trim(), 'note'));
-    else if (task === 'summarizeInvestigation') { S('established fact', v.establishedFacts); S('causal analysis', v.causalAnalysis); S('unresolved', v.unresolved); S('corrective action', v.correctiveActions); }
-    else if (task === 'draftInvestigationNarrative') addResult(suggestion(task, 'AI-assisted draft narrative (editable)', v.narrative, 'note'));
+    else if (task === 'suggestHypothesisBranches') v.hypotheses.forEach((h, i) => addResult(suggestion(task, 'Hypothesis — requires evidence and investigator validation', `${h.statement}\nWhy relevant: ${h.relevance}\nEvidence required: ${h.evidenceRequired}\nDisconfirmed by: ${h.disconfirmedBy}`, 'hypothesis', { review: R0(i), ctx: { kind: 'hypothesis', origin: 'ai' }, provenance: out.provenance, sourceIds: h.evidenceIds })));
+    else if (task === 'reviewCorrectiveActionAlignment') addResult(suggestion(task, `alignment: ${v.rating} (addresses ${v.addresses})`, `${v.rationale} ${v.residualQuestion}`.trim(), 'note', { review: R0(0), ctx: { kind: 'rewrite', origin: 'ai', cause: input.cause, action: input.action }, provenance: out.provenance }));
+    else if (task === 'summarizeInvestigation') { const all = [['established fact', v.establishedFacts], ['causal analysis', v.causalAnalysis], ['corrective action', v.correctiveActions]]; let k = 0; all.forEach(([l, a]) => a.forEach((x) => { const rv = R0(k++); addResult(suggestion(task, l, x, 'note', { review: rv, ctx: { kind: 'summary', origin: 'ai', sourceText: input.text, context: input.text }, provenance: out.provenance })); })); S('unresolved (kept separate)', v.unresolved); }
+    else if (task === 'draftInvestigationNarrative') addResult(suggestion(task, 'AI-assisted draft narrative (editable)', v.narrative, 'note', { review: R0(0), ctx: { kind: 'narrative', origin: 'ai', sourceText: input.text, context: input.text }, provenance: out.provenance, sourceIds: v.evidenceIds }));
   } catch (e) { addResult(card('ai', 'AI Assistant is unavailable', $('div', { class: 'err', text: 'Your investigation has not been changed. You can continue in Standard Mode.' }), $('div', { class: 'note', text: svc.error || String(e.message || e) }))); }
 }
-
-const TASK_BTNS = [['reviewPrimaryEffect', 'Review wording'], ['rewritePrimaryEffect', 'Suggest rewrite'], ['extractTimelineCandidates', 'Extract timeline'], ['reviewCauseStatement', 'Ask RCA Coach'], ['identifyEvidenceGaps', 'Check evidence gap'], ['generateClarifyingQuestions', 'Clarifying questions'], ['suggestHypothesisBranches', 'Suggest hypotheses'], ['reviewCorrectiveActionAlignment', 'Review cause alignment'], ['summarizeInvestigation', 'Summarize'], ['draftInvestigationNarrative', 'Draft narrative']];
+const TASK_BTNS = [['reviewPrimaryEffect', 'Review wording'], ['rewritePrimaryEffect', 'Suggest rewrite'], ['extractTimelineCandidates', 'Extract timeline'], ['reviewCauseStatement', 'Ask RCA Coach'], ['identifyEvidenceGaps', 'Check evidence gap'], ['generateClarifyingQuestions', 'Clarifying questions'], ['suggestHypothesisBranches', 'Suggest hypotheses'], ['reviewCorrectiveActionAlignment', 'Review cause alignment'], ['summarizeInvestigation', 'Summarize'], ['draftInvestigationNarrative', 'Draft narrative'], ['reviewAnalysisIntegrity', 'Integrity review'], ['reviewNarrativeIntegrity', 'Narrative integrity'], ['detectContradictions', 'Detect contradictions'], ['detectUnsupportedClaims', 'Unsupported claims']];
 drawer.append(
   $('div', { class: 'h2cc-head' }, $('span', { text: 'RCA Coach · h2c_Creates' }), $('button', { class: 'b', type: 'button', 'aria-label': 'Close RCA Coach', text: '✕', onclick: 'void 0' })),
   $('div', { class: 'h2cc-body' },
@@ -130,23 +160,28 @@ drawer.append(
     $('div', { class: 'note', text: 'Local AI can make mistakes. Treat its output as a suggestion. Verify against evidence and investigation records before acceptance.' }),
     tgt,
     $('div', { class: 'row' }, $('button', { class: 'b alt', type: 'button', text: 'Rule check (no AI)', id: 'h2cc-rule' }), $('button', { class: 'b alt', type: 'button', text: 'Use focused field', id: 'h2cc-use' }), undoBtn, $('button', { class: 'b bad', type: 'button', text: 'Cancel AI task', id: 'h2cc-cancel' })),
-    $('div', { class: 'row' }, ...TASK_BTNS.map(([k, l]) => { const b = $('button', { class: 'b', type: 'button', 'data-ai': k, text: l, disabled: '' }); b.onclick = () => runTask(k); return b; })),
+    $('div', { class: 'row' }, ...TASK_BTNS.map(([k, l]) => { const det = ['reviewAnalysisIntegrity', 'reviewNarrativeIntegrity', 'detectContradictions', 'detectUnsupportedClaims'].includes(k); const b = $('button', det ? { class: 'b alt', type: 'button', text: l } : { class: 'b', type: 'button', 'data-ai': k, text: l, disabled: '' }); b.onclick = () => runTask(k); return b; })),
     results, notesBox,
-    $('div', { class: 'row' }, $('button', { class: 'b bad', type: 'button', text: 'Reset local data…', id: 'h2cc-reset' })),
+    $('div', { class: 'row' }, $('button', { class: 'b alt', type: 'button', text: 'Export case (JSON)', id: 'h2cc-export' }), $('button', { class: 'b alt', type: 'button', text: 'Import case (JSON)', id: 'h2cc-import' }), $('input', { type: 'file', accept: 'application/json,.json', id: 'h2cc-file', 'aria-label': 'Choose case file to import', style: 'display:none' }), $('button', { class: 'b bad', type: 'button', text: 'Reset local data…', id: 'h2cc-reset' })),
     $('div', { class: 'note', text: `Model: ${MODEL_CONFIG.id} (${MODEL_CONFIG.license}) via Transformers.js ${MODEL_CONFIG.libraryVersion} (Apache-2.0).` })));
-drawer.querySelector('.h2cc-head button').onclick = () => drawer.classList.remove('open');
+drawer.querySelector('.h2cc-head button').onclick = () => openDrawer(false);
 drawer.querySelector('#h2cc-rule').onclick = ruleCard;
 drawer.querySelector('#h2cc-use').onclick = () => { if (lastField) tgt.value = lastField.value; };
 drawer.querySelector('#h2cc-cancel').onclick = () => svc.cancel();
 drawer.querySelector('#h2cc-reset').onclick = () => { if (confirm('Delete ALL locally stored investigation data and AI notes in this browser? This cannot be undone.')) { localStorage.removeItem(APP_KEY); localStorage.removeItem(NOTES_KEY); location.reload(); } };
-pill.onclick = () => drawer.classList.toggle('open');
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') drawer.classList.remove('open'); });
+const openDrawer = (o) => { drawer.classList.toggle('open', o); if (o) drawer.querySelector('.h2cc-head button').focus(); else pill.focus(); };
+pill.onclick = () => openDrawer(!drawer.classList.contains('open'));
+drawer.setAttribute('role', 'dialog'); drawer.setAttribute('aria-modal', 'false');
+drawer.querySelector('#h2cc-export').onclick = () => { const blob = new Blob([JSON.stringify(exportCase(appState(), notes()), null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'h2c-rca-case.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+drawer.querySelector('#h2cc-import').onclick = () => drawer.querySelector('#h2cc-file').click();
+drawer.querySelector('#h2cc-file').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; const r = validateImport(await f.text()); if (!r.ok) { addResult(card('rule', 'Import rejected', $('div', { class: 'err', text: r.error + ' Nothing was changed.' }))); return; } if (!confirm('Replace the current investigation with the imported case?')) return; localStorage.setItem(APP_KEY, JSON.stringify(r.state)); saveNotes(r.notes); location.reload(); };
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer.classList.contains('open')) openDrawer(false); });
 
 // contextual chip next to the focused app field
 document.addEventListener('focusin', (e) => {
   const el = e.target; if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) || root.contains(el) || (el.type && !['text', 'search', ''].includes(el.type) && el.tagName === 'INPUT')) return;
   lastField = el; const r = el.getBoundingClientRect(); const label = fieldLabel(el); const isPE = /^what$/i.test(label);
-  chip.replaceChildren(...[isPE ? ['Review wording', 'reviewPrimaryEffect'] : el.tagName === 'TEXTAREA' ? ['Extract timeline', 'extractTimelineCandidates'] : ['Ask RCA Coach', 'reviewCauseStatement']].map(([l, k]) => { const b = $('button', { type: 'button', text: l }); b.onmousedown = (ev) => ev.preventDefault(); b.onclick = () => { tgt.value = el.value; target = k; drawer.classList.add('open'); ruleCard(); }; return b; }));
+  chip.replaceChildren(...[isPE ? ['Review wording', 'reviewPrimaryEffect'] : el.tagName === 'TEXTAREA' ? ['Extract timeline', 'extractTimelineCandidates'] : ['Ask RCA Coach', 'reviewCauseStatement']].map(([l, k]) => { const b = $('button', { type: 'button', text: l }); b.onmousedown = (ev) => ev.preventDefault(); b.onclick = () => { tgt.value = el.value; target = k; openDrawer(true); ruleCard(); }; return b; }));
   chip.style.display = 'flex'; chip.style.left = Math.max(4, Math.min(r.left, innerWidth - 170)) + 'px'; chip.style.top = Math.max(4, r.top - 30) + 'px';
 });
 document.addEventListener('scroll', () => (chip.style.display = 'none'), true);

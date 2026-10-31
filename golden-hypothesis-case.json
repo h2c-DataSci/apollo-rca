@@ -1,0 +1,1 @@
+{"candidate":"The valve obstruction caused the event.","ctx":{"kind":"finding","sourceText":"Possible valve obstruction."},"expectPrinciples":["P04"],"minDecision":"BLOCK"}

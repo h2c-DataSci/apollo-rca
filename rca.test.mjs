@@ -28,7 +28,7 @@ test('parser: enums coerced, limits applied, events always need validation', () 
   assert.equal(v.evidenceSupport, 'not-enough-information'); assert.equal(v.assumptionRisk, 'high'); assert.equal(v.questions.length, 5);
   assert.equal(parseTaskOutput('extractTimelineCandidates', '{"events":[{"event":"x","needsValidation":false}]}').events[0].needsValidation, true);
 });
-test('all ten tasks have prompts and validators', () => { assert.equal(TASK_NAMES.length, 10); for (const t of TASK_NAMES) assert.ok(PROMPTS[t]({ text: 'x' }).includes('Schema')); });
+test('all ten tasks have prompts and validators', () => { assert.equal(TASK_NAMES.length, 14); for (const t of TASK_NAMES) assert.ok(PROMPTS[t]({ text: 'x' }).includes('Schema')); });
 
 const mock = (out, cap = { supported: true, backend: 'mock' }) => ({ capability: async () => cap, load: async (p) => p(50), generate: async () => out, unload: async () => {}, cancel() {} });
 test('service: disabled by default, enable, run, standard mode unaffected', async () => {
@@ -52,3 +52,21 @@ test('base path: no root-absolute asset URLs outside /apollo-rca/', () => {
 test('no secrets / telemetry in client code', () => {
   for (const f of ['ai-config.js','ai-service.js','ai-worker.js','ai-transport.js','coach-ui.js']) { const s = readFileSync(new URL('./' + f, import.meta.url), 'utf8'); assert.ok(!/api[_-]?key|secret|token\s*[:=]|sk-[A-Za-z0-9]/i.test(s), f); assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(s), f + ' makes network calls'); }
 });
+import { exportCase, validateImport } from './case-io.js';
+test('export/import round trip, hypotheses keep status, evidence IDs survive', () => {
+  const st = { effects: [{ id: 'pe-1' }], timeline: [{ id: 't1' }], evidence: [{ id: 'e1', text: 'x' }] };
+  const out = JSON.stringify(exportCase(st, [{ task: 'suggestHypothesisBranches', text: 'h', status: 'hypothesis' }]));
+  const r = validateImport(out); assert.ok(r.ok); assert.equal(r.state.evidence[0].id, 'e1'); assert.equal(r.notes[0].status, 'hypothesis');
+});
+test('import rejects malformed, wrong format, duplicate IDs, and downgrades AI notes', () => {
+  assert.equal(validateImport('{bad').ok, false); assert.equal(validateImport('{"format":"x"}').ok, false);
+  const base = (o) => JSON.stringify({ format: 'h2c-rca-case-v1', state: { effects: [{}], evidence: o.ev }, aiNotes: o.n });
+  assert.equal(validateImport(base({ ev: [{ id: 'a', text: 't' }, { id: 'a', text: 't' }] })).ok, false);
+  assert.equal(validateImport(base({ ev: [{ id: 1 }] })).ok, false);
+  assert.equal(validateImport(base({ ev: [], n: [{ task: 't', text: 'x', status: 'VALIDATED' }] })).notes[0].status, 'ai-assisted');
+});
+test('base path: router basepath is /apollo-rca and no URL-rewrite hack remains', () => {
+  const j = readFileSync(new URL('./index-DH8ng2OV.js', import.meta.url), 'utf8'); assert.ok(j.includes('basepath:`/apollo-rca`')); assert.ok(!j.includes('basepath:``,serializationAdapters'));
+  assert.ok(!readFileSync(new URL('./index.html', import.meta.url), 'utf8').includes('replaceState'));
+});
+test('no root-absolute asset URLs in built JS', () => { const j = readFileSync(new URL('./index-DH8ng2OV.js', import.meta.url), 'utf8'); assert.ok(!/[`"']\/assets\//.test(j)); });
