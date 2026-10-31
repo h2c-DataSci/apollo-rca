@@ -53,7 +53,7 @@ function renderStatus() {
   enableBox.replaceChildren();
   if (svc.status === 'disabled' || svc.status === 'error' || svc.status === 'unsupported') {
     if (svc.status !== 'disabled') enableBox.append($('div', { class: 'err', text: 'AI Assistant is unavailable. Your investigation has not been changed. You can continue in Standard Mode.' }));
-    if (svc.status !== 'unsupported') enableBox.append($('div', { class: 'note', text: `Enabling AI downloads an open-source model (${MODEL_CONFIG.label}, ${MODEL_CONFIG.license}, about ${MODEL_CONFIG.approxDownloadMB} MB, cached in your browser) and runs it locally. Investigation content is not sent to any AI service. Only the model files are fetched from the Hugging Face model host.` }), $('button', { class: 'b', text: svc.status === 'error' ? 'Retry' : 'Enable AI Assistant', type: 'button' }));
+    if (svc.status !== 'unsupported') enableBox.append($('div', { class: 'note', text: `Enabling AI downloads an open-source model (${MODEL_CONFIG.label}, ${MODEL_CONFIG.license}, about ${MODEL_CONFIG.approxDownloadMB} MB, cached in your browser) and runs it locally. Investigation content is not sent to any AI service. Only the AI library (jsDelivr CDN) and the model files (Hugging Face) are fetched; investigation text never leaves your browser.` }), $('button', { class: 'b', text: svc.status === 'error' ? 'Retry' : 'Enable AI Assistant', type: 'button' }));
     const b = enableBox.querySelector('button'); if (b) b.onclick = () => svc.enable();
   } else if (svc.status === 'loading') {
     enableBox.append($('div', { text: `Downloading / loading model… ${svc.progress || 0}%` }), $('div', { class: 'row' }, $('button', { class: 'b bad', type: 'button', text: 'Cancel', onclick: 'void 0' })));
