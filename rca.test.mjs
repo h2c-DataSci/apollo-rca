@@ -1,0 +1,54 @@
+import test from 'node:test'; import assert from 'node:assert/strict';
+import * as R from './rca-rules.js'; import { parseTaskOutput, extractJSON, AIParseError } from './ai-parser.js';
+import { AIService, PROMPTS, TASK_NAMES } from './ai-service.js';
+import { readFileSync } from 'node:fs';
+
+test('primary effect: good', () => assert.equal(R.reviewPrimaryEffect('Oil Released').status, 'ok'));
+test('primary effect: blame/length/cause', () => { const r = R.reviewPrimaryEffect('Operator error caused by negligence of the night crew'); const c = r.issues.map((i) => i.code); assert.ok(c.includes('BLAME') && c.includes('LENGTH') && c.includes('IMPLIED_CAUSE')); });
+test('person wording flagged', () => assert.ok(R.reviewPrimaryEffect('Valve closed by John Cruz').issues.some((i) => i.code === 'PERSON')));
+test('cause review: assumption + evidence levels', () => {
+  assert.equal(R.reviewCause('Probably seal failed', []).assumptionRisk, 'medium');
+  assert.equal(R.reviewCause('Seal temperature exceeded limit', []).evidenceSupport, 'not-enough-information');
+  assert.equal(R.reviewCause('Seal temperature exceeded limit', ['Seal temperature trend exceeded limit at 14:32']).evidenceSupport, 'supported');
+  assert.equal(R.reviewCause('Pump bearing worn', ['Seal temperature rose']).evidenceSupport, 'unsupported');
+});
+test('action alignment', () => { assert.equal(R.alignAction('Seal cooling flow low', 'Restore seal cooling flow monitoring'), 'strong'); assert.equal(R.alignAction('Seal cooling flow low', 'Train staff'), 'weak'); assert.equal(R.alignAction('', 'x'), 'indeterminate'); });
+test('timeline rules never invent times', () => { const e = R.timelineFromNarrative('At 14:32 the seal temperature rose. Oil leaked afterwards.'); assert.equal(e[0].dateTimeText, '14:32'); assert.equal(e[1].dateTimeText, ''); assert.equal(e[1].certainty, 'unknown'); assert.ok(e.every((x) => x.needsValidation)); });
+test('parseTimeHHMM', () => { assert.equal(R.parseTimeHHMM('2:40 PM'), '14:40'); assert.equal(R.parseTimeHHMM('nope'), ''); });
+
+test('parser: valid, fenced, invalid', () => {
+  assert.deepEqual(parseTaskOutput('rewritePrimaryEffect', 'x ```json\n{"rewrites":["Oil Released","<b>Oil Leaked</b>"],"rationale":"r"}\n```').rewrites, ['Oil Released', 'Oil Leaked']);
+  assert.throws(() => parseTaskOutput('rewritePrimaryEffect', 'no json'), AIParseError);
+  assert.throws(() => parseTaskOutput('rewritePrimaryEffect', '{"rewrites":[]}'), AIParseError);
+  assert.throws(() => parseTaskOutput('extractTimelineCandidates', '{"events":[{"x":1}]}'), AIParseError);
+  assert.throws(() => extractJSON('{bad json}'), AIParseError);
+});
+test('parser: enums coerced, limits applied, events always need validation', () => {
+  const v = parseTaskOutput('reviewCauseStatement', JSON.stringify({ evidenceSupport: 'definitely', assumptionRisk: 'HIGH', questions: ['a','b','c','d','e','f','g'] }));
+  assert.equal(v.evidenceSupport, 'not-enough-information'); assert.equal(v.assumptionRisk, 'high'); assert.equal(v.questions.length, 5);
+  assert.equal(parseTaskOutput('extractTimelineCandidates', '{"events":[{"event":"x","needsValidation":false}]}').events[0].needsValidation, true);
+});
+test('all ten tasks have prompts and validators', () => { assert.equal(TASK_NAMES.length, 10); for (const t of TASK_NAMES) assert.ok(PROMPTS[t]({ text: 'x' }).includes('Schema')); });
+
+const mock = (out, cap = { supported: true, backend: 'mock' }) => ({ capability: async () => cap, load: async (p) => p(50), generate: async () => out, unload: async () => {}, cancel() {} });
+test('service: disabled by default, enable, run, standard mode unaffected', async () => {
+  const s = new AIService(mock('{"questions":["What was the trend?"]}')); assert.equal(s.status, 'disabled');
+  await assert.rejects(() => s.run('generateClarifyingQuestions', { text: 'x' }));
+  await s.enable(); assert.equal(s.status, 'ready');
+  assert.deepEqual((await s.run('generateClarifyingQuestions', { text: 'x' })).value.questions, ['What was the trend?']); assert.equal(s.status, 'ready');
+  await s.disable(); assert.equal(s.status, 'disabled');
+});
+test('service: invalid output -> recoverable, still ready, nothing returned', async () => {
+  const s = new AIService(mock('garbage')); await s.enable();
+  await assert.rejects(() => s.run('rewritePrimaryEffect', { text: 'x' })); assert.equal(s.status, 'ready'); assert.match(s.error, /Nothing was changed/);
+});
+test('service: unsupported device falls back', async () => { const s = new AIService(mock('', { supported: false, reason: 'no' })); await s.enable(); assert.equal(s.status, 'unsupported'); });
+test('service: load failure -> error state', async () => { const t = mock(''); t.load = async () => { throw new Error('net'); }; const s = new AIService(t); await s.enable(); assert.equal(s.status, 'error'); });
+
+test('base path: no root-absolute asset URLs outside /apollo-rca/', () => {
+  const h = readFileSync(new URL('./index.html', import.meta.url), 'utf8'); const bad = [...h.matchAll(/(?:src|href)="(\/[^"]*)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/apollo-rca/'));
+  assert.deepEqual(bad, []);
+});
+test('no secrets / telemetry in client code', () => {
+  for (const f of ['ai-config.js','ai-service.js','ai-worker.js','ai-transport.js','coach-ui.js']) { const s = readFileSync(new URL('./' + f, import.meta.url), 'utf8'); assert.ok(!/api[_-]?key|secret|token\s*[:=]|sk-[A-Za-z0-9]/i.test(s), f); assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(s), f + ' makes network calls'); }
+});
