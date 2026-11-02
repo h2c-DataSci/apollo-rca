@@ -66,13 +66,13 @@ The interactive 7-Step Workflow Navigator at the top tracks your investigation p
 ## 3. Official 7-Episode Training Series
 
 Click the `▶ 7 Videos (Training)` button in the top toolbar to access the official video curriculum:
-1. **Episode 1 of 7**: Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)
-2. **Episode 2 of 7**: Defining the Problem — The 4-Element Formula Without Placing Blame
-3. **Episode 3 of 7**: Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)
-4. **Episode 4 of 7**: Evidence; Sufficient and Necessary — How to Test and Prove Causes
-5. **Episode 5 of 7**: Effective Solutions, Implementation, and Tracking (Preventing Recurrence)
-6. **Episode 6 of 7**: Culture and Facilitation — Fix the Cause, Not the Blame
-7. **Episode 7 of 7**: Success and a New Way of Thinking (Why Success Is Planned)
+1. **Episode 1 of 7** (⏱ **55:50**): [Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)](https://youtu.be/IXXgr85wO74)
+2. **Episode 2 of 7** (⏱ **22:02**): [Defining the Problem — The 4-Element Formula Without Placing Blame](https://youtu.be/tCQuu_rvSJ8)
+3. **Episode 3 of 7** (⏱ **07:57**): [Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)](https://youtu.be/8y501jMIS7k)
+4. **Episode 4 of 7** (⏱ **06:59**): [Evidence; Sufficient and Necessary — How to Test and Prove Causes](https://youtu.be/lppZuZFyHzM)
+5. **Episode 5 of 7**: Effective Solutions, Implementation, and Tracking (Preventing Recurrence) *(Placeholder)*
+6. **Episode 6 of 7**: Culture and Facilitation — Fix the Cause, Not the Blame *(Placeholder)*
+7. **Episode 7 of 7**: Success and a New Way of Thinking (Why Success Is Planned) *(Placeholder)*
 
 ---
 

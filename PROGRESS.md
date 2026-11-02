@@ -259,11 +259,34 @@
 
 ---
 
+- [x] **Phase 13: Official YouTube Video Durations & Visual Alignment Verification**:
+  - **Updated Exact Durations for Official YouTube Training Episodes**:
+    - **Episode 1 of 7** (`IXXgr85wO74`): **`55:50`** (*Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)*)
+    - **Episode 2 of 7** (`tCQuu_rvSJ8`): **`22:02`** (*Defining the Problem — The 4-Element Formula Without Placing Blame*)
+    - **Episode 3 of 7** (`8y501jMIS7k`): **`07:57`** (*Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)*)
+    - **Episode 4 of 7** (`lppZuZFyHzM`): **`06:59`** (*Evidence; Sufficient and Necessary — How to Test and Prove Causes*)
+    - Episodes 5, 6, and 7 remain active placeholders awaiting subsequent YouTube URLs.
+  - **Verified UI Duration Display**:
+    - Both `.h2cv-duration-badge` (header badge, e.g. `⏱ 55:50 • HD`) and `.h2cv-screen-duration` (preview screen duration) correctly render the exact updated durations.
+  - **Header & Legal Showcase Visual Alignment**:
+    - Toolbar button `[▶ 7 Videos (Training)]` is positioned directly next to `[? Help]` in the header navigation.
+    - Full Executive Legal Showcase is situated at the bottom with 3D book cards, nominative fair use, safe harbor protections, and link to `https://realitycharting.com/home/`.
+  - **Automated Verification & Zero Regression**:
+    - Standalone CDP scripts `verify-durations.mjs` and `capture-dual-verification.mjs` executed and verified all elements live in headless Chrome.
+    - Captured verified visual artifacts: `screenshot-updated-durations.png`, `screenshot-header-video-button.png`, `screenshot-bottom-disclosure-verified.png`, `screenshot-drawer-durations-verified.png`.
+    - Full regression test suite: **68/68 PASS** (`node --test`).
+
+---
+
 ## 4. Verification Evidence & Artifact References
 - **Baseline Report**: [baseline-report.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/baseline-report.md)
 - **Security & Risk Report**: [security-and-risk-report.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/security-and-risk-report.md)
 - **Final Walkthrough**: [final-walkthrough-and-verification.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/final-walkthrough-and-verification.md)
 - **Visual Artifacts**:
+  - Verified Updated Video Durations (55:50, 22:02, 07:57, 06:59): `screenshot-updated-durations.png`
+  - Header Navigation with Video Button next to ? Help: `screenshot-header-video-button.png`
+  - Bottom Legal Showcase and Safe Harbor: `screenshot-bottom-disclosure-verified.png`
+  - Video Drawer with Verified Episode Durations: `screenshot-drawer-durations-verified.png`
   - Phase 3 Functional Verification (Sample Case 7/7 Ready): `screenshot-phase3-functional-verified.png`
   - Phase 4 Performance Benchmark (FCP 628ms, 1.37MB Heap): `screenshot-phase4-perf-verified.png`
   - Phase 5 Mobile Responsive Viewport (375x667): `screenshot-mobile-responsive.png`

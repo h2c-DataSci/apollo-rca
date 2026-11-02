@@ -12,7 +12,7 @@ export const VIDEO_MODULES = [
     title: 'Episode 1 of 7: Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)',
     shortTitle: 'Introduction & Fundamentals',
     subtitle: 'The Root Cause Myth, causal principles, and foundational Apollo RCA thinking',
-    duration: '11:45',
+    duration: '55:50',
     defaultYtId: 'IXXgr85wO74', // Official Video 1: https://youtu.be/IXXgr85wO74
     targetId: 'section-define',
     summary: 'Dismantle the single root cause myth: problems are never caused by a single isolated event, but by a confluence of necessary and sufficient causes. Master foundational causal principles before charting.',
@@ -29,7 +29,7 @@ export const VIDEO_MODULES = [
     title: 'Episode 2 of 7: Defining the Problem — The 4-Element Formula Without Placing Blame',
     shortTitle: 'Defining the Problem',
     subtitle: 'The 4-Element Formula (What, Where, When, Significance) without placing blame',
-    duration: '14:20',
+    duration: '22:02',
     defaultYtId: 'tCQuu_rvSJ8', // Official Video 2: https://youtu.be/tCQuu_rvSJ8
     targetId: 'section-define',
     summary: 'Master the 4-element problem definition formula: Primary Effect (What), Location (Where), Time (When), and Actual/Potential Significance. Never place blame or ask "why".',
@@ -46,7 +46,7 @@ export const VIDEO_MODULES = [
     title: 'Episode 3 of 7: Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)',
     shortTitle: 'Causal Relationships & RealityChart',
     subtitle: 'Actions, Conditions, Cause Sets, AND/OR logic gates, and Stop Reasons',
-    duration: '18:50',
+    duration: '07:57',
     defaultYtId: '8y501jMIS7k', // Official Video 3: https://youtu.be/8y501jMIS7k
     targetId: 'realitychart',
     summary: 'Construct the RealityChart by pairing action causes with condition causes at each causal step. Connect effects to causes using strict AND/OR logic, and identify valid stop reasons.',
@@ -63,7 +63,7 @@ export const VIDEO_MODULES = [
     title: 'Episode 4 of 7: Evidence; Sufficient and Necessary — How to Test and Prove Causes',
     shortTitle: 'Evidence: Sufficient & Necessary',
     subtitle: 'Necessary & sufficient testing, 4 quality tiers, proving and corroborating causes',
-    duration: '13:15',
+    duration: '06:59',
     defaultYtId: 'lppZuZFyHzM', // Official Video 4: https://youtu.be/lppZuZFyHzM
     targetId: 'section-evidence',
     summary: 'Rigorously test causes using necessary and sufficient logic. Gather, anchor, and tier physical and data evidence across all 4 quality levels to prove causal claims.',

@@ -1,6 +1,6 @@
 import { KB, KB_VERSION } from './help-kb.js?v=15';
 import { DIAGRAMS, DIAGRAM_FOR } from './help-diagrams.js?v=15';
-import './h2c-videos.js?v=1';
+import './h2c-videos.js?v=2';
 const SITE = 'https://www.haroldhenrycabanilla.com';
 const css = document.createElement('style');
 css.textContent = `
