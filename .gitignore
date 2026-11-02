@@ -1,0 +1,25 @@
+# Environment and virtual environments
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# Node dependencies and build artifacts
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+.vscode/
+.idea/
+
+# Local diagnostic and scratch files
+screenshot-*.png
+*.bak
+*.orig

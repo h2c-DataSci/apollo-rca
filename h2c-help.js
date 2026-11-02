@@ -21,11 +21,11 @@ css.textContent = `
 .h2ch-dev a{color:#0a5c45;font-weight:700}
 .h2c-devfoot{background:linear-gradient(180deg,#0a5c45,#043d2e);color:#f1d16b;text-align:center;padding:12px 10px;font:14px system-ui;border-top:3px solid #c9a227}
 .h2c-devfoot a{color:#f6dd7a;font-weight:700}`;
-document.head.append(css);
+
 const el = (t, props = {}, ...kids) => { const n = Object.assign(document.createElement(t), props); n.append(...kids); return n; };
 const devLine = () => { const d = el('span'); d.append('Developed by Engr. Harold Henry G. Cabanilla · ', el('a', { href: SITE, target: '_blank', rel: 'noopener noreferrer', textContent: 'www.haroldhenrycabanilla.com' })); return d; };
-// footer credit
-function ensureFoot() { if (document.querySelector('.h2c-devfoot')) return; const f = el('footer', { className: 'h2c-devfoot' }); f.append('H2C Root Cause Analyst · h2c_Creates · ', devLine()); document.documentElement.append(f); }
+
+function ensureFoot() { if (document.querySelector('.h2c-devfoot') || !document.body) return; const f = el('footer', { className: 'h2c-devfoot' }); f.append('H2C Root Cause Analyst · h2c_Creates · ', devLine()); document.body.append(f); }
 let panel, back, fab, lastFocus;
 const score = (a, terms) => { const h = (a.title + ' ' + a.tags).toLowerCase(), b = a.body.toLowerCase(); let s = 0; for (const t of terms) { if (h.includes(t)) s += 5; if (b.includes(t)) s += 1; else if (!h.includes(t)) return 0; } return s; };
 function close() { panel?.remove(); back?.remove(); panel = back = null; lastFocus?.focus(); }
@@ -47,9 +47,26 @@ function open() {
   s.oninput = () => list(s.value); list('');
   panel.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); if (e.key === 'Tab') { const f = [...panel.querySelectorAll('button,input,a')]; const i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f.at(-1).focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } } });
 }
-function mount() { if (!fab || !fab.isConnected) { fab = el('button', { className: 'h2ch-fab', type: 'button', textContent: '? Help' }); fab.setAttribute('aria-label', 'Open help and knowledge base'); fab.onclick = open; document.documentElement.append(fab); } ensureFoot(); }
-mount(); new MutationObserver(() => { if (!fab?.isConnected || !document.querySelector('.h2c-devfoot')) mount(); }).observe(document.documentElement, { childList: true });
+
+function mount() { if (!document.body) return; if (!fab || !fab.isConnected) { fab = el('button', { className: 'h2ch-fab', type: 'button', textContent: '? Help' }); fab.setAttribute('aria-label', 'Open help and knowledge base'); fab.onclick = open; document.body.append(fab); } ensureFoot(); }
 
 // Toolbar Help button next to New analysis (reuses its styling), alongside the floating button.
 function toolbar() { const nb = [...document.querySelectorAll('button')].find((b) => /^\s*New analysis\s*$/.test(b.textContent)); if (!nb || document.querySelector('.h2ch-tb')) return; const b = nb.cloneNode(false); b.className = nb.className.replace('h2c-new-prominent', '') + ' h2ch-tb'; b.type = 'button'; b.textContent = '? Help'; b.setAttribute('aria-label', 'Open help and knowledge base'); b.onclick = open; nb.parentNode.insertBefore(b, nb); }
-new MutationObserver(toolbar).observe(document.documentElement, { childList: true, subtree: true }); toolbar();
+
+function init() {
+  if (!document.head.contains(css)) document.head.append(css);
+  mount();
+  toolbar();
+  if (document.body) {
+    new MutationObserver(() => {
+      if (!fab?.isConnected || !document.querySelector('.h2c-devfoot')) mount();
+      toolbar();
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => setTimeout(init, 50));
+} else {
+  setTimeout(init, 50);
+}
