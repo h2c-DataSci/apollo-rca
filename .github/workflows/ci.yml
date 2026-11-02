@@ -1,0 +1,37 @@
+name: CI - Apollo RCA Test & Security Suite
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Node ${{ matrix.node-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run Test Suite (node --test)
+        run: node --test
+
+      - name: Verify Single-Source Model Invariant
+        run: node --test ai-pipeline.test.mjs
+
+      - name: Verify Local AI Daemon Bridge
+        run: node --test local-ai-bridge.test.mjs
+
+      - name: Verify End-to-End Workflow & Integrity
+        run: node --test e2e-workflow.test.mjs
