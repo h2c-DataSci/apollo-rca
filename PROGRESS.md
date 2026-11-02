@@ -22,6 +22,7 @@
 | **Phase 7** | AI Coach Resilience & Session Stabilization | **COMPLETED** | 100% | Resolved recurring "AI loads then drops" issue: increased token budget (160->384), resilient auto-repairing JSON parser, preserved `ready` state with Apollo rule fallback |
 | **Phase 8** | Legal Disclosure, Trademark Attribution & Safe Harbor | **COMPLETED** | 100% | Added bold red text disclosure, Dean L. Gano authorship attribution, trademarks notice (Apollo RCA™, RealityCharting®), official website link, and nominative fair use safe harbor |
 | **Phase 9** | 7-Step YouTube Video Training Companion Hub | **COMPLETED** | 100% | Added "? Help"-style toolbar button & floating FAB for 7 YouTube training videos, interactive slide-out video drawer, responsive 16:9 player cards, methodology guides, and step deep-links |
+| **Phase 10** | Official Video Training Modules 1–4 Integration | **COMPLETED** | 100% | Integrated user's 4 official YouTube video URLs into modules 1–4, added direct "Watch on YouTube" links, implemented localStorage auto-migration, verified in headless CDP |
 
 ---
 
@@ -186,6 +187,22 @@
   - Captured screenshots: `screenshot-video-training-main.png`, `screenshot-video-training-drawer.png`, `screenshot-video-step3-filtered.png`.
   - 100% test compatibility: All 54 tests pass (`node --test`).
 
+### Phase 10: Official Video Training Modules 1–4 Integration (Completed)
+- [x] **Configured Official YouTube Video URLs for Steps 1 through 4**:
+  - Step 1 (Problem Definition & Primary Effects): `https://youtu.be/IXXgr85wO74` (ID: `IXXgr85wO74`)
+  - Step 2 (Timeline Construction & Event Sequencing): `https://youtu.be/tCQuu_rvSJ8` (ID: `tCQuu_rvSJ8`)
+  - Step 3 (Reality Tree Cause-and-Effect Logic): `https://youtu.be/8y501jMIS7k` (ID: `8y501jMIS7k`)
+  - Step 4 (Evidence Gathering & Quality Tiering): `https://youtu.be/lppZuZFyHzM` (ID: `lppZuZFyHzM`)
+  - Steps 5, 6, and 7 remain ready placeholders waiting for subsequent user URLs.
+- [x] **Client-Side Migration & Persistence**:
+  - Updated `getStoredVideos()` in `h2c-videos.js` to automatically migrate existing `localStorage` (`h2c-youtube-training-videos-v1`) entries from legacy `dQw4w9WgXcQ` placeholders to the new official video IDs.
+- [x] **Enhanced Player & Direct Links**:
+  - Added a direct `Watch on YouTube →` external link button (`https://youtu.be/${ytId}`) alongside `✏️ Edit URL` and `🎯 Jump to Step in Workspace`, giving users immediate flexibility to view in YouTube natively or play embedded in-app.
+- [x] **Automated CDP Verification & Test Suite**:
+  - Standalone script `scratch/verify-updated-videos.mjs` executed via Chrome DevTools Protocol.
+  - Captured visual verification screenshot: `screenshot-video-training-updated.png`.
+  - Full regression test suite: All 54 tests PASS (`node --test`).
+
 ---
 
 ## 4. Verification Evidence & Artifact References
@@ -193,6 +210,7 @@
 - **Security & Risk Report**: [security-and-risk-report.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/security-and-risk-report.md)
 - **Final Walkthrough**: [final-walkthrough-and-verification.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/final-walkthrough-and-verification.md)
 - **Visual Artifacts**:
+  - Official Videos 1–4 Updated Training Drawer (Verified): `screenshot-video-training-updated.png`
   - Video Training Main Page with Launch Buttons (Verified): `screenshot-video-training-main.png`
   - Video Training Drawer with 7 Step Modules (Verified): `screenshot-video-training-drawer.png`
   - Video Training Step 3 Filtered View (Verified): `screenshot-video-step3-filtered.png`

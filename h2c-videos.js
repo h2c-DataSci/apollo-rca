@@ -11,7 +11,7 @@ export const VIDEO_MODULES = [
     title: 'Step 1: Problem Definition & Primary Effects',
     subtitle: 'Noun-verb formulation, What, Where, When, Significance, avoiding blame & why',
     duration: '11:45',
-    defaultYtId: 'dQw4w9WgXcQ', // Placeholder: easily replaced by user
+    defaultYtId: 'IXXgr85wO74', // Official Video 1: https://youtu.be/IXXgr85wO74
     targetId: 'section-define',
     summary: 'Define up to three primary effects using strict 2-4 word noun-verb statements. Establish exact facility/equipment location and time without speculating on why or assigning blame.',
     keyPoints: [
@@ -26,7 +26,7 @@ export const VIDEO_MODULES = [
     title: 'Step 2: Timeline Construction & Event Sequencing',
     subtitle: 'Ordering facts chronologically, actions vs conditions, establishing sequence',
     duration: '14:20',
-    defaultYtId: 'dQw4w9WgXcQ',
+    defaultYtId: 'tCQuu_rvSJ8', // Official Video 2: https://youtu.be/tCQuu_rvSJ8
     targetId: 'section-timeline',
     summary: 'Build a verifiable chronological timeline of events leading to the incident. Differentiate between transitional action causes and pre-existing condition causes.',
     keyPoints: [
@@ -41,7 +41,7 @@ export const VIDEO_MODULES = [
     title: 'Step 3: Reality Tree Cause-and-Effect Logic',
     subtitle: 'Building the reality tree, AND/OR logic gates, cause sets, leaf terminators',
     duration: '18:50',
-    defaultYtId: 'dQw4w9WgXcQ',
+    defaultYtId: '8y501jMIS7k', // Official Video 3: https://youtu.be/8y501jMIS7k
     targetId: 'realitychart',
     summary: 'Construct the reality tree connecting each effect to its necessary and sufficient causes. Apply AND gates for co-existing causes and OR branches for hypotheses.',
     keyPoints: [
@@ -56,7 +56,7 @@ export const VIDEO_MODULES = [
     title: 'Step 4: Evidence Gathering & Quality Tiering',
     subtitle: 'Attaching physical evidence, the 4 quality tiers, validating cause nodes',
     duration: '13:15',
-    defaultYtId: 'dQw4w9WgXcQ',
+    defaultYtId: 'lppZuZFyHzM', // Official Video 4: https://youtu.be/lppZuZFyHzM
     targetId: 'section-evidence',
     summary: 'Attach verifiable evidence items to every cause node. Classify evidence by quality tier: Sensed, Inferred, Intuited, or Emotional.',
     keyPoints: [
@@ -71,7 +71,7 @@ export const VIDEO_MODULES = [
     title: 'Step 5: Logic Verification & The 15 Analysis Principles',
     subtitle: 'Automated integrity testing, contradiction detection, eliminating bias',
     duration: '16:30',
-    defaultYtId: 'dQw4w9WgXcQ',
+    defaultYtId: 'PLACEHOLDER_STEP5',
     targetId: 'qa-stress-suite',
     summary: 'Rigorously audit the analysis against the 15 Apollo Analysis Principles. Verify that hypotheses are not treated as proven findings until corroborated.',
     keyPoints: [
@@ -86,7 +86,7 @@ export const VIDEO_MODULES = [
     title: 'Step 6: Solution Action Matrix & Prevention Criteria',
     subtitle: 'Developing corrective actions that break cause paths, ROI & control',
     duration: '15:10',
-    defaultYtId: 'dQw4w9WgXcQ',
+    defaultYtId: 'PLACEHOLDER_STEP6',
     targetId: 'section-solutions',
     summary: 'Develop targeted corrective actions designed to break specific cause-and-effect paths. Score each solution against the four Apollo prevention criteria.',
     keyPoints: [
@@ -101,7 +101,7 @@ export const VIDEO_MODULES = [
     title: 'Step 7: Implementation & Recurrence Tracking',
     subtitle: 'Assigning owners, deadlines, ROI verification, long-term audits',
     duration: '10:45',
-    defaultYtId: 'dQw4w9WgXcQ',
+    defaultYtId: 'PLACEHOLDER_STEP7',
     targetId: 'section-track',
     summary: 'Assign single accountable owners and firm deadlines for every accepted action. Establish recurring audits to ensure solutions remain active and effective.',
     keyPoints: [
@@ -116,9 +116,18 @@ export const VIDEO_MODULES = [
 function getStoredVideos() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
+    const data = raw ? JSON.parse(raw) : {};
+    // Ensure newly assigned official video IDs take effect over legacy placeholders
+    VIDEO_MODULES.forEach(m => {
+      if (!data[m.step] || data[m.step] === 'dQw4w9WgXcQ') {
+        data[m.step] = m.defaultYtId;
+      }
+    });
+    return data;
   } catch {
-    return {};
+    const defaults = {};
+    VIDEO_MODULES.forEach(m => defaults[m.step] = m.defaultYtId);
+    return defaults;
   }
 }
 
@@ -615,9 +624,15 @@ export function openVideoDrawer(targetStep = null) {
           <button type="button" class="h2cv-jump-btn" data-target="${mod.targetId}">
             🎯 Jump to Step ${mod.step} in Workspace &rarr;
           </button>
-          <button type="button" class="h2cv-edit-btn" data-step="${mod.step}">
-            ✏️ Set Custom YouTube Link
-          </button>
+          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            <a href="https://youtu.be/${ytId}" target="_blank" rel="noopener noreferrer" class="h2cv-yt-link-btn" style="display: inline-flex; align-items: center; gap: 5px; background: #fff5f5; border: 1px solid #fca5a5; color: #dc2626; border-radius: 6px; padding: 6px 10px; font: 700 11.5px system-ui; text-decoration: none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#dc2626" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
+              Watch on YouTube &rarr;
+            </a>
+            <button type="button" class="h2cv-edit-btn" data-step="${mod.step}">
+              ✏️ Edit URL
+            </button>
+          </div>
         </div>
       `;
 
