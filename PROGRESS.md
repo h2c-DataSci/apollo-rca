@@ -19,6 +19,7 @@
 | **Phase 4** | UX, Visual Design & Accessibility | **COMPLETED** | 100% | WCAG 2.2 AA audit passed (contrast >4.5:1), keyboard Escape trap verified, zero network leakage in Standard Mode |
 | **Phase 5** | Implementation, GitHub Hygiene & Verification | **COMPLETED** | 100% | Feature branch created, clean conventional commits, verified headless CDP browser test, Final Walkthrough artifact published |
 | **Phase 6** | Interactive 7-Step Workflow & Color Validation | **COMPLETED** | 100% | Transformed static boxes into interactive workflow hub with hover/click effects, status pills, progress bar, and real-time color validation (Red/Amber/Emerald) |
+| **Phase 7** | AI Coach Resilience & Session Stabilization | **COMPLETED** | 100% | Resolved recurring "AI loads then drops" issue: increased token budget (160->384), resilient auto-repairing JSON parser, preserved `ready` state with Apollo rule fallback |
 
 ---
 
@@ -109,6 +110,27 @@
   - Valid primary effect typing validation captured
   - Blame detection alert captured
   - Sample case workflow state captured
+
+### Phase 7: AI Coach Resilience & Session Stabilization (Completed)
+- [x] **Diagnosed Root Cause of "AI loads then drops"**:
+  1. *Token Budget Exhaustion*: Web Worker was configured with `max_new_tokens: 160`. When generating structured schemas (e.g., narratives, hypotheses, timelines), the output exceeded 160 tokens and was cut off abruptly mid-string without closing quotes, brackets, or braces.
+  2. *Brittle JSON Parsing*: `qt(e)` in `routes-v13.js` attempted a strict `JSON.parse(t.slice(n, r + 1))`. When `r <= n` (no closing brace) or when syntax irregularities occurred, it threw an unrecoverable exception: `"The model returned JSON that could not be parsed."`.
+  3. *Catastrophic State Drop*: The catch handler in `F` caught the exception and invoked `o('error')`. Setting the state to `'error'` switched the UI status pill to `AI Error`, reverted the action button back to `Enable AI Assistant`, and completely discarded the loaded 786 MB ONNX model session, requiring a full re-download and re-initialization.
+- [x] **Implemented Resilient Parser & Token Expansion**:
+  - `rca-coach.worker-v13.js`: Expanded inference token budget `max_new_tokens` from 160 to 384 tokens (matching `MODEL_CONFIG.generation.max_new_tokens` in `ai-config.js`).
+  - `routes-v13.js`: Replaced `qt(e)` with `robustParseJSON`:
+    - Strips `<think>...</think>` tags and markdown code fences.
+    - Automatically cleans trailing commas `,\s*([}\]])` and unescaped newlines.
+    - Balances unclosed double quotes and auto-appends missing closing brackets `]` and braces `}` for truncated outputs.
+    - Fallback regex extraction: If `JSON.parse` still fails, extracts known fields (`summary`, `proposedText`, `explanation`, `quality`, `issues`, `questions`, `hypotheses`, `events`) directly via targeted regular expressions.
+  - `routes-v13.js`: Updated task execution error handler `F`:
+    - Changed `o('error')` to `o('ready')` so the model session is never dropped.
+    - Instantly falls back to Apollo heuristic rule recommendation `m([t])`.
+    - Informs the user non-blockingly: `"${e.message} Apollo rule recommendation applied. AI Assistant remains ready."`.
+- [x] **Verification**:
+  - Created standalone unit test suite `scratch/test-robust-parser.mjs` verifying auto-repair of truncated JSON, trailing commas, markdown fences, and regex fallback.
+  - Full automated regression test suite: **54/54 PASS** (0 failures, 100% test pass rate).
+  - Headless browser verification: Confirmed RCA Coach opens cleanly, controls are responsive, and session state persists.
 
 ---
 
