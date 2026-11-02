@@ -23,6 +23,7 @@
 | **Phase 8** | Legal Disclosure, Trademark Attribution & Safe Harbor | **COMPLETED** | 100% | Added bold red text disclosure, Dean L. Gano authorship attribution, trademarks notice (Apollo RCA™, RealityCharting®), official website link, and nominative fair use safe harbor |
 | **Phase 9** | 7-Step YouTube Video Training Companion Hub | **COMPLETED** | 100% | Added "? Help"-style toolbar button & floating FAB for 7 YouTube training videos, interactive slide-out video drawer, responsive 16:9 player cards, methodology guides, and step deep-links |
 | **Phase 10** | Official Video Training Modules 1–4 Integration | **COMPLETED** | 100% | Integrated user's 4 official YouTube video URLs into modules 1–4, added direct "Watch on YouTube" links, implemented localStorage auto-migration, verified in headless CDP |
+| **Phase 11** | Official 7 Episode Titles & Executive Bottom Showcase | **COMPLETED** | 100% | Updated 7 video training modules to exact official episode titles, replaced top harsh red banner with sleek attribution ribbon and toolbar button, relocated full legal attribution to executive bottom showcase with book cards |
 
 ---
 
@@ -203,6 +204,39 @@
   - Captured visual verification screenshot: `screenshot-video-training-updated.png`.
   - Full regression test suite: All 54 tests PASS (`node --test`).
 
+### Phase 11: Official 7 Episode Titles & Executive Bottom Showcase Architecture (Completed)
+- [x] **Configured Exact Official Titles for All 7 Video Modules**:
+  - **Episode 1 of 7**: *Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)*
+  - **Episode 2 of 7**: *Defining the Problem — The 4-Element Formula Without Placing Blame*
+  - **Episode 3 of 7**: *Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)*
+  - **Episode 4 of 7**: *Evidence; Sufficient and Necessary — How to Test and Prove Causes*
+  - **Episode 5 of 7**: *Effective Solutions, Implementation, and Tracking (Preventing Recurrence)*
+  - **Episode 6 of 7**: *Culture and Facilitation — Fix the Cause, Not the Blame*
+  - **Episode 7 of 7**: *Success and a New Way of Thinking (Why Success Is Planned)*
+- [x] **Refactored Video Drawer UI**:
+  - Updated tabs to `All 7 Episodes`, `Ep 1`, `Ep 2`, `Ep 3`, `Ep 4`, `Ep 5`, `Ep 6`, `Ep 7`.
+  - Updated card pills to `Episode {N} of 7` with exact official titles and tailored subtitles.
+  - Contextual workspace jump buttons (e.g. `🎯 Jump to Problem Definition`, `🎯 Jump to Reality Tree`, etc.).
+- [x] **Creative Legal Disclosure & Safe Harbor Redesign**:
+  - **Eliminated Top Visual Fatigue**: Removed the harsh, eye-straining red-bordered warning banner from above the 7-Step Workflow Navigator.
+  - **Added Sleek Top Attribution Ribbon (`.h2c-top-ribbon`)**: Compact, eye-friendly cream/gold badge with link to `realitycharting.com` and `📜 Full Legal Notice & Safe Harbor ↓` smooth-scrolling button.
+  - **Added Top Toolbar Button (`.h2c-tb-legal`)**: `⚖️ Legal & Trademarks` button positioned in header navigation next to `? Help` and `▶ 7 Videos (Official Series)`.
+  - **Executive Bottom Showcase (`#legal-disclosure`)**:
+    - Relocated full legal disclosure to the bottom of `<main>`, seamlessly situated before the footer.
+    - Designed with warm parchment, subtle gold trim, and deep burgundy accents instead of harsh neon red.
+    - **Dual Book Showcase**: Dedicated 3D-styled cards for Dean L. Gano's foundational books (*"Apollo Root Cause Analysis: A New Way of Thinking"* and *"RealityCharting: Seven Steps to Effective Problem-Solving"*).
+    - **Official Enterprise Recommendation**: Clean emerald/gold card with high-visibility CTA to `https://realitycharting.com/home/`.
+    - **Comprehensive Legal Protections**: Explicit Nominative Fair Use (15 U.S.C. § 1125 / Lanham Act), MIT License, non-affiliation, non-infringement, and warranty disclaimers protecting the user from copyright/trademark claims.
+    - **Ergonomics**: Includes smooth-scrolling `↑ Back to Top of Analysis` button and focus pulse animation when jumped to from the top ribbon or toolbar.
+- [x] **Automated CDP Verification & 100% Test Passing**:
+  - Standalone script `scratch/verify-redone-ux.mjs` executed via Chrome DevTools Protocol.
+  - Verified 0 legacy red banners, active top ribbon, active toolbar button, active bottom showcase with 2 book cards, and all 7 official episode titles.
+  - Captured verified visual screenshots:
+    - `screenshot-top-clean-ribbon.png`
+    - `screenshot-bottom-legal-showcase.png`
+    - `screenshot-videos-official-titles.png`
+  - Automated test suite: **54/54 PASS** (`node --test`).
+
 ---
 
 ## 4. Verification Evidence & Artifact References
@@ -210,6 +244,9 @@
 - **Security & Risk Report**: [security-and-risk-report.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/security-and-risk-report.md)
 - **Final Walkthrough**: [final-walkthrough-and-verification.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/final-walkthrough-and-verification.md)
 - **Visual Artifacts**:
+  - Clean Top View with Attribution Ribbon (Verified): `screenshot-top-clean-ribbon.png`
+  - Executive Bottom Legal Showcase with Book Cards (Verified): `screenshot-bottom-legal-showcase.png`
+  - Video Training Drawer with 7 Official Episode Titles (Verified): `screenshot-videos-official-titles.png`
   - Official Videos 1–4 Updated Training Drawer (Verified): `screenshot-video-training-updated.png`
   - Video Training Main Page with Launch Buttons (Verified): `screenshot-video-training-main.png`
   - Video Training Drawer with 7 Step Modules (Verified): `screenshot-video-training-drawer.png`

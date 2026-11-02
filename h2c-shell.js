@@ -13,155 +13,285 @@ css.textContent = `
 .h2c-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:10000;background:#043d2e;color:#f1d16b;border:2px solid #c9a227;border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;font:600 14px system-ui;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 .h2c-toast button{background:#f1d16b;color:#043d2e;border:0;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer}.h2c-toast button:focus-visible{outline:3px solid #fff}
 
-/* Bold Red Disclosure & Legal Attribution Banner */
-.h2c-legal-banner {
-  margin-bottom: 1.5rem;
-  background: #fff8f8;
-  border: 2px solid #dc2626;
-  border-left: 8px solid #b91c1c;
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 4px 18px rgba(220, 38, 38, 0.08), 0 1px 3px rgba(0,0,0,0.04);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: #7f1d1d;
-  line-height: 1.5;
-}
-.h2c-legal-topline {
+/* Elegant, Eye-Friendly Methodology & Attribution Ribbon (Top) */
+.h2c-top-ribbon {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  background: #fffdf9;
+  border: 1px solid #e7ded0;
+  border-left: 4px solid #c9a227;
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin-top: 10px;
   margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1.5px dashed #fca5a5;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12.5px;
+  color: #3e331c;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
 }
-.h2c-legal-badge {
+.h2c-top-ribbon-text {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #dc2626;
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 5px 12px;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+  flex-wrap: wrap;
 }
-.h2c-legal-subbadge {
-  font-size: 11px;
-  font-weight: 800;
-  color: #dc2626;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-.h2c-legal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.h2c-legal-bold-red {
-  color: #dc2626;
-  font-weight: 800;
+.h2c-top-ribbon-badge {
+  background: #043d2e;
+  color: #f1d16b;
+  font-weight: 700;
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 4px;
   letter-spacing: 0.02em;
 }
-.h2c-legal-author-box {
-  background: #ffffff;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  padding: 12px 14px;
+.h2c-top-ribbon-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
-.h2c-legal-author-text {
-  margin: 4px 0 8px 0;
-  font-size: 13.5px;
-  color: #991b1b;
-  line-height: 1.5;
+.h2c-top-ribbon-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #043d2e !important;
+  font-weight: 700;
+  text-decoration: underline !important;
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
 }
-.h2c-legal-book-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 6px 0 10px 0;
+.h2c-top-ribbon-link:hover {
+  background: #f0f7f3;
+  color: #065f46 !important;
+}
+.h2c-top-ribbon-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fbf7ee;
+  border: 1px solid #c9a227;
+  color: #634a12;
+  font-weight: 700;
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.h2c-top-ribbon-jump:hover {
+  background: #c9a227;
+  color: #043d2e;
+  transform: translateY(-1px);
+}
+
+/* Toolbar button for Legal & Trademarks */
+.h2c-tb-legal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffdfa;
+  border: 1.5px solid #d4c5a9;
+  color: #4a3d24;
+  font: 700 13px system-ui, -apple-system, sans-serif;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.h2c-tb-legal:hover {
+  background: #fbf7ee;
+  border-color: #c9a227;
+  color: #043d2e;
+  transform: translateY(-1px);
+}
+
+/* Executive Bottom Legal Showcase & Safe Harbor */
+.h2c-legal-showcase {
+  margin-top: 3.5rem;
+  margin-bottom: 2rem;
+  background: #fffdf9;
+  border: 1.5px solid #dcd3be;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(4, 61, 46, 0.05), 0 1px 4px rgba(0,0,0,0.02);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #2d3748;
+  line-height: 1.55;
+  overflow: hidden;
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.h2c-legal-showcase.h2c-pulse-focus {
+  border-color: #c9a227;
+  box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.3), 0 8px 30px rgba(4, 61, 46, 0.12);
+}
+.h2c-legal-accent-bar {
+  height: 5px;
+  background: linear-gradient(90deg, #7f1d1d 0%, #c9a227 40%, #043d2e 100%);
+}
+.h2c-legal-showcase-inner {
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 13px;
-  color: #991b1b;
+  gap: 18px;
 }
-.h2c-legal-book-list li {
-  padding-left: 8px;
-  border-left: 3px solid #dc2626;
-  font-weight: 600;
-}
-.h2c-legal-tm-text {
-  margin: 0;
-  font-size: 12px;
-  color: #b91c1c;
-  line-height: 1.45;
-  background: #fef2f2;
-  padding: 6px 10px;
-  border-radius: 6px;
-}
-.h2c-legal-official-box {
-  background: linear-gradient(180deg, #fff5f5 0%, #fee2e2 100%);
-  border: 2px solid #ef4444;
-  border-radius: 8px;
-  padding: 14px 16px;
-}
-.h2c-legal-official-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-.h2c-official-icon {
-  font-size: 22px;
-  line-height: 1;
-}
-.h2c-legal-official-desc {
-  margin: 4px 0 10px 0;
-  font-size: 13px;
-  color: #7f1d1d;
-  font-weight: 600;
-  line-height: 1.45;
-}
-.h2c-legal-cta-row {
+.h2c-legal-header-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px solid #ece4d2;
 }
-.h2c-legal-cta-btn {
+.h2c-legal-header-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #1a202c;
+  letter-spacing: -0.01em;
+}
+.h2c-legal-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.h2c-legal-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  letter-spacing: 0.02em;
+}
+.h2c-legal-pill-burgundy { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.h2c-legal-pill-gold { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.h2c-legal-pill-green { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+
+/* Dual Book Showcase Cards */
+.h2c-books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+.h2c-book-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fbf9f4;
+  border: 1px solid #e7ded0;
+  border-left: 4px solid #c9a227;
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.h2c-book-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+.h2c-book-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 2px 0;
+}
+.h2c-book-pub {
+  font-size: 11.5px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Official Recommendation Section */
+.h2c-official-promo-card {
+  background: linear-gradient(180deg, #f0fdf4 0%, #e6f7ec 100%);
+  border: 1.5px solid #86efac;
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.h2c-official-promo-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.h2c-official-promo-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #065f46;
+}
+.h2c-official-promo-desc {
+  font-size: 13px;
+  color: #166534;
+  line-height: 1.5;
+  margin: 0;
+}
+.h2c-official-cta-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+  background: linear-gradient(180deg, #059669 0%, #047857 100%);
   color: #ffffff !important;
   font-weight: 800;
   font-size: 13.5px;
-  padding: 9px 18px;
+  padding: 10px 18px;
   border-radius: 8px;
   text-decoration: none !important;
-  box-shadow: 0 3px 10px rgba(185, 28, 28, 0.3);
+  box-shadow: 0 3px 10px rgba(5, 150, 105, 0.25);
   transition: all 0.2s ease;
+  width: fit-content;
 }
-.h2c-legal-cta-btn:hover {
-  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+.h2c-official-cta-btn:hover {
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(185, 28, 28, 0.4);
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
 }
-.h2c-legal-safeharbor {
-  border-top: 1.5px solid #fecaca;
-  padding-top: 10px;
+
+/* Safe Harbor Card */
+.h2c-legal-safeharbor-card {
+  background: #f9f7f2;
+  border: 1px solid #e5dfd3;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 12px;
+  color: #4b5563;
+  line-height: 1.55;
 }
-.h2c-legal-safeharbor-text {
-  margin: 4px 0;
-  font-size: 11.5px;
-  color: #991b1b;
-  line-height: 1.45;
+.h2c-legal-safeharbor-card strong {
+  color: #1f2937;
 }
-.h2c-header-disclosure {
-  width: 100%;
+.h2c-legal-safeharbor-card p {
+  margin: 4px 0 8px 0;
+}
+.h2c-legal-safeharbor-card p:last-child {
+  margin-bottom: 0;
+}
+
+/* Back to Top button */
+.h2c-back-to-top-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f3efe6;
+  border: 1px solid #d5cbba;
+  color: #4a5568;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.h2c-back-to-top-btn:hover {
+  background: #c9a227;
+  color: #043d2e;
 }
 
 /* 7-Step Interactive Workflow Hub */
@@ -535,100 +665,171 @@ function getAppState() {
   };
 }
 
-function updateHeaderDisclosure() {
-  const sub = document.querySelector('header p.text-muted');
-  if (sub && !document.querySelector('.h2c-header-disclosure')) {
-    const d = document.createElement('div');
-    d.className = 'h2c-header-disclosure';
-    d.innerHTML = `
-      <div style="margin-top: 8px; padding: 7px 12px; background: #fff5f5; border: 1.5px solid #dc2626; border-radius: 6px; font-size: 12px; line-height: 1.45; color: #991b1b;">
-        <strong style="color: #dc2626; font-size: 12px;">⚖️ BOLD RED DISCLOSURE:</strong>
-        <span style="font-weight: 700; color: #b91c1c;">Independent educational prototype ("vibe coded work").</span>
-        Credit to original author <strong>Dean L. Gano</strong> (<em>"Apollo Root Cause Analysis"</em> &amp; <em>"RealityCharting"</em> books).
-        Apollo RCA&trade; and RealityCharting&reg; are trademarks of Dean L. Gano / Apollonian Publications, LLC.
-        Not affiliated with or endorsed by the original author.
-        For official software instead of this vibe coded work, visit:
-        <a href="https://realitycharting.com/home/" target="_blank" rel="noopener noreferrer" style="color: #dc2626; font-weight: 800; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
-          https://realitycharting.com/home/ &rarr;
-        </a>
-      </div>
-    `;
-    sub.parentNode.appendChild(d);
+function scrollToLegal() {
+  const el = document.getElementById('legal-disclosure');
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('h2c-pulse-focus');
+    setTimeout(() => el.classList.remove('h2c-pulse-focus'), 1800);
   }
 }
 
-function ensureLegalBanner() {
-  const target = document.querySelector('.h2c-workflow-hub') || document.querySelector('ol.grid-cols-2, ol.sm\\:grid-cols-7');
-  if (!target || !target.parentNode) return;
+function updateTopAttributionRibbon() {
+  // Remove legacy red disclosure if present
+  const old = document.querySelector('.h2c-header-disclosure');
+  if (old) old.remove();
 
-  let banner = document.querySelector('.h2c-legal-banner');
-  if (!banner) {
-    banner = document.createElement('section');
-    banner.className = 'no-print h2c-legal-banner';
-    banner.setAttribute('role', 'region');
-    banner.setAttribute('aria-label', 'Legal disclosure and trademark attribution');
-    target.parentNode.insertBefore(banner, target);
+  const sub = document.querySelector('header p.text-muted');
+  if (sub && !document.querySelector('.h2c-top-ribbon')) {
+    const ribbon = document.createElement('div');
+    ribbon.className = 'no-print h2c-top-ribbon';
+    ribbon.innerHTML = `
+      <div class="h2c-top-ribbon-text">
+        <span class="h2c-top-ribbon-badge">⚖️ METHODOLOGY ATTRIBUTION</span>
+        <span>Independent study tool based on Apollo RCA&trade; principles created by <strong>Dean L. Gano</strong>.</span>
+      </div>
+      <div class="h2c-top-ribbon-actions">
+        <a href="https://realitycharting.com/home/" target="_blank" rel="noopener noreferrer" class="h2c-top-ribbon-link">
+          Official Software: realitycharting.com &rarr;
+        </a>
+        <button type="button" class="h2c-top-ribbon-jump" id="h2c-ribbon-jump-btn">
+          📜 Full Legal Notice &amp; Safe Harbor &darr;
+        </button>
+      </div>
+    `;
+    const btn = ribbon.querySelector('#h2c-ribbon-jump-btn');
+    if (btn) btn.onclick = scrollToLegal;
+    sub.parentNode.appendChild(ribbon);
   }
 
-  if (banner && !banner.dataset.rendered) {
-    banner.dataset.rendered = 'true';
-    banner.innerHTML = `
-      <div class="h2c-legal-topline">
-        <div class="h2c-legal-badge">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          MANDATORY LEGAL DISCLOSURE &amp; TRADEMARK ATTRIBUTION
-        </div>
-        <span class="h2c-legal-subbadge">NOMINATIVE FAIR USE &bull; INDEPENDENT OPEN-SOURCE EXPERIMENT</span>
-      </div>
+  // Also ensure toolbar button is mounted
+  mountLegalToolbarBtn();
+}
 
-      <div class="h2c-legal-body">
-        <div class="h2c-legal-author-box">
-          <p class="h2c-legal-bold-red" style="margin: 0 0 4px 0; font-size: 13.5px;">
-            ATTRIBUTION TO ORIGINAL AUTHOR &amp; TRADEMARK CREDIT:
+function mountLegalToolbarBtn() {
+  const anchor = document.querySelector('.h2cv-tb') || document.querySelector('.h2ch-tb') || 
+    [...document.querySelectorAll('button')].find(b => /^\s*\?\s*Help\s*$/.test(b.textContent));
+  if (anchor && anchor.parentNode && !document.querySelector('.h2c-tb-legal')) {
+    const tb = document.createElement('button');
+    tb.className = 'no-print h2c-tb-legal';
+    tb.type = 'button';
+    tb.setAttribute('aria-label', 'View Legal disclosure and trademark attribution');
+    tb.innerHTML = `
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      <span>⚖️ Legal &amp; Trademarks</span>
+    `;
+    tb.onclick = scrollToLegal;
+    anchor.parentNode.insertBefore(tb, anchor.nextSibling);
+  }
+}
+
+function ensureBottomLegalShowcase() {
+  // Remove any legacy banner that was placed above the workflow hub
+  const oldTop = document.querySelector('.h2c-legal-banner');
+  if (oldTop) oldTop.remove();
+
+  const main = document.querySelector('main');
+  if (!main) return;
+
+  let showcase = document.getElementById('legal-disclosure');
+  if (!showcase) {
+    showcase = document.createElement('section');
+    showcase.id = 'legal-disclosure';
+    showcase.className = 'no-print h2c-legal-showcase';
+    showcase.setAttribute('role', 'region');
+    showcase.setAttribute('aria-label', 'Intellectual Property, Trademark Attribution and Legal Safe Harbor');
+    main.appendChild(showcase);
+  }
+
+  if (showcase && !showcase.dataset.rendered) {
+    showcase.dataset.rendered = 'true';
+    showcase.innerHTML = `
+      <div class="h2c-legal-accent-bar"></div>
+      <div class="h2c-legal-showcase-inner">
+        <div class="h2c-legal-header-row">
+          <div class="h2c-legal-header-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Intellectual Property, Trademark Attribution &amp; Legal Safe Harbor</span>
+          </div>
+          <div class="h2c-legal-pills-row">
+            <span class="h2c-legal-pill h2c-legal-pill-burgundy">NOMINATIVE FAIR USE (15 U.S.C. &sect; 1125)</span>
+            <span class="h2c-legal-pill h2c-legal-pill-gold">DEAN L. GANO INTELLECTUAL PROPERTY</span>
+            <span class="h2c-legal-pill h2c-legal-pill-green">INDEPENDENT OPEN SOURCE (MIT)</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 800; color: #1a202c;">
+            ATTRIBUTION TO ORIGINAL AUTHOR &amp; FOUNDATIONAL LITERATURE
+          </h4>
+          <p style="margin: 0 0 8px 0; font-size: 13px; color: #4a5568; line-height: 1.5;">
+            The principles of Apollo Root Cause Analysis, the Reality Tree causal logic diagramming method, and the RealityCharting methodology were conceived, developed, and authored by renowned reliability engineer and educator <strong>Dean L. Gano</strong>. This web study application is directly inspired by his seminal books:
           </p>
-          <p class="h2c-legal-author-text">
-            Root Cause Analysis principles and the RealityCharting methodology were created and authored by <strong>Dean L. Gano</strong>, author of the acclaimed books:
-          </p>
-          <ul class="h2c-legal-book-list">
-            <li>📖 <em>"Apollo Root Cause Analysis: A New Way of Thinking"</em> (Apollonian Publications)</li>
-            <li>📖 <em>"RealityCharting: Seven Steps to Effective Problem-Solving and Strategies for Personal Success"</em></li>
-          </ul>
-          <p class="h2c-legal-tm-text">
-            <strong>"Apollo Root Cause Analysis"</strong>, <strong>"Apollo RCA"</strong>, <strong>"Reality Tree"</strong>, and <strong>"RealityCharting&reg;"</strong> are registered trademarks and intellectual property of <strong>Dean L. Gano</strong> and <strong>Apollonian Publications, LLC</strong>. All rights are fully reserved by the respective trademark owners.
+          <div class="h2c-books-grid">
+            <div class="h2c-book-card">
+              <span class="h2c-book-icon">📘</span>
+              <div>
+                <p class="h2c-book-title">Apollo Root Cause Analysis: A New Way of Thinking</p>
+                <p class="h2c-book-pub">Apollonian Publications &bull; Foundational text establishing the principles of cause-and-effect and elimination of the root cause myth.</p>
+              </div>
+            </div>
+            <div class="h2c-book-card">
+              <span class="h2c-book-icon">📙</span>
+              <div>
+                <p class="h2c-book-title">RealityCharting: Seven Steps to Effective Problem-Solving</p>
+                <p class="h2c-book-pub">Apollonian Publications &bull; Comprehensive methodology guide for facilitators, investigators, and organizations.</p>
+              </div>
+            </div>
+          </div>
+          <p style="margin: 10px 0 0 0; font-size: 12px; color: #718096; line-height: 1.45; background: #f7fafc; border: 1px solid #edf2f7; padding: 8px 12px; border-radius: 6px;">
+            <strong>Trademark Notice:</strong> <em>"Apollo Root Cause Analysis"</em>, <em>"Apollo RCA"</em>, <em>"Reality Tree"</em>, and <em>"RealityCharting&reg;"</em> are registered trademarks and intellectual property of <strong>Dean L. Gano</strong> and <strong>Apollonian Publications, LLC</strong>. All rights are fully and strictly reserved by their respective trademark owners.
           </p>
         </div>
 
-        <div class="h2c-legal-official-box">
-          <div class="h2c-legal-official-header">
-            <span class="h2c-official-icon">📢</span>
+        <div class="h2c-official-promo-card">
+          <div class="h2c-official-promo-head">
+            <span style="font-size: 24px; line-height: 1;">📢</span>
             <div>
-              <strong class="h2c-legal-bold-red" style="font-size: 13.5px;">RECOMMENDATION: USE THE OFFICIAL CERTIFIED SOFTWARE</strong>
-              <p class="h2c-legal-official-desc">
-                If you want to know more, master genuine certified methodology, or use the official enterprise software instead of this experimental vibe coded work, please visit the official website:
+              <div class="h2c-official-promo-title">RECOMMENDATION: USE THE OFFICIAL CERTIFIED SOFTWARE &amp; TRAINING</div>
+              <p class="h2c-official-promo-desc">
+                If you want to master genuine certified Apollo RCA, obtain professional facilitator certification, or deploy official enterprise-grade software instead of this experimental vibe coded study tool, please visit the official Dean L. Gano website:
               </p>
             </div>
           </div>
-          <div class="h2c-legal-cta-row">
-            <a href="https://realitycharting.com/home/" target="_blank" rel="noopener noreferrer" class="h2c-legal-cta-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              Go to Official RealityCharting&reg; Software &amp; Website (realitycharting.com) &rarr;
-            </a>
-          </div>
+          <a href="https://realitycharting.com/home/" target="_blank" rel="noopener noreferrer" class="h2c-official-cta-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Go to Official RealityCharting&reg; Software &amp; Website (realitycharting.com) &rarr;</span>
+          </a>
         </div>
 
-        <div class="h2c-legal-safeharbor">
-          <p class="h2c-legal-bold-red" style="font-size: 12px; margin-bottom: 4px;">
+        <div class="h2c-legal-safeharbor-card">
+          <p style="font-weight: 800; font-size: 12px; color: #2d3748; margin-bottom: 4px;">
             LEGAL NON-AFFILIATION, SAFE HARBOR &amp; DISCLAIMER OF CLAIMS:
           </p>
-          <p class="h2c-legal-safeharbor-text">
-            This web tool (<em>H2C Root Cause Analyst</em>) is an independent, non-commercial open-source experimental prototype ("vibe coded work") developed by Engr. Harold Henry G. Cabanilla (h2c_Creates / h2c-DataSci) strictly for educational, personal research, and community demonstration purposes under the MIT License. It is <strong>NOT</strong> affiliated with, endorsed by, sponsored by, authorized by, or in any way officially connected with <strong>Dean L. Gano</strong>, <strong>Apollonian Publications, LLC</strong>, or <strong>RealityCharting.com</strong>.
+          <p>
+            <strong>Independent Community Prototype:</strong> This web application (<em>H2C Root Cause Analyst</em>) is an independent, non-commercial open-source experimental prototype ("vibe coded work") developed by Engr. Harold Henry G. Cabanilla (h2c_Creates / h2c-DataSci) strictly for educational, personal research, and community demonstration purposes under the MIT License. It is <strong>NOT</strong> affiliated with, endorsed by, sponsored by, authorized by, or in any way officially connected with <strong>Dean L. Gano</strong>, <strong>Apollonian Publications, LLC</strong>, or <strong>RealityCharting.com</strong>.
           </p>
-          <p class="h2c-legal-safeharbor-text">
-            No proprietary source code, copyrighted illustrations, or certified training materials from Apollonian Publications, LLC have been used or reproduced. All methodology references are made strictly under <strong>Nominative Fair Use (15 U.S.C. &sect; 1125 / Lanham Act)</strong> for descriptive identification. All trademarks belong to their respective holders. Provided strictly "AS IS" without warranty of any kind.
+          <p>
+            <strong>Non-Infringement &amp; Nominative Fair Use:</strong> No proprietary source code, copyrighted illustrations, or certified training materials from Apollonian Publications, LLC have been used, reverse-engineered, or reproduced. All methodology names and trademarks are referenced strictly under <strong>Nominative Fair Use (15 U.S.C. &sect; 1125 / Lanham Act)</strong> for descriptive identification.
+          </p>
+          <p>
+            <strong>Disclaimer of Warranties:</strong> The software is provided "AS IS", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. In no event shall the authors be liable for any claim, damages, or other liability arising from the use of this tool.
           </p>
         </div>
+
+        <button type="button" class="h2c-back-to-top-btn" id="h2c-legal-back-top-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          <span>↑ Back to Top of Analysis</span>
+        </button>
       </div>
     `;
+
+    const backBtn = showcase.querySelector('#h2c-legal-back-top-btn');
+    if (backBtn) {
+      backBtn.onclick = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+    }
   }
 }
 
@@ -901,8 +1102,8 @@ function refreshAll() {
   if (updating) return;
   updating = true;
   try {
-    updateHeaderDisclosure();
-    ensureLegalBanner();
+    updateTopAttributionRibbon();
+    ensureBottomLegalShowcase();
     updateStepsHub();
     updateColorCodedValidation();
   } finally {
@@ -917,6 +1118,7 @@ function initShell() {
     const b = findBtn();
     if (b && !b.classList.contains('h2c-new-prominent')) b.classList.add('h2c-new-prominent');
     if (!document.querySelector('.h2c-workflow-hub')) refreshAll();
+    mountLegalToolbarBtn();
   };
 
   applyProminent();

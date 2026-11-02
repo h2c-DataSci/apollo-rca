@@ -8,107 +8,121 @@ const STORAGE_KEY = 'h2c-youtube-training-videos-v1';
 export const VIDEO_MODULES = [
   {
     step: 1,
-    title: 'Step 1: Problem Definition & Primary Effects',
-    subtitle: 'Noun-verb formulation, What, Where, When, Significance, avoiding blame & why',
+    episode: 'Episode 1 of 7',
+    title: 'Episode 1 of 7: Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)',
+    shortTitle: 'Introduction & Fundamentals',
+    subtitle: 'The Root Cause Myth, causal principles, and foundational Apollo RCA thinking',
     duration: '11:45',
     defaultYtId: 'IXXgr85wO74', // Official Video 1: https://youtu.be/IXXgr85wO74
     targetId: 'section-define',
-    summary: 'Define up to three primary effects using strict 2-4 word noun-verb statements. Establish exact facility/equipment location and time without speculating on why or assigning blame.',
+    summary: 'Dismantle the single root cause myth: problems are never caused by a single isolated event, but by a confluence of necessary and sufficient causes. Master foundational causal principles before charting.',
     keyPoints: [
-      'State the primary effect as an observed noun-verb outcome (e.g., "Oil Released").',
-      'Keep statements strictly to 2–4 words; avoid run-on sentences.',
-      'Never name people or assign blame (Principles P05 & P06).',
-      'Never include the word "why" in the problem definition (Principle P01).'
+      'Dismantle the single root cause myth: causation is a continuous web of actions and conditions.',
+      'Principles of cause-and-effect: causes and effects are the same thing viewed at different moments in time.',
+      'An effect is always caused by at least two causes: an action cause and a condition cause.',
+      'Establishing the blameless, fact-based Apollo RCA mindset across the investigation team.'
     ]
   },
   {
     step: 2,
-    title: 'Step 2: Timeline Construction & Event Sequencing',
-    subtitle: 'Ordering facts chronologically, actions vs conditions, establishing sequence',
+    episode: 'Episode 2 of 7',
+    title: 'Episode 2 of 7: Defining the Problem — The 4-Element Formula Without Placing Blame',
+    shortTitle: 'Defining the Problem',
+    subtitle: 'The 4-Element Formula (What, Where, When, Significance) without placing blame',
     duration: '14:20',
     defaultYtId: 'tCQuu_rvSJ8', // Official Video 2: https://youtu.be/tCQuu_rvSJ8
-    targetId: 'section-timeline',
-    summary: 'Build a verifiable chronological timeline of events leading to the incident. Differentiate between transitional action causes and pre-existing condition causes.',
+    targetId: 'section-define',
+    summary: 'Master the 4-element problem definition formula: Primary Effect (What), Location (Where), Time (When), and Actual/Potential Significance. Never place blame or ask "why".',
     keyPoints: [
-      'Order observed occurrences by exact timestamp (HH:MM).',
-      'Establish temporal sequence without mistaking time order for causation (Principle P08).',
-      'Identify action causes (triggers) and background condition causes (states).',
-      'Ensure every timeline entry is backed by physical logs, alarms, or witness statements.'
+      'State the primary effect as an observed noun-verb outcome (e.g., "Oil Released").',
+      'Keep statements strictly to 2–4 words; avoid run-on sentences or compound clauses.',
+      'Zero Blame Rule: Never name people or assign blame in the problem definition (Principles P05 & P06).',
+      'Define exact facility/equipment location, precise timestamp, and operational significance.'
     ]
   },
   {
     step: 3,
-    title: 'Step 3: Reality Tree Cause-and-Effect Logic',
-    subtitle: 'Building the reality tree, AND/OR logic gates, cause sets, leaf terminators',
+    episode: 'Episode 3 of 7',
+    title: 'Episode 3 of 7: Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)',
+    shortTitle: 'Causal Relationships & RealityChart',
+    subtitle: 'Actions, Conditions, Cause Sets, AND/OR logic gates, and Stop Reasons',
     duration: '18:50',
     defaultYtId: '8y501jMIS7k', // Official Video 3: https://youtu.be/8y501jMIS7k
     targetId: 'realitychart',
-    summary: 'Construct the reality tree connecting each effect to its necessary and sufficient causes. Apply AND gates for co-existing causes and OR branches for hypotheses.',
+    summary: 'Construct the RealityChart by pairing action causes with condition causes at each causal step. Connect effects to causes using strict AND/OR logic, and identify valid stop reasons.',
     keyPoints: [
-      'Every effect must have at least one action cause and one condition cause.',
-      'Check sufficiency: together, do the causes adequately produce the effect?',
-      'Check necessity: if you remove one cause, does the effect still happen?',
-      'Terminate branches cleanly with STOP, Need More Info (?), or GOTO (repeated cause).'
+      'Causal sets: Every effect requires an action cause co-existing with one or more condition causes.',
+      'AND logic: Both the action and condition must be present simultaneously for the effect to occur.',
+      'Branching & Hypotheses: Use OR branches for competing possibilities with evidence tags.',
+      'Valid Stop reasons: Physical laws, outside sphere of control, or non-preventable conditions.'
     ]
   },
   {
     step: 4,
-    title: 'Step 4: Evidence Gathering & Quality Tiering',
-    subtitle: 'Attaching physical evidence, the 4 quality tiers, validating cause nodes',
+    episode: 'Episode 4 of 7',
+    title: 'Episode 4 of 7: Evidence; Sufficient and Necessary — How to Test and Prove Causes',
+    shortTitle: 'Evidence: Sufficient & Necessary',
+    subtitle: 'Necessary & sufficient testing, 4 quality tiers, proving and corroborating causes',
     duration: '13:15',
     defaultYtId: 'lppZuZFyHzM', // Official Video 4: https://youtu.be/lppZuZFyHzM
     targetId: 'section-evidence',
-    summary: 'Attach verifiable evidence items to every cause node. Classify evidence by quality tier: Sensed, Inferred, Intuited, or Emotional.',
+    summary: 'Rigorously test causes using necessary and sufficient logic. Gather, anchor, and tier physical and data evidence across all 4 quality levels to prove causal claims.',
     keyPoints: [
-      'Tier 1 (Sensed): Direct physical observation, photographs, metallurgical examination.',
-      'Tier 2 (Inferred): Sensor trends, SCADA alarms, calculations, process logs.',
-      'Tier 3 (Intuited): Professional experience and expert engineering assessment.',
-      'Tier 4 (Emotional): Unverified subjective recollections; requires corroboration.'
+      'The Necessity Test: If this cause did not exist, could the effect still occur?',
+      'The Sufficiency Test: Do all identified causes completely produce the effect?',
+      '4 Evidence Quality Tiers: Sensed (Tier 1 direct physical), Inferred (Tier 2 data/logs), Intuited (Tier 3 expert), and Emotional (Tier 4 unverified).',
+      'Hypothesis Corroboration: Unverified theories never become findings without evidentiary proof.'
     ]
   },
   {
     step: 5,
-    title: 'Step 5: Logic Verification & The 15 Analysis Principles',
-    subtitle: 'Automated integrity testing, contradiction detection, eliminating bias',
-    duration: '16:30',
-    defaultYtId: 'PLACEHOLDER_STEP5',
-    targetId: 'qa-stress-suite',
-    summary: 'Rigorously audit the analysis against the 15 Apollo Analysis Principles. Verify that hypotheses are not treated as proven findings until corroborated.',
+    episode: 'Episode 5 of 7',
+    title: 'Episode 5 of 7: Effective Solutions, Implementation, and Tracking (Preventing Recurrence)',
+    shortTitle: 'Effective Solutions & Tracking',
+    subtitle: 'Targeted corrective actions, 4 prevention criteria, owner tracking, and ROI verification',
+    duration: '15:10',
+    defaultYtId: 'PLACEHOLDER_EPISODE5',
+    targetId: 'section-solutions',
+    summary: 'Formulate corrective solutions that break specific causal paths. Evaluate actions against the four prevention criteria, assign owners, and track implementation to prevent recurrence.',
     keyPoints: [
-      'P01 Evidence before conclusion: No unverified causal claims.',
-      'P02 No invented evidence: Fabricated evidence IDs immediately trigger BLOCK.',
-      'P05 No person as root cause: Examine systemic & equipment conditions instead.',
-      'P09 Show contradictions: Conflicting witness or sensor data must be reconciled.'
+      'Target action or condition causes directly to eliminate causal linkages permanently.',
+      'Score each solution against the 4 Prevention Criteria: recurrence prevention, sphere of control, ROI, and no new hazards.',
+      'Assign single accountable owners, firm completion dates, and measurable milestones.',
+      'Schedule 30/60/90-day post-implementation effectiveness reviews to guarantee sustained control.'
     ]
   },
   {
     step: 6,
-    title: 'Step 6: Solution Action Matrix & Prevention Criteria',
-    subtitle: 'Developing corrective actions that break cause paths, ROI & control',
-    duration: '15:10',
-    defaultYtId: 'PLACEHOLDER_STEP6',
-    targetId: 'section-solutions',
-    summary: 'Develop targeted corrective actions designed to break specific cause-and-effect paths. Score each solution against the four Apollo prevention criteria.',
+    episode: 'Episode 6 of 7',
+    title: 'Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame',
+    shortTitle: 'Culture & Facilitation',
+    subtitle: 'Facilitating blameless investigations, team alignment, and overcoming organizational resistance',
+    duration: '16:30',
+    defaultYtId: 'PLACEHOLDER_EPISODE6',
+    targetId: 'section-timeline',
+    summary: 'Build an organizational culture focused on fixing causes rather than assigning human blame. Facilitate collaborative inquiry, team alignment, and transparent evidence-based analysis.',
     keyPoints: [
-      'Criterion 1: Does the action prevent recurrence of the specific cause?',
-      'Criterion 2: Is the action within your organization\'s sphere of control?',
-      'Criterion 3: Does the action meet financial goals and ROI targets?',
-      'Criterion 4: Does the action avoid creating new, unforeseen problems?'
+      'Shift organization culture from "Who made the mistake?" to "What conditions allowed the failure?".',
+      'Facilitation techniques: Keep cross-functional teams aligned on objective reality charting.',
+      'Overcome defensiveness and finger-pointing using structured, non-judgmental causal questions.',
+      'Principle P05: Human beings are never the root cause; human actions are caused by systems and conditions.'
     ]
   },
   {
     step: 7,
-    title: 'Step 7: Implementation & Recurrence Tracking',
-    subtitle: 'Assigning owners, deadlines, ROI verification, long-term audits',
-    duration: '10:45',
-    defaultYtId: 'PLACEHOLDER_STEP7',
+    episode: 'Episode 7 of 7',
+    title: 'Episode 7 of 7: Success and a New Way of Thinking (Why Success Is Planned)',
+    shortTitle: 'Success & A New Way of Thinking',
+    subtitle: 'Proactive problem-solving, planning success, and institutionalizing Apollo RCA mastery',
+    duration: '14:45',
+    defaultYtId: 'PLACEHOLDER_EPISODE7',
     targetId: 'section-track',
-    summary: 'Assign single accountable owners and firm deadlines for every accepted action. Establish recurring audits to ensure solutions remain active and effective.',
+    summary: 'Transform problem-solving from reactive firefighting into proactive success planning. Apply Apollo RCA principles to design reliable future systems and institutionalize mastery.',
     keyPoints: [
-      'Assign an individual owner (not a department) for every action item.',
-      'Establish explicit completion dates and measurable milestones.',
-      'Schedule 30/60/90-day post-implementation effectiveness reviews.',
-      'Document evidence of long-term recurrence prevention in the final report package.'
+      'Success and failure share identical causal mechanisms: success is planned, not accidental.',
+      'Apply causal charting proactively during design, capital projects, and operational planning.',
+      'Institutionalize lessons learned across the organization to prevent cross-facility recurrence.',
+      'Cultivate an enterprise-wide culture of scientific inquiry, verifiable evidence, and systemic prevention.'
     ]
   }
 ];
@@ -119,7 +133,7 @@ function getStoredVideos() {
     const data = raw ? JSON.parse(raw) : {};
     // Ensure newly assigned official video IDs take effect over legacy placeholders
     VIDEO_MODULES.forEach(m => {
-      if (!data[m.step] || data[m.step] === 'dQw4w9WgXcQ') {
+      if (!data[m.step] || data[m.step] === 'dQw4w9WgXcQ' || (data[m.step].startsWith('PLACEHOLDER') && !m.defaultYtId.startsWith('PLACEHOLDER'))) {
         data[m.step] = m.defaultYtId;
       }
     });
@@ -534,7 +548,7 @@ export function openVideoDrawer(targetStep = null) {
   panel.className = 'h2cv-panel';
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-modal', 'true');
-  panel.setAttribute('aria-label', '7-Step Methodology Training Videos');
+  panel.setAttribute('aria-label', '7 Official Methodology Training Video Episodes');
 
   // Header
   const head = document.createElement('div');
@@ -543,8 +557,8 @@ export function openVideoDrawer(targetStep = null) {
     <div class="h2cv-head-title">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
       <div>
-        <h2>7-Step Methodology Video Training</h2>
-        <p>Official Video Companions for Apollo RCA &amp; RealityCharting</p>
+        <h2>Apollo RCA Methodology Video Series</h2>
+        <p>Official 7-Episode Video Companion Series for Apollo RCA &amp; RealityCharting by Dean L. Gano</p>
       </div>
     </div>
   `;
@@ -562,7 +576,7 @@ export function openVideoDrawer(targetStep = null) {
   const allTab = document.createElement('button');
   allTab.type = 'button';
   allTab.className = 'h2cv-tab-btn' + (!targetStep ? ' active' : '');
-  allTab.textContent = 'All 7 Videos';
+  allTab.textContent = 'All 7 Episodes';
   allTab.onclick = () => filterStep(null);
   tabs.appendChild(allTab);
 
@@ -570,7 +584,8 @@ export function openVideoDrawer(targetStep = null) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'h2cv-tab-btn' + (targetStep === mod.step ? ' active' : '');
-    btn.textContent = `Step ${mod.step}`;
+    btn.textContent = `Ep ${mod.step}`;
+    btn.title = mod.title;
     btn.onclick = () => filterStep(mod.step);
     tabs.appendChild(btn);
   });
@@ -592,9 +607,19 @@ export function openVideoDrawer(targetStep = null) {
       const ytId = stored[mod.step] || mod.defaultYtId;
       const isPlaceholder = ytId.startsWith('PLACEHOLDER') || ytId === 'dQw4w9WgXcQ';
 
+      const jumpLabels = {
+        1: '🎯 Jump to Problem Definition in Workspace &rarr;',
+        2: '🎯 Jump to Problem Definition in Workspace &rarr;',
+        3: '🎯 Jump to Reality Tree in Workspace &rarr;',
+        4: '🎯 Jump to Evidence Tiers in Workspace &rarr;',
+        5: '🎯 Jump to Solutions Action Matrix &rarr;',
+        6: '🎯 Jump to Timeline & Event Sequencing &rarr;',
+        7: '🎯 Jump to Tracking & Reports &rarr;'
+      };
+
       card.innerHTML = `
         <div class="h2cv-card-header">
-          <span class="h2cv-step-pill">Module ${mod.step} of 7</span>
+          <span class="h2cv-step-pill">${mod.episode}</span>
           <span class="h2cv-duration-badge">⏱ ${mod.duration} • HD</span>
         </div>
         <div>
@@ -608,7 +633,7 @@ export function openVideoDrawer(targetStep = null) {
               <div class="h2cv-play-arrow"></div>
             </div>
             <div class="h2cv-screen-title">${mod.title}</div>
-            <div class="h2cv-screen-hint">${isPlaceholder ? '▶ Click to preview / configure YouTube link' : '▶ Click to play YouTube video'}</div>
+            <div class="h2cv-screen-hint">${isPlaceholder ? '▶ Click to preview / configure YouTube link' : '▶ Click to play official YouTube video'}</div>
             <span class="h2cv-screen-duration">${mod.duration}</span>
           </div>
         </div>
@@ -622,7 +647,7 @@ export function openVideoDrawer(targetStep = null) {
 
         <div class="h2cv-card-actions">
           <button type="button" class="h2cv-jump-btn" data-target="${mod.targetId}">
-            🎯 Jump to Step ${mod.step} in Workspace &rarr;
+            ${jumpLabels[mod.step] || `🎯 Jump to Step ${mod.step} in Workspace &rarr;`}
           </button>
           <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
             <a href="https://youtu.be/${ytId}" target="_blank" rel="noopener noreferrer" class="h2cv-yt-link-btn" style="display: inline-flex; align-items: center; gap: 5px; background: #fff5f5; border: 1px solid #fca5a5; color: #dc2626; border-radius: 6px; padding: 6px 10px; font: 700 11.5px system-ui; text-decoration: none;">
@@ -668,7 +693,7 @@ export function openVideoDrawer(targetStep = null) {
       editBtn.onclick = () => {
         const current = getStoredVideos()[mod.step] || '';
         const input = prompt(
-          `Enter the YouTube Video URL or 11-character Video ID for Step ${mod.step}:\n(e.g., https://youtu.be/dQw4w9WgXcQ or dQw4w9WgXcQ)`,
+          `Enter the YouTube Video URL or 11-character Video ID for Episode ${mod.step} ("${mod.shortTitle}"):\n(e.g., https://youtu.be/dQw4w9WgXcQ or dQw4w9WgXcQ)`,
           current
         );
         if (input !== null) {
@@ -676,7 +701,7 @@ export function openVideoDrawer(targetStep = null) {
           if (parsed) {
             saveVideoId(mod.step, parsed);
             renderCards(filterNum);
-            alert(`Step ${mod.step} video updated to YouTube ID: ${parsed}`);
+            alert(`Episode ${mod.step} video updated to YouTube ID: ${parsed}`);
           } else if (input.trim() === '') {
             saveVideoId(mod.step, mod.defaultYtId);
             renderCards(filterNum);
