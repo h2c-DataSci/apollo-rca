@@ -279,7 +279,7 @@ css.textContent = `
   border: 2px solid #e6d7a8;
   background: #ffffff;
   border-radius: 10px;
-  padding: 10px 11px;
+  padding: 10px 10px;
   text-align: left;
   cursor: pointer;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -287,6 +287,8 @@ css.textContent = `
   user-select: none;
   position: relative;
   width: 100%;
+  min-height: 115px;
+  gap: 4px;
 }
 .h2c-step-card:hover {
   transform: translateY(-3px);
@@ -309,6 +311,17 @@ css.textContent = `
 .h2c-step-card.is-ready:hover {
   border-color: #047857;
   box-shadow: 0 8px 20px rgba(5, 150, 105, 0.2);
+}
+.h2c-step-bot {
+  margin-top: auto;
+  padding-top: 5px;
+  border-top: 1px dashed rgba(0,0,0,0.08);
+}
+.h2c-step-vid-btn:hover {
+  background: #fee2e2 !important;
+  border-color: #dc2626 !important;
+  color: #991b1b !important;
+  transform: translateY(-1px);
 }
 .h2c-step-top {
   display: flex;
@@ -754,9 +767,10 @@ function updateStepsHub() {
 
   const grid = hub.querySelector('.h2c-steps-grid');
   for (const s of steps) {
-    const card = document.createElement('button');
-    card.type = 'button';
+    const card = document.createElement('div');
     card.className = `h2c-step-card ${s.isReady ? 'is-ready' : ''}`;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
     card.setAttribute('aria-label', `Step ${s.num}: ${s.name} (${s.status})`);
     card.innerHTML = `
       <div class="h2c-step-top">
@@ -765,8 +779,26 @@ function updateStepsHub() {
       </div>
       <div class="h2c-step-name">${s.name}</div>
       <div class="h2c-step-sub">${s.sub}</div>
+      <div class="h2c-step-bot" style="margin-top: 6px; padding-top: 4px; border-top: 1px dashed rgba(0,0,0,0.08);">
+        <button type="button" class="h2c-step-vid-btn" title="Watch Step ${s.num} Video Tutorial" style="width: 100%; font-size: 10.5px; font-weight: 700; color: #b91c1c; background: #fff5f5; border: 1px solid #fca5a5; border-radius: 5px; padding: 3px 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease;">
+          ▶ Video Tutorial
+        </button>
+      </div>
     `;
-    card.onclick = s.action;
+    card.onclick = (e) => {
+      if (e.target.closest && e.target.closest('.h2c-step-vid-btn')) {
+        e.stopPropagation();
+        window.h2cOpenVideoDrawer?.(s.num);
+        return;
+      }
+      s.action();
+    };
+    card.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        s.action();
+      }
+    };
     grid.append(card);
   }
 }

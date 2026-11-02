@@ -1,5 +1,6 @@
 import { KB, KB_VERSION } from './help-kb.js?v=15';
 import { DIAGRAMS, DIAGRAM_FOR } from './help-diagrams.js?v=15';
+import './h2c-videos.js?v=1';
 const SITE = 'https://www.haroldhenrycabanilla.com';
 const css = document.createElement('style');
 css.textContent = `
@@ -55,7 +56,14 @@ function open() {
     el('a', { href: 'https://realitycharting.com/home/', target: '_blank', rel: 'noopener noreferrer', style: 'color: #0a5c45; font-weight: 700; text-decoration: underline;' }, 'realitycharting.com')
   );
   dev.append(el('strong', { textContent: 'About the developer: ' }), devLine(), el('div', { textContent: 'Help text is original summary guidance (' + KB_VERSION + '), not a copy of any book.' }), dNotice);
-  panel.append(head, s, body, dev); document.body.append(back, panel); s.focus();
+  
+  const vidBanner = el('button', {
+    type: 'button',
+    style: 'margin: 6px 14px 4px; padding: 8px 12px; background: linear-gradient(180deg, #fff5f5, #fee2e2); border: 1.5px solid #ef4444; border-radius: 8px; color: #b91c1c; font: 700 12.5px system-ui; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; width: calc(100% - 28px);'
+  });
+  vidBanner.innerHTML = '<span>📺 <strong>Watch 7-Step Training Videos</strong></span><span style="font-size: 11px; background: #dc2626; color: #fff; padding: 2px 8px; border-radius: 4px;">▶ Open Videos</span>';
+  vidBanner.onclick = () => { close(); window.h2cOpenVideoDrawer?.(); };
+  panel.append(head, vidBanner, s, body, dev); document.body.append(back, panel); s.focus();
   const show = (a) => { body.replaceChildren(); const back2 = el('button', { className: 'h2ch-item', type: 'button', textContent: '← All topics' }); back2.onclick = () => list(s.value); body.append(back2, el('div', { className: 'h2ch-art' }, el('div', { className: 'h2ch-cat', textContent: a.cat }), el('h3', { textContent: a.title }), ...(DIAGRAMS[DIAGRAM_FOR[a.id]] ? [DIAGRAMS[DIAGRAM_FOR[a.id]]()] : []), el('p', { textContent: a.body }))); back2.focus(); };
   const list = (q) => { body.replaceChildren(); const terms = q.toLowerCase().split(/\s+/).filter(Boolean); let items = KB; if (terms.length) items = KB.map((a) => [a, score(a, terms)]).filter((r) => r[1] > 0).sort((a, b) => b[1] - a[1]).map((r) => r[0]);
     if (!items.length) { body.append(el('p', { textContent: 'No help topic matches "' + q + '". Try a shorter word.' })); return; }

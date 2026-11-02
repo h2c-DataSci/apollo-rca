@@ -21,6 +21,7 @@
 | **Phase 6** | Interactive 7-Step Workflow & Color Validation | **COMPLETED** | 100% | Transformed static boxes into interactive workflow hub with hover/click effects, status pills, progress bar, and real-time color validation (Red/Amber/Emerald) |
 | **Phase 7** | AI Coach Resilience & Session Stabilization | **COMPLETED** | 100% | Resolved recurring "AI loads then drops" issue: increased token budget (160->384), resilient auto-repairing JSON parser, preserved `ready` state with Apollo rule fallback |
 | **Phase 8** | Legal Disclosure, Trademark Attribution & Safe Harbor | **COMPLETED** | 100% | Added bold red text disclosure, Dean L. Gano authorship attribution, trademarks notice (Apollo RCA™, RealityCharting®), official website link, and nominative fair use safe harbor |
+| **Phase 9** | 7-Step YouTube Video Training Companion Hub | **COMPLETED** | 100% | Added "? Help"-style toolbar button & floating FAB for 7 YouTube training videos, interactive slide-out video drawer, responsive 16:9 player cards, methodology guides, and step deep-links |
 
 ---
 
@@ -158,6 +159,33 @@
   - Captured verified visual screenshot: `screenshot-legal-disclosure-verified.png`.
   - All 54 tests pass (`node --test`, 0 regressions).
 
+### Phase 9: 7-Step YouTube Video Training Companion Hub (Completed)
+- [x] **"? Help"-style Launch Points**:
+  - Header Toolbar Button: `▶ 7 Videos (Training)` with YouTube red icon, positioned alongside `? Help` and `RCA Coach`.
+  - Floating Action Button (FAB): `.h2cv-fab` positioned on the bottom left margin side-by-side with `? Help`.
+  - Help Drawer Bridge: Added `📺 Watch 7-Step Training Videos` banner button directly inside the `? Help` drawer.
+  - 7-Step Workflow Navigator Integration: Each of the 7 step cards in `.h2c-workflow-hub` now includes a dedicated `▶ Video Tutorial` button.
+- [x] **7-Step Video Training Companion Drawer (`h2c-videos.js`)**:
+  - Created slide-out interactive modal (`.h2cv-panel`) with YouTube red/emerald gradient header and keyboard accessibility (Escape close, Tab focus trapping).
+  - Step Filter Navigation: Quick tabs for `All 7 Videos`, `Step 1`, `Step 2`, `Step 3`, `Step 4`, `Step 5`, `Step 6`, `Step 7`.
+  - 7 Structured Training Modules:
+    1. *Step 1: Problem Definition & Primary Effects* (11:45 min)
+    2. *Step 2: Timeline Construction & Event Sequencing* (14:20 min)
+    3. *Step 3: Reality Tree Cause-and-Effect Logic* (18:50 min)
+    4. *Step 4: Evidence Gathering & Quality Tiering* (13:15 min)
+    5. *Step 5: Logic Verification & The 15 Analysis Principles* (16:30 min)
+    6. *Step 6: Solution Action Matrix & Prevention Criteria* (15:10 min)
+    7. *Step 7: Implementation & Recurrence Tracking* (10:45 min)
+- [x] **Responsive 16:9 Player Cards & Custom URL Configurator**:
+  - 16:9 dark-mode video preview cards with red YouTube play button overlay, duration timestamps, and methodology focus checklists.
+  - Privacy-friendly on-demand embed: clicking play mounts `youtube-nocookie.com/embed/{id}`.
+  - Built-in configurator: `✏️ Set Custom YouTube Link` prompt saves user-defined YouTube URLs or IDs to `localStorage` under `h2c-youtube-training-videos-v1`.
+  - `🎯 Jump to Step in Workspace` action button smooth-scrolls directly to the relevant workspace section.
+- [x] **Verification & Evidence**:
+  - Automated CDP headless testing verified drawer opening, tab switching, and card rendering.
+  - Captured screenshots: `screenshot-video-training-main.png`, `screenshot-video-training-drawer.png`, `screenshot-video-step3-filtered.png`.
+  - 100% test compatibility: All 54 tests pass (`node --test`).
+
 ---
 
 ## 4. Verification Evidence & Artifact References
@@ -165,6 +193,9 @@
 - **Security & Risk Report**: [security-and-risk-report.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/security-and-risk-report.md)
 - **Final Walkthrough**: [final-walkthrough-and-verification.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/final-walkthrough-and-verification.md)
 - **Visual Artifacts**:
+  - Video Training Main Page with Launch Buttons (Verified): `screenshot-video-training-main.png`
+  - Video Training Drawer with 7 Step Modules (Verified): `screenshot-video-training-drawer.png`
+  - Video Training Step 3 Filtered View (Verified): `screenshot-video-step3-filtered.png`
   - Legal Disclosure & Trademark Attribution Banner (Verified): `screenshot-legal-disclosure-verified.png`
   - Interactive Workflow Initial (0 words, Red Alert): `screenshot-interactive-initial.png`
   - Interactive Workflow Valid (2-4 words, Emerald Green): `screenshot-interactive-valid.png`
