@@ -25,7 +25,19 @@ css.textContent = `
 const el = (t, props = {}, ...kids) => { const n = Object.assign(document.createElement(t), props); n.append(...kids); return n; };
 const devLine = () => { const d = el('span'); d.append('Developed by Engr. Harold Henry G. Cabanilla · ', el('a', { href: SITE, target: '_blank', rel: 'noopener noreferrer', textContent: 'www.haroldhenrycabanilla.com' })); return d; };
 
-function ensureFoot() { if (document.querySelector('.h2c-devfoot') || !document.body) return; const f = el('footer', { className: 'h2c-devfoot' }); f.append('H2C Root Cause Analyst · h2c_Creates · ', devLine()); document.body.append(f); }
+function ensureFoot() {
+  if (document.querySelector('.h2c-devfoot') || !document.body) return;
+  const f = el('footer', { className: 'h2c-devfoot' });
+  const row1 = el('div', {}, 'H2C Root Cause Analyst · h2c_Creates · ', devLine());
+  const row2 = el('div', { style: 'font-size: 11px; margin-top: 5px; color: #fdf6d8; line-height: 1.4;' },
+    'Trademarks Notice: Apollo RCA™ & RealityCharting® are registered trademarks of Apollonian Publications, LLC / Dean L. Gano. ',
+    'This vibe coded work is an independent educational prototype, not affiliated with or endorsed by them. ',
+    'For the official certified enterprise software, visit: ',
+    el('a', { href: 'https://realitycharting.com/home/', target: '_blank', rel: 'noopener noreferrer', style: 'color: #ffffff; font-weight: 700; text-decoration: underline;' }, 'realitycharting.com')
+  );
+  f.append(row1, row2);
+  document.body.append(f);
+}
 let panel, back, fab, lastFocus;
 const score = (a, terms) => { const h = (a.title + ' ' + a.tags).toLowerCase(), b = a.body.toLowerCase(); let s = 0; for (const t of terms) { if (h.includes(t)) s += 5; if (b.includes(t)) s += 1; else if (!h.includes(t)) return 0; } return s; };
 function close() { panel?.remove(); back?.remove(); panel = back = null; lastFocus?.focus(); }
@@ -37,7 +49,12 @@ function open() {
   const head = el('div', { className: 'h2ch-head' }, el('h2', { textContent: 'Help · Knowledge' }), x);
   const s = el('input', { className: 'h2ch-s', type: 'search', placeholder: 'Search help (e.g. evidence, BLOCK, chart colors)' }); s.setAttribute('aria-label', 'Search help');
   const body = el('div', { className: 'h2ch-body', id: 'h2ch-body' }); body.setAttribute('aria-live', 'polite');
-  const dev = el('div', { className: 'h2ch-dev' }); dev.append(el('strong', { textContent: 'About the developer: ' }), devLine(), el('div', { textContent: 'Help text is original summary guidance (' + KB_VERSION + '), not a copy of any book.' }));
+  const dev = el('div', { className: 'h2ch-dev' });
+  const dNotice = el('div', { style: 'font-size: 11.5px; color: #991b1b; margin-top: 6px; font-weight: 600; line-height: 1.4;' },
+    'Disclaimer: Apollo RCA™ and RealityCharting® are trademarks of Dean L. Gano / Apollonian Publications, LLC. Not affiliated with or endorsed by them. Official software: ',
+    el('a', { href: 'https://realitycharting.com/home/', target: '_blank', rel: 'noopener noreferrer', style: 'color: #0a5c45; font-weight: 700; text-decoration: underline;' }, 'realitycharting.com')
+  );
+  dev.append(el('strong', { textContent: 'About the developer: ' }), devLine(), el('div', { textContent: 'Help text is original summary guidance (' + KB_VERSION + '), not a copy of any book.' }), dNotice);
   panel.append(head, s, body, dev); document.body.append(back, panel); s.focus();
   const show = (a) => { body.replaceChildren(); const back2 = el('button', { className: 'h2ch-item', type: 'button', textContent: '← All topics' }); back2.onclick = () => list(s.value); body.append(back2, el('div', { className: 'h2ch-art' }, el('div', { className: 'h2ch-cat', textContent: a.cat }), el('h3', { textContent: a.title }), ...(DIAGRAMS[DIAGRAM_FOR[a.id]] ? [DIAGRAMS[DIAGRAM_FOR[a.id]]()] : []), el('p', { textContent: a.body }))); back2.focus(); };
   const list = (q) => { body.replaceChildren(); const terms = q.toLowerCase().split(/\s+/).filter(Boolean); let items = KB; if (terms.length) items = KB.map((a) => [a, score(a, terms)]).filter((r) => r[1] > 0).sort((a, b) => b[1] - a[1]).map((r) => r[0]);

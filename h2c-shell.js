@@ -13,6 +13,157 @@ css.textContent = `
 .h2c-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:10000;background:#043d2e;color:#f1d16b;border:2px solid #c9a227;border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;font:600 14px system-ui;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 .h2c-toast button{background:#f1d16b;color:#043d2e;border:0;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer}.h2c-toast button:focus-visible{outline:3px solid #fff}
 
+/* Bold Red Disclosure & Legal Attribution Banner */
+.h2c-legal-banner {
+  margin-bottom: 1.5rem;
+  background: #fff8f8;
+  border: 2px solid #dc2626;
+  border-left: 8px solid #b91c1c;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 18px rgba(220, 38, 38, 0.08), 0 1px 3px rgba(0,0,0,0.04);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #7f1d1d;
+  line-height: 1.5;
+}
+.h2c-legal-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px dashed #fca5a5;
+}
+.h2c-legal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+}
+.h2c-legal-subbadge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #dc2626;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.h2c-legal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.h2c-legal-bold-red {
+  color: #dc2626;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.h2c-legal-author-box {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.h2c-legal-author-text {
+  margin: 4px 0 8px 0;
+  font-size: 13.5px;
+  color: #991b1b;
+  line-height: 1.5;
+}
+.h2c-legal-book-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 6px 0 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #991b1b;
+}
+.h2c-legal-book-list li {
+  padding-left: 8px;
+  border-left: 3px solid #dc2626;
+  font-weight: 600;
+}
+.h2c-legal-tm-text {
+  margin: 0;
+  font-size: 12px;
+  color: #b91c1c;
+  line-height: 1.45;
+  background: #fef2f2;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+.h2c-legal-official-box {
+  background: linear-gradient(180deg, #fff5f5 0%, #fee2e2 100%);
+  border: 2px solid #ef4444;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.h2c-legal-official-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.h2c-official-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.h2c-legal-official-desc {
+  margin: 4px 0 10px 0;
+  font-size: 13px;
+  color: #7f1d1d;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.h2c-legal-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.h2c-legal-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: 13.5px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  text-decoration: none !important;
+  box-shadow: 0 3px 10px rgba(185, 28, 28, 0.3);
+  transition: all 0.2s ease;
+}
+.h2c-legal-cta-btn:hover {
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(185, 28, 28, 0.4);
+}
+.h2c-legal-safeharbor {
+  border-top: 1.5px solid #fecaca;
+  padding-top: 10px;
+}
+.h2c-legal-safeharbor-text {
+  margin: 4px 0;
+  font-size: 11.5px;
+  color: #991b1b;
+  line-height: 1.45;
+}
+.h2c-header-disclosure {
+  width: 100%;
+}
+
 /* 7-Step Interactive Workflow Hub */
 .h2c-workflow-hub {
   margin-bottom: 2rem;
@@ -371,6 +522,103 @@ function getAppState() {
   };
 }
 
+function updateHeaderDisclosure() {
+  const sub = document.querySelector('header p.text-muted');
+  if (sub && !document.querySelector('.h2c-header-disclosure')) {
+    const d = document.createElement('div');
+    d.className = 'h2c-header-disclosure';
+    d.innerHTML = `
+      <div style="margin-top: 8px; padding: 7px 12px; background: #fff5f5; border: 1.5px solid #dc2626; border-radius: 6px; font-size: 12px; line-height: 1.45; color: #991b1b;">
+        <strong style="color: #dc2626; font-size: 12px;">⚖️ BOLD RED DISCLOSURE:</strong>
+        <span style="font-weight: 700; color: #b91c1c;">Independent educational prototype ("vibe coded work").</span>
+        Credit to original author <strong>Dean L. Gano</strong> (<em>"Apollo Root Cause Analysis"</em> &amp; <em>"RealityCharting"</em> books).
+        Apollo RCA&trade; and RealityCharting&reg; are trademarks of Dean L. Gano / Apollonian Publications, LLC.
+        Not affiliated with or endorsed by the original author.
+        For official software instead of this vibe coded work, visit:
+        <a href="https://realitycharting.com/home/" target="_blank" rel="noopener noreferrer" style="color: #dc2626; font-weight: 800; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
+          https://realitycharting.com/home/ &rarr;
+        </a>
+      </div>
+    `;
+    sub.parentNode.appendChild(d);
+  }
+}
+
+function ensureLegalBanner() {
+  const target = document.querySelector('.h2c-workflow-hub') || document.querySelector('ol.grid-cols-2, ol.sm\\:grid-cols-7');
+  if (!target || !target.parentNode) return;
+
+  let banner = document.querySelector('.h2c-legal-banner');
+  if (!banner) {
+    banner = document.createElement('section');
+    banner.className = 'no-print h2c-legal-banner';
+    banner.setAttribute('role', 'region');
+    banner.setAttribute('aria-label', 'Legal disclosure and trademark attribution');
+    target.parentNode.insertBefore(banner, target);
+  }
+
+  if (banner && !banner.dataset.rendered) {
+    banner.dataset.rendered = 'true';
+    banner.innerHTML = `
+      <div class="h2c-legal-topline">
+        <div class="h2c-legal-badge">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          MANDATORY LEGAL DISCLOSURE &amp; TRADEMARK ATTRIBUTION
+        </div>
+        <span class="h2c-legal-subbadge">NOMINATIVE FAIR USE &bull; INDEPENDENT OPEN-SOURCE EXPERIMENT</span>
+      </div>
+
+      <div class="h2c-legal-body">
+        <div class="h2c-legal-author-box">
+          <p class="h2c-legal-bold-red" style="margin: 0 0 4px 0; font-size: 13.5px;">
+            ATTRIBUTION TO ORIGINAL AUTHOR &amp; TRADEMARK CREDIT:
+          </p>
+          <p class="h2c-legal-author-text">
+            Root Cause Analysis principles and the RealityCharting methodology were created and authored by <strong>Dean L. Gano</strong>, author of the acclaimed books:
+          </p>
+          <ul class="h2c-legal-book-list">
+            <li>📖 <em>"Apollo Root Cause Analysis: A New Way of Thinking"</em> (Apollonian Publications)</li>
+            <li>📖 <em>"RealityCharting: Seven Steps to Effective Problem-Solving and Strategies for Personal Success"</em></li>
+          </ul>
+          <p class="h2c-legal-tm-text">
+            <strong>"Apollo Root Cause Analysis"</strong>, <strong>"Apollo RCA"</strong>, <strong>"Reality Tree"</strong>, and <strong>"RealityCharting&reg;"</strong> are registered trademarks and intellectual property of <strong>Dean L. Gano</strong> and <strong>Apollonian Publications, LLC</strong>. All rights are fully reserved by the respective trademark owners.
+          </p>
+        </div>
+
+        <div class="h2c-legal-official-box">
+          <div class="h2c-legal-official-header">
+            <span class="h2c-official-icon">📢</span>
+            <div>
+              <strong class="h2c-legal-bold-red" style="font-size: 13.5px;">RECOMMENDATION: USE THE OFFICIAL CERTIFIED SOFTWARE</strong>
+              <p class="h2c-legal-official-desc">
+                If you want to know more, master genuine certified methodology, or use the official enterprise software instead of this experimental vibe coded work, please visit the official website:
+              </p>
+            </div>
+          </div>
+          <div class="h2c-legal-cta-row">
+            <a href="https://realitycharting.com/home/" target="_blank" rel="noopener noreferrer" class="h2c-legal-cta-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Go to Official RealityCharting&reg; Software &amp; Website (realitycharting.com) &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="h2c-legal-safeharbor">
+          <p class="h2c-legal-bold-red" style="font-size: 12px; margin-bottom: 4px;">
+            LEGAL NON-AFFILIATION, SAFE HARBOR &amp; DISCLAIMER OF CLAIMS:
+          </p>
+          <p class="h2c-legal-safeharbor-text">
+            This web tool (<em>H2C Root Cause Analyst</em>) is an independent, non-commercial open-source experimental prototype ("vibe coded work") developed by Engr. Harold Henry G. Cabanilla (h2c_Creates / h2c-DataSci) strictly for educational, personal research, and community demonstration purposes under the MIT License. It is <strong>NOT</strong> affiliated with, endorsed by, sponsored by, authorized by, or in any way officially connected with <strong>Dean L. Gano</strong>, <strong>Apollonian Publications, LLC</strong>, or <strong>RealityCharting.com</strong>.
+          </p>
+          <p class="h2c-legal-safeharbor-text">
+            No proprietary source code, copyrighted illustrations, or certified training materials from Apollonian Publications, LLC have been used or reproduced. All methodology references are made strictly under <strong>Nominative Fair Use (15 U.S.C. &sect; 1125 / Lanham Act)</strong> for descriptive identification. All trademarks belong to their respective holders. Provided strictly "AS IS" without warranty of any kind.
+          </p>
+        </div>
+      </div>
+    `;
+  }
+}
+
 function updateStepsHub() {
   const existingOl = document.querySelector('ol.grid-cols-2, ol.sm\\:grid-cols-7');
   let hub = document.querySelector('.h2c-workflow-hub');
@@ -621,6 +869,8 @@ function refreshAll() {
   if (updating) return;
   updating = true;
   try {
+    updateHeaderDisclosure();
+    ensureLegalBanner();
     updateStepsHub();
     updateColorCodedValidation();
   } finally {

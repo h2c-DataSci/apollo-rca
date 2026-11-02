@@ -20,6 +20,7 @@
 | **Phase 5** | Implementation, GitHub Hygiene & Verification | **COMPLETED** | 100% | Feature branch created, clean conventional commits, verified headless CDP browser test, Final Walkthrough artifact published |
 | **Phase 6** | Interactive 7-Step Workflow & Color Validation | **COMPLETED** | 100% | Transformed static boxes into interactive workflow hub with hover/click effects, status pills, progress bar, and real-time color validation (Red/Amber/Emerald) |
 | **Phase 7** | AI Coach Resilience & Session Stabilization | **COMPLETED** | 100% | Resolved recurring "AI loads then drops" issue: increased token budget (160->384), resilient auto-repairing JSON parser, preserved `ready` state with Apollo rule fallback |
+| **Phase 8** | Legal Disclosure, Trademark Attribution & Safe Harbor | **COMPLETED** | 100% | Added bold red text disclosure, Dean L. Gano authorship attribution, trademarks notice (Apollo RCA™, RealityCharting®), official website link, and nominative fair use safe harbor |
 
 ---
 
@@ -132,6 +133,31 @@
   - Full automated regression test suite: **54/54 PASS** (0 failures, 100% test pass rate).
   - Headless browser verification: Confirmed RCA Coach opens cleanly, controls are responsive, and session state persists.
 
+### Phase 8: Mandatory Legal Disclosure, Trademark Attribution & Safe Harbor (Completed)
+- [x] **Added Bold Red Text Disclosure & Dean L. Gano Authorship Credit**:
+  - Sub-Header Callout: Embedded high-contrast bold red notice directly beneath the app description.
+  - Full-Width Disclosure Banner: Injected a prominent warning card (`.h2c-legal-banner`) directly between the header toolbar and the 7-Step Workflow Navigator (exact location of user red arrow).
+  - Credit to original author **Dean L. Gano** and his foundational books:
+    - *"Apollo Root Cause Analysis: A New Way of Thinking"* (Apollonian Publications)
+    - *"RealityCharting: Seven Steps to Effective Problem-Solving and Strategies for Personal Success"*
+  - Explicit trademark notice: **"Apollo Root Cause Analysis"**, **"Apollo RCA"**, **"Reality Tree"**, and **"RealityCharting®"** are registered trademarks of Dean L. Gano and Apollonian Publications, LLC.
+- [x] **Official Software Recommendation & Active Website Link**:
+  - Included active CTA button with direct link to the official software site: [`https://realitycharting.com/home/`](https://realitycharting.com/home/).
+  - Text advises users: *"If you want to know more, master genuine certified methodology, or use the official enterprise software instead of this experimental vibe coded work, please visit the official website."*
+- [x] **Comprehensive Legal Safe Harbor Protections**:
+  - **Nominative Fair Use**: Methodology references are made strictly under 15 U.S.C. § 1125 / Lanham Act for educational commentary and descriptive identification.
+  - **Non-Affiliation**: Explicitly declares this project is an independent, non-commercial open-source experimental prototype ("vibe coded work") by Engr. Harold Henry G. Cabanilla (h2c_Creates / h2c-DataSci) and is NOT affiliated with, sponsored by, or endorsed by Dean L. Gano or Apollonian Publications, LLC.
+  - **Non-Infringement**: Confirms zero proprietary source code, copyrighted diagrams, or certified courseware from Apollonian Publications, LLC have been used or reproduced.
+  - **Disclaimer of Warranties**: Tool provided strictly "AS IS" under the MIT License.
+- [x] **Omnipresent Legal Coverage**:
+  - Main app banner (`h2c-shell.js`)
+  - Subtitle callout (`h2c-shell.js`)
+  - Help Drawer knowledge base topics (`limits`, `sources`, `trademark` in `help-kb.js` & `h2c-help.js`)
+  - Persistent sticky footer (`h2c-devfoot` in `h2c-help.js`)
+- [x] **Automated CDP Verification & Test Suite**:
+  - Captured verified visual screenshot: `screenshot-legal-disclosure-verified.png`.
+  - All 54 tests pass (`node --test`, 0 regressions).
+
 ---
 
 ## 4. Verification Evidence & Artifact References
@@ -139,6 +165,7 @@
 - **Security & Risk Report**: [security-and-risk-report.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/security-and-risk-report.md)
 - **Final Walkthrough**: [final-walkthrough-and-verification.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/final-walkthrough-and-verification.md)
 - **Visual Artifacts**:
+  - Legal Disclosure & Trademark Attribution Banner (Verified): `screenshot-legal-disclosure-verified.png`
   - Interactive Workflow Initial (0 words, Red Alert): `screenshot-interactive-initial.png`
   - Interactive Workflow Valid (2-4 words, Emerald Green): `screenshot-interactive-valid.png`
   - Interactive Workflow Blame Violation (P01/P05 Alert): `screenshot-interactive-blame.png`
