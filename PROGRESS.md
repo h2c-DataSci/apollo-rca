@@ -278,11 +278,39 @@
 
 ---
 
+- [x] **Phase 14: Lesson Plan v3 Alignment & YouTube Video Descriptions (Completed)**:
+  - **Full Curriculum Integration (PART 1–7 to Episodes 1–7)**:
+    - Integrated Dean L. Gano's *Thinking in Causes (v3)* lesson plan into the application metadata, in-app video module cards, and standalone documentation.
+    - Updated `VIDEO_MODULES` in `h2c-videos.js` with comprehensive metadata:
+      - **Episode 1 of 7** (`55:50`, `IXXgr85wO74`): **PART 1: Foundations** (RC Intro & Chs. 1–3, pp. 13–69; AR Chs. 1–2, Appendix).
+      - **Episode 2 of 7** (`22:02`, `tCQuu_rvSJ8`): **PART 2: Step 1, Define the Problem** (RC Ch. 4, pp. 70–77; AR Ch. 3, pp. 61–66).
+      - **Episode 3 of 7** (`07:57`, `8y501jMIS7k`): **PART 3: Steps 2–3, Causal Relationships and the RealityChart** (RC Chs. 5–6, pp. 78–96; AR Ch. 3, pp. 67–74, 81–87).
+      - **Episode 4 of 7** (`06:59`, `lppZuZFyHzM`): **PART 4: Steps 4–5, Evidence; Sufficient and Necessary** (RC Chs. 7–8, pp. 97–111; AR Ch. 3, pp. 74–81).
+      - **Episode 5 of 7** (`15:10`): **PART 5: Steps 6–7, Solutions, Implement and Track** (RC Chs. 9–10, pp. 112–131; AR Chs. 4–5).
+      - **Episode 6 of 7** (`16:30`): **PART 6: Culture and Facilitation, Light** (RC Chs. 11–12, pp. 132–174; AR Chs. 5–6).
+      - **Episode 7 of 7** (`14:45`): **PART 7: Success and a New Way of Thinking** (RC Chs. 13–14, pp. 175–194).
+  - **Interactive Drawer Enhancements**:
+    - Added expandable `<details class="h2cv-lesson-details">` to every episode card displaying:
+      - Book unit references with exact printed page ranges.
+      - Student and learner competency objectives.
+      - Gano's book case studies (Frank's lights, Pot Boiled Over, Elevator near miss, 1926 steering knuckles, Percy's microwave).
+      - YouTube video outline chapters with timestamps.
+      - `📋 Copy Full YouTube Description` button with animated confirmation.
+  - **Dedicated YouTube Publishing Artifact**:
+    - Created `YOUTUBE_DESCRIPTIONS.md` containing all 7 production-ready video descriptions with chapters, quotes, and legal disclosures for `h2c_Learnings`.
+  - **Automated Verification**:
+    - Verified live drawer rendering and copy button operation via CDP script `verify-lesson-plan-videos.mjs`.
+    - Captured visual artifact: `screenshot-lesson-plan-videos.png`.
+    - 100% test coverage maintained: **68/68 PASS** (`node --test`).
+
+---
+
 ## 4. Verification Evidence & Artifact References
 - **Baseline Report**: [baseline-report.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/baseline-report.md)
 - **Security & Risk Report**: [security-and-risk-report.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/security-and-risk-report.md)
 - **Final Walkthrough**: [final-walkthrough-and-verification.md](file:///C:/Users/harol/.gemini/antigravity/brain/f01f54ac-c169-4a2f-aea1-dd43e8f9972c/final-walkthrough-and-verification.md)
 - **Visual Artifacts**:
+  - Lesson Plan v3 Aligned Video Drawer & Copy Button: `screenshot-lesson-plan-videos.png`
   - Verified Updated Video Durations (55:50, 22:02, 07:57, 06:59): `screenshot-updated-durations.png`
   - Header Navigation with Video Button next to ? Help: `screenshot-header-video-button.png`
   - Bottom Legal Showcase and Safe Harbor: `screenshot-bottom-disclosure-verified.png`

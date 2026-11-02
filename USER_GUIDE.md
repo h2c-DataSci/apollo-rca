@@ -63,16 +63,33 @@ The interactive 7-Step Workflow Navigator at the top tracks your investigation p
 
 ---
 
-## 3. Official 7-Episode Training Series
+## 3. Official 7-Episode Training Series & Lesson Plan (Thinking in Causes)
 
-Click the `▶ 7 Videos (Training)` button in the top toolbar to access the official video curriculum:
-1. **Episode 1 of 7** (⏱ **55:50**): [Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)](https://youtu.be/IXXgr85wO74)
-2. **Episode 2 of 7** (⏱ **22:02**): [Defining the Problem — The 4-Element Formula Without Placing Blame](https://youtu.be/tCQuu_rvSJ8)
-3. **Episode 3 of 7** (⏱ **07:57**): [Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)](https://youtu.be/8y501jMIS7k)
-4. **Episode 4 of 7** (⏱ **06:59**): [Evidence; Sufficient and Necessary — How to Test and Prove Causes](https://youtu.be/lppZuZFyHzM)
-5. **Episode 5 of 7**: Effective Solutions, Implementation, and Tracking (Preventing Recurrence) *(Placeholder)*
-6. **Episode 6 of 7**: Culture and Facilitation — Fix the Cause, Not the Blame *(Placeholder)*
-7. **Episode 7 of 7**: Success and a New Way of Thinking (Why Success Is Planned) *(Placeholder)*
+Click the `▶ 7 Videos (Training)` button in the top toolbar to access the official video curriculum aligned with the **Thinking in Causes (v3)** lesson plan on Dean L. Gano's *RealityCharting®* (2011) and *Apollo Root Cause Analysis* (2003):
+
+- **Episode 1 of 7** (⏱ **55:50**): [Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)](https://youtu.be/IXXgr85wO74)
+  - *Lesson Alignment:* **PART 1: Foundations** (RC Intro & Chs. 1–3, pp. 13–69; AR Chs. 1–2, Appendix)
+  - *Core Concepts:* Common reality, 3 failed strategies, the single root cause myth, 6 RCA criteria, 4 Principles of Cause and Effect, Action & Condition causal sets.
+- **Episode 2 of 7** (⏱ **22:02**): [Defining the Problem — The 4-Element Formula Without Placing Blame](https://youtu.be/tCQuu_rvSJ8)
+  - *Lesson Alignment:* **PART 2: Step 1, Define the Problem** (RC Ch. 4, pp. 70–77; AR Ch. 3, pp. 61–66)
+  - *Core Concepts:* 4-element formula (What, When, Where, Significance), noun-verb primary effect (2–4 words), Zero Blame rule (no Who/no Why), 95% failure rule.
+- **Episode 3 of 7** (⏱ **07:57**): [Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)](https://youtu.be/8y501jMIS7k)
+  - *Lesson Alignment:* **PART 3: Steps 2–3, Causal Relationships and the RealityChart** (RC Chs. 5–6, pp. 78–96; AR Ch. 3, pp. 67–74, 81–87)
+  - *Core Concepts:* 4-part process, "Caused By" statements, finding missing conditions (add "exists"), Square One Loop, Four Stop Reasons (Desired Condition, Lack of Control, New Primary Effect, Other Paths), no single correct chart.
+- **Episode 4 of 7** (⏱ **06:59**): [Evidence; Sufficient and Necessary — How to Test and Prove Causes](https://youtu.be/lppZuZFyHzM)
+  - *Lesson Alignment:* **PART 4: Steps 4–5, Evidence; Sufficient and Necessary** (RC Chs. 7–8, pp. 97–111; AR Ch. 3, pp. 74–81)
+  - *Core Concepts:* 4 Evidence Quality Tiers (Sensed, Inferred, Intuited, Emotional), Fact = cause supported by evidence, Sufficiency test, Necessity test (Remove-It Test), Sagan's Baloney Detection Kit.
+- **Episode 5 of 7** (⏱ **15:10**): Effective Solutions, Implementation, and Tracking (Preventing Recurrence) *(Ready for upload)*
+  - *Lesson Alignment:* **PART 5: Steps 6–7, Solutions, Implement and Track** (RC Chs. 9–10, pp. 112–131; AR Chs. 4–5)
+  - *Core Concepts:* Root causes defined by solutions, challenge causes right-to-left, 4 Solution Criteria, eliminating "re" traps (retrain, rewrite), Rapid Response brainstorming, corrective-action log & trending.
+- **Episode 6 of 7** (⏱ **16:30**): Culture and Facilitation — Fix the Cause, Not the Blame *(Ready for upload)*
+  - *Lesson Alignment:* **PART 6: Culture and Facilitation, Light** (RC Chs. 11–12, pp. 132–174; AR Chs. 5–6)
+  - *Core Concepts:* Facilitator role (< 8 members), evidence go-bag & checklist, no-blame interview ("Please help me understand..."), 3 group traps (Consensus, Groupthink, Time as a cause), "Fix the cause, not the blame".
+- **Episode 7 of 7** (⏱ **14:45**): Success and a New Way of Thinking (Why Success Is Planned) *(Ready for upload)*
+  - *Lesson Alignment:* **PART 7: Success and a New Way of Thinking** (RC Chs. 13–14, pp. 175–194)
+  - *Core Concepts:* Success is planned and failure is not, serendipity anatomy, decoupling systems in time and space, applying solutions to conditions, moving from caveman storytelling to causal thinking.
+
+> 📋 **YouTube Studio Ready Descriptions**: Complete video titles, timestamps, book quotes, case studies, and tags are accessible in [`YOUTUBE_DESCRIPTIONS.md`](file:///d:/GitHub-Antigravity/apollo-rca/YOUTUBE_DESCRIPTIONS.md) and via the **📋 Copy Full YouTube Description** button in each in-app video module card.
 
 ---
 
