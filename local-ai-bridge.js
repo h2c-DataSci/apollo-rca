@@ -86,6 +86,8 @@ export async function testLocalDaemonConnection(endpoint = 'http://127.0.0.1:114
         models,
         message: `Connected to Ollama on ${url} (${models.length} model(s) available)`
       };
+    } else {
+      throw new Error(`Ollama returned status ${res.status}`);
     }
   } catch (err) {
     clearTimeout(timer);

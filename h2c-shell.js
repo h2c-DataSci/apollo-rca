@@ -1,3 +1,13 @@
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Thin shell around the Grok Build app: one-click "New analysis" with confirm + undo,
 // interactive lively 7-step Apollo RCA workflow hub, real-time color-coded validation,
 // and local AI daemon bridge for low-resource hardware.
@@ -1292,7 +1302,8 @@ function toggleCoachWorkbench(force) {
             outputBadge.textContent = 'AI SUGGESTION';
             outputBadge.style.background = '#dbeafe';
             outputBadge.style.color = '#1e40af';
-            outputContent.innerHTML = `<strong>Local AI (${cfg.model}):</strong><br>${chatRes.content.replace(/\n/g, '<br>')}`;
+            const chatText = typeof chatRes === 'string' ? chatRes : (chatRes?.content || '');
+            outputContent.innerHTML = `<strong>Local AI (${cfg.model}):</strong><br>${chatText.replace(/\n/g, '<br>')}`;
           } catch (e) {
             outputBadge.textContent = 'RULE FALLBACK';
             outputBadge.style.background = '#fef3c7';

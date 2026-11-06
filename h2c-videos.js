@@ -3,12 +3,30 @@
 // Slide-out Video Training Drawer, 7 Step Video Cards with responsive 16:9
 // YouTube player embeds, duration badges, methodology summaries, and configurable URLs.
 
-const STORAGE_KEY = 'h2c-youtube-training-videos-v1';
+export const STORAGE_KEY = 'h2c-youtube-training-videos-v2';
+export const LEGACY_STORAGE_KEY = 'h2c-youtube-training-videos-v1';
+export const SYNC_VERSION = 'v16-20261106';
+export const SYNC_KEY = 'h2c-yt-sync-ver';
+
+export const OFFICIAL_CHANNEL_URL = 'https://www.youtube.com/@h2c_Learnings';
+
+export const OFFICIAL_VIDEOS = {
+  1: { id: 'IXXgr85wO74', duration: '55:50', tier: 'Full Masterclass' },
+  2: { id: 'tCQuu_rvSJ8', duration: '20:22', tier: 'Deep Dive' },
+  3: { id: '8y501jMIS7k', duration: '07:57', tier: 'Focused Guide' },
+  4: { id: 'lppZuZFyHzM', duration: '06:59', tier: 'Essential Lab' },
+  5: { id: 'PLACEHOLDER_EPISODE5', duration: '15:10', tier: 'Action Framework' },
+  6: { id: 'PLACEHOLDER_EPISODE6', duration: '16:30', tier: 'Culture & Alignment' },
+  7: { id: 'PLACEHOLDER_EPISODE7', duration: '14:45', tier: 'Proactive Mastery' }
+};
 
 export const VIDEO_MODULES = [
   {
     step: 1,
     episode: 'Episode 1 of 7',
+    tier: 'Full Masterclass',
+    badgeText: '55:50 • Full Masterclass',
+    verified: true,
     part: 'Part 1: Foundations',
     title: 'Episode 1 of 7: Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)',
     shortTitle: 'Introduction & Fundamentals',
@@ -100,11 +118,14 @@ Why do recurring problems keep happening in organizations despite endless invest
   {
     step: 2,
     episode: 'Episode 2 of 7',
+    tier: 'Deep Dive',
+    badgeText: '20:22 • Deep Dive',
+    verified: true,
     part: 'Part 2: Step 1, Define the Problem',
     title: 'Episode 2 of 7: Defining the Problem — The 4-Element Formula Without Placing Blame',
     shortTitle: 'Defining the Problem',
     subtitle: 'The 4-Element Formula (What, Where, When, Significance) without placing blame',
-    duration: '22:02',
+    duration: '20:22',
     defaultYtId: 'tCQuu_rvSJ8', // Official Video 2: https://youtu.be/tCQuu_rvSJ8
     targetId: 'section-define',
     bookRef: 'RC Ch. 4 (pp. 70–77); AR Ch. 3 (pp. 61–66)',
@@ -138,7 +159,7 @@ Why do recurring problems keep happening in organizations despite endless invest
     ],
     fullDescription: `Episode 2 of 7: Defining the Problem — The 4-Element Formula Without Placing Blame
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 22:02 | Official URL: https://youtu.be/tCQuu_rvSJ8
+Duration: 20:22 | Official URL: https://youtu.be/tCQuu_rvSJ8
 
 📌 LESSON PLAN ALIGNMENT: PART 2 — STEP 1, DEFINE THE PROBLEM
 Main Text: Dean L. Gano, RealityCharting® (2011), Ch. 4, pp. 70–77.
@@ -177,6 +198,9 @@ Why do organizations fail to define the problem well 95% of the time? In Step 1 
   {
     step: 3,
     episode: 'Episode 3 of 7',
+    tier: 'Focused Guide',
+    badgeText: '07:57 • Focused Guide',
+    verified: true,
     part: 'Part 3: Steps 2–3, Causal Relationships and the RealityChart',
     title: 'Episode 3 of 7: Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)',
     shortTitle: 'Causal Relationships & RealityChart',
@@ -253,6 +277,9 @@ How do you build a graphical Realitychart that maps the full causal reality of a
   {
     step: 4,
     episode: 'Episode 4 of 7',
+    tier: 'Essential Lab',
+    badgeText: '06:59 • Essential Lab',
+    verified: true,
     part: 'Part 4: Steps 4–5, Evidence; Sufficient and Necessary',
     title: 'Episode 4 of 7: Evidence; Sufficient and Necessary — How to Test and Prove Causes',
     shortTitle: 'Evidence: Sufficient & Necessary',
@@ -334,6 +361,9 @@ How do you prove that your causes are real and avoid jumping to ungrounded concl
   {
     step: 5,
     episode: 'Episode 5 of 7',
+    tier: 'Action Framework',
+    badgeText: '15:10 • Action Framework',
+    verified: false,
     part: 'Part 5: Steps 6–7, Solutions, Implement and Track',
     title: 'Episode 5 of 7: Effective Solutions, Implementation, and Tracking (Preventing Recurrence)',
     shortTitle: 'Effective Solutions & Tracking',
@@ -415,6 +445,9 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
   {
     step: 6,
     episode: 'Episode 6 of 7',
+    tier: 'Culture & Alignment',
+    badgeText: '16:30 • Culture & Alignment',
+    verified: false,
     part: 'Part 6: Culture and Facilitation, Light',
     title: 'Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame',
     shortTitle: 'Culture & Facilitation',
@@ -495,6 +528,9 @@ Why do so many RCA meetings degenerate into finger-pointing, defensiveness, and 
   {
     step: 7,
     episode: 'Episode 7 of 7',
+    tier: 'Proactive Mastery',
+    badgeText: '14:45 • Proactive Mastery',
+    verified: false,
     part: 'Part 7: Success and a New Way of Thinking',
     title: 'Episode 7 of 7: Success and a New Way of Thinking (Why Success Is Planned)',
     shortTitle: 'Success & A New Way of Thinking',
@@ -570,33 +606,88 @@ Why do we only investigate failures when we could be charting and replicating ou
   }
 ];
 
-function getStoredVideos() {
+export function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function sanitizeVideoId(id, fallback = '') {
+  if (typeof id === 'string') {
+    const trimmed = id.trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+    if (trimmed.startsWith('PLACEHOLDER') && /^[a-zA-Z0-9_-]+$/.test(trimmed)) return trimmed;
+  }
+  return fallback;
+}
+
+export function syncOfficialVideos(force = false) {
+  if (typeof localStorage === 'undefined') {
+    const defaults = {};
+    VIDEO_MODULES.forEach(m => defaults[m.step] = m.defaultYtId);
+    return defaults;
+  }
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const data = raw ? JSON.parse(raw) : {};
-    // Ensure newly assigned official video IDs take effect over legacy placeholders
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+    let data = raw ? JSON.parse(raw) : {};
+    const lastVer = localStorage.getItem(SYNC_KEY);
+
+    if (force || lastVer !== SYNC_VERSION) {
+      // Auto-migrate: ensure verified official videos 1-4 take precedence
+      Object.entries(OFFICIAL_VIDEOS).forEach(([stepStr, info]) => {
+        const step = Number(stepStr);
+        if (force || !data[step] || data[step].startsWith('PLACEHOLDER') || data[step] === 'dQw4w9WgXcQ') {
+          data[step] = info.id;
+        }
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(data));
+      localStorage.setItem(SYNC_KEY, SYNC_VERSION);
+    }
+    // Sanitize
     VIDEO_MODULES.forEach(m => {
-      if (!data[m.step] || data[m.step] === 'dQw4w9WgXcQ' || (data[m.step].startsWith('PLACEHOLDER') && !m.defaultYtId.startsWith('PLACEHOLDER'))) {
+      const val = data[m.step];
+      if (!val || val === 'dQw4w9WgXcQ' || (typeof val === 'string' && val.startsWith('PLACEHOLDER') && !m.defaultYtId.startsWith('PLACEHOLDER'))) {
         data[m.step] = m.defaultYtId;
+      } else {
+        data[m.step] = sanitizeVideoId(val, m.defaultYtId);
       }
     });
     return data;
-  } catch {
+  } catch (err) {
+    console.warn('Storage sync error:', err);
     const defaults = {};
     VIDEO_MODULES.forEach(m => defaults[m.step] = m.defaultYtId);
     return defaults;
   }
 }
 
-function saveVideoId(stepNum, ytId) {
-  try {
-    const data = getStoredVideos();
-    data[stepNum] = ytId.trim();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {}
+export function getStoredVideos() {
+  return syncOfficialVideos(false);
 }
 
-const css = document.createElement('style');
+export function saveVideoId(stepNum, ytId) {
+  try {
+    const data = getStoredVideos();
+    const clean = parseYouTubeId(ytId) || sanitizeVideoId(ytId, null);
+    if (clean) {
+      data[stepNum] = clean;
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(data));
+      }
+      return clean;
+    }
+  } catch {}
+  return null;
+}
+
+const css = typeof document !== 'undefined' ? document.createElement('style') : null;
+if (css)
 css.textContent = `
 /* Floating Video Academy Button */
 .h2cv-fab {
@@ -608,21 +699,21 @@ css.textContent = `
   color: #ffffff;
   border: 2px solid #ef4444;
   border-radius: 999px;
-  padding: 10px 15px;
+  padding: 10px 16px;
   font: 700 13px system-ui, -apple-system, sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(185, 28, 28, 0.4);
+  box-shadow: 0 4px 14px rgba(185, 28, 28, 0.45);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .h2cv-fab:hover {
   background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(185, 28, 28, 0.5);
+  box-shadow: 0 6px 20px rgba(185, 28, 28, 0.55);
 }
-.h2cv-fab:focus-visible, .h2cv-tb:focus-visible, .h2cv-x:focus-visible {
+.h2cv-fab:focus-visible, .h2cv-tb:focus-visible, .h2cv-x:focus-visible, .h2cv-sync-btn:focus-visible {
   outline: 3px solid #f6dd7a;
   outline-offset: 2px;
 }
@@ -655,27 +746,40 @@ css.textContent = `
 .h2cv-back {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
   z-index: 9998;
+  animation: h2cv-fade-in 0.2s ease-out;
+}
+@keyframes h2cv-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .h2cv-panel {
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
-  width: min(600px, 100vw);
+  width: min(680px, 100vw);
   background: #fffdfa;
   z-index: 9999;
   display: flex;
   flex-direction: column;
   border-left: 4px solid #dc2626;
-  box-shadow: -8px 0 28px rgba(0, 0, 0, 0.35);
+  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.4);
   font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #14261c;
+  animation: h2cv-slide-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-overflow-scrolling: touch;
 }
+@keyframes h2cv-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* Drawer Header */
 .h2cv-head {
-  background: linear-gradient(180deg, #991b1b 0%, #7f1d1d 100%);
+  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 60%, #450a0a 100%);
   color: #ffffff;
   padding: 14px 18px;
   display: flex;
@@ -683,21 +787,61 @@ css.textContent = `
   justify-content: space-between;
   gap: 12px;
   border-bottom: 2px solid #ef4444;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 .h2cv-head-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+.h2cv-head-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 .h2cv-head h2 {
   margin: 0;
   font: 700 17px system-ui, sans-serif;
   color: #ffffff;
+  letter-spacing: -0.01em;
 }
 .h2cv-head p {
   margin: 2px 0 0;
   font-size: 11.5px;
   color: #fca5a5;
+  line-height: 1.35;
+}
+.h2cv-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.h2cv-head-yt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font: 700 12px system-ui, sans-serif;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.h2cv-head-yt-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: #ffffff;
+  transform: translateY(-1px);
 }
 .h2cv-x {
   background: #ffffff;
@@ -706,12 +850,113 @@ css.textContent = `
   border-radius: 6px;
   padding: 6px 12px;
   font-weight: 800;
+  font-size: 12.5px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 .h2cv-x:hover {
   background: #fee2e2;
   transform: scale(1.05);
+}
+
+/* Sync & Status Banner */
+.h2cv-sync-bar {
+  background: linear-gradient(90deg, #ecfdf5 0%, #f0fdf4 100%);
+  border-bottom: 1.5px solid #a7f3d0;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 64px;
+  z-index: 9;
+}
+.h2cv-sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #065f46;
+}
+.h2cv-sync-status-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+}
+.h2cv-sync-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.h2cv-sync-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #047857;
+  color: #ffffff;
+  border: 0;
+  border-radius: 6px;
+  padding: 4px 11px;
+  font: 700 11.5px system-ui;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(4, 120, 87, 0.25);
+}
+.h2cv-sync-btn:hover {
+  background: #065f46;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(4, 120, 87, 0.35);
+}
+.h2cv-channel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font: 700 11.5px system-ui;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.h2cv-channel-btn:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
+/* Floating in-drawer sync toast */
+.h2cv-sync-toast {
+  position: absolute;
+  top: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  background: #064e3b;
+  color: #a7f3d0;
+  border: 1.5px solid #10b981;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font: 700 12.5px system-ui;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: h2cv-toast-pop 0.25s ease-out;
+}
+@keyframes h2cv-toast-pop {
+  from { opacity: 0; transform: translate(-50%, -8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 /* Step Filter Tabs */
@@ -723,6 +968,9 @@ css.textContent = `
   border-bottom: 1px solid #e6d7a8;
   overflow-x: auto;
   white-space: nowrap;
+  position: sticky;
+  top: 104px;
+  z-index: 8;
 }
 .h2cv-tab-btn {
   padding: 5px 12px;
@@ -759,19 +1007,25 @@ css.textContent = `
 .h2cv-card {
   background: #ffffff;
   border: 1.5px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 16px;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: 12px;
-  scroll-margin-top: 10px;
+  scroll-margin-top: 160px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.h2cv-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 .h2cv-card-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
+  flex-wrap: wrap;
 }
 .h2cv-step-pill {
   background: #dc2626;
@@ -780,18 +1034,59 @@ css.textContent = `
   font-size: 11px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 4px;
+  padding: 3px 9px;
+  border-radius: 6px;
 }
+.h2cv-part-pill {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* High-contrast glowing duration badge (Header) */
 .h2cv-duration-badge {
-  background: #f3f4f6;
-  color: #4b5563;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-weight: 700;
   font-size: 11.5px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid #e5e7eb;
+  letter-spacing: 0.02em;
+  padding: 4px 11px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
 }
+.h2cv-duration-badge.verified {
+  background: linear-gradient(135deg, #022c22 0%, #064e3b 100%);
+  color: #6ee7b7;
+  border: 1.5px solid #059669;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.h2cv-duration-badge.upcoming {
+  background: linear-gradient(135deg, #27272a 0%, #18181b 100%);
+  color: #fbbf24;
+  border: 1.5px solid #71717a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.h2cv-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+  display: inline-block;
+  animation: h2cv-pulse 2s infinite ease-in-out;
+}
+@keyframes h2cv-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.8); }
+}
+
 .h2cv-card-title {
   margin: 6px 0 2px;
   font: 700 16px/1.3 Georgia, serif;
@@ -808,10 +1103,10 @@ css.textContent = `
   width: 100%;
   aspect-ratio: 16 / 9;
   background: #0f172a;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
 }
 .h2cv-screen {
   width: 100%;
@@ -861,23 +1156,48 @@ css.textContent = `
   font-size: 11px;
   color: #9ca3af;
 }
+
+/* Thumbnail Overlay Duration Badge */
 .h2cv-screen-duration {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.8);
+  bottom: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.94);
   color: #ffffff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 3px 9px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 2;
+}
+.h2cv-screen-duration.verified {
+  background: rgba(4, 45, 36, 0.94);
+  color: #6ee7b7;
+  border-color: rgba(52, 211, 153, 0.6);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.4), 0 3px 10px rgba(0, 0, 0, 0.7);
+}
+.h2cv-screen-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 6px #34d399;
+  display: inline-block;
 }
 
 /* Summary & Key Points */
 .h2cv-summary-box {
   background: #fbf7ee;
   border: 1px solid #e6d7a8;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 10px 12px;
   font-size: 12.5px;
   color: #374151;
@@ -990,6 +1310,23 @@ css.textContent = `
   background: #0a5c45;
   color: #ffffff;
 }
+.h2cv-yt-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #fff5f5;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font: 700 11.5px system-ui;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.h2cv-yt-link-btn:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
 .h2cv-edit-btn {
   display: inline-flex;
   align-items: center;
@@ -1012,14 +1349,32 @@ css.textContent = `
 .h2cv-foot {
   background: #fbf7ee;
   border-top: 2px solid #e6d7a8;
-  padding: 12px 16px;
+  padding: 12px 18px;
   font-size: 12px;
   color: #4b5a53;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
 }
-`;
+.h2cv-foot-yt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #b91c1c;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  transition: all 0.15s ease;
+}
+.h2cv-foot-yt-link:hover {
+  background: #fee2e2;
+  color: #991b1b;
+}`;
 
 let panel, back, fab, lastFocus;
 
@@ -1030,24 +1385,25 @@ export function closeVideoDrawer() {
   lastFocus?.focus();
 }
 
-function parseYouTubeId(input) {
-  if (!input) return null;
+export function parseYouTubeId(input) {
+  if (!input || typeof input !== 'string') return null;
   input = input.trim();
   // If already an 11-char ID
   if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+
   // youtu.be/ID
-  const m1 = input.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+  const m1 = input.match(/^(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})(?:[?&#].*)?$/i);
   if (m1) return m1[1];
-  // youtube.com/watch?v=ID
-  const m2 = input.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-  if (m2) return m2[1];
-  // youtube.com/embed/ID
-  const m3 = input.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
-  if (m3) return m3[1];
+
+  // (www.)youtube.com or (www.)youtube-nocookie.com /watch?v=ID or /embed/ or /shorts/ or /live/
+  const m2 = input.match(/^(?:https?:\/\/)?(?:www\.)?youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=([a-zA-Z0-9_-]{11})|(?:embed|shorts|live)\/([a-zA-Z0-9_-]{11}))(?:[?&#].*)?$/i);
+  if (m2) return m2[1] || m2[2];
+
   return null;
 }
 
 export function openVideoDrawer(targetStep = null) {
+  if (typeof document === 'undefined') return;
   if (panel) {
     if (targetStep) scrollToStep(targetStep);
     return;
@@ -1062,31 +1418,76 @@ export function openVideoDrawer(targetStep = null) {
   panel.className = 'h2cv-panel';
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-modal', 'true');
-  panel.setAttribute('aria-label', '7 Official Methodology Training Video Episodes');
+  panel.setAttribute('aria-label', 'Official Apollo RCA Methodology Training Video Series');
 
   // Header
   const head = document.createElement('div');
   head.className = 'h2cv-head';
   head.innerHTML = `
     <div class="h2cv-head-title">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
+      <div class="h2cv-head-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
+      </div>
       <div>
         <h2>Apollo RCA Methodology Video Series</h2>
-        <p>Official 7-Episode Video Companion Series for Apollo RCA &amp; RealityCharting by Dean L. Gano</p>
+        <p>Official 7-Episode Training Series • Dean L. Gano's RealityCharting&reg; for @h2c_Learnings</p>
       </div>
     </div>
+    <div class="h2cv-head-actions">
+      <a href="${OFFICIAL_CHANNEL_URL}" target="_blank" rel="noopener noreferrer" class="h2cv-head-yt-btn" title="Open @h2c_Learnings YouTube channel in new tab">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
+        <span>@h2c_Learnings ↗</span>
+      </a>
+      <button type="button" class="h2cv-x" aria-label="Close video training drawer">Close ✕</button>
+    </div>
   `;
-  const closeBtn = document.createElement('button');
-  closeBtn.type = 'button';
-  closeBtn.className = 'h2cv-x';
-  closeBtn.textContent = 'Close ✕';
+  const closeBtn = head.querySelector('.h2cv-x');
   closeBtn.onclick = closeVideoDrawer;
-  head.appendChild(closeBtn);
+
+  // Sync & Status Bar
+  const syncBar = document.createElement('div');
+  syncBar.className = 'h2cv-sync-bar';
+  syncBar.innerHTML = `
+    <div class="h2cv-sync-status">
+      <span class="h2cv-sync-status-icon">✓</span>
+      <span>Live Official YouTube Durations Active (v16)</span>
+    </div>
+    <div class="h2cv-sync-actions">
+      <button type="button" class="h2cv-sync-btn" title="Force sync and verify official video IDs and durations">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
+        <span>Sync Official Durations</span>
+      </button>
+      <a href="${OFFICIAL_CHANNEL_URL}" target="_blank" rel="noopener noreferrer" class="h2cv-channel-btn" title="Visit official YouTube channel">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#dc2626" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
+        <span>Channel</span> ↗
+      </a>
+    </div>
+  `;
+
+  function showSyncToast(message) {
+    const existing = panel.querySelector('.h2cv-sync-toast');
+    existing?.remove();
+    const toast = document.createElement('div');
+    toast.className = 'h2cv-sync-toast';
+    toast.setAttribute('role', 'status');
+    toast.innerHTML = `<span style="color: #34d399;">✓</span> <span>${message}</span>`;
+    panel.appendChild(toast);
+    setTimeout(() => toast.remove(), 2600);
+  }
+
+  const syncBtn = syncBar.querySelector('.h2cv-sync-btn');
+  syncBtn.onclick = () => {
+    syncOfficialVideos(true);
+    renderCards(currentFilter);
+    showSyncToast('Official YouTube Durations & IDs Synchronized!');
+  };
 
   // Tabs
   const tabs = document.createElement('div');
   tabs.className = 'h2cv-tabs';
   
+  let currentFilter = targetStep;
+
   const allTab = document.createElement('button');
   allTab.type = 'button';
   allTab.className = 'h2cv-tab-btn' + (!targetStep ? ' active' : '');
@@ -1133,35 +1534,44 @@ export function openVideoDrawer(targetStep = null) {
 
       card.innerHTML = `
         <div class="h2cv-card-header">
-          <span class="h2cv-step-pill">${mod.episode}</span>
-          <span class="h2cv-duration-badge">⏱ ${mod.duration} • HD</span>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span class="h2cv-step-pill">${mod.episode}</span>
+            <span class="h2cv-part-pill">${escapeHtml(mod.part ? mod.part.split(':')[0] : 'Lesson')}</span>
+          </div>
+          <span class="h2cv-duration-badge ${mod.verified ? 'verified' : 'upcoming'}" title="${mod.verified ? 'Verified with official YouTube channel' : 'Upcoming video release'}">
+            ${mod.verified ? '<span class="h2cv-live-dot" aria-hidden="true"></span>' : '⏱'}
+            <span>${escapeHtml(mod.badgeText || (mod.duration + ' • ' + (mod.tier || 'Guide')))}</span>
+          </span>
         </div>
         <div>
-          <h3 class="h2cv-card-title">${mod.title}</h3>
-          <p class="h2cv-card-sub">${mod.subtitle}</p>
+          <h3 class="h2cv-card-title">${escapeHtml(mod.title)}</h3>
+          <p class="h2cv-card-sub">${escapeHtml(mod.subtitle)}</p>
         </div>
 
         <div class="h2cv-player-box" id="h2cv-player-box-${mod.step}">
-          <div class="h2cv-screen" role="button" tabindex="0" aria-label="Play video for ${mod.title}">
+          <div class="h2cv-screen" role="button" tabindex="0" aria-label="Play video for ${escapeHtml(mod.title)}">
             <div class="h2cv-play-btn">
               <div class="h2cv-play-arrow"></div>
             </div>
-            <div class="h2cv-screen-title">${mod.title}</div>
+            <div class="h2cv-screen-title">${escapeHtml(mod.title)}</div>
             <div class="h2cv-screen-hint">${isPlaceholder ? '▶ Click to preview / configure YouTube link' : '▶ Click to play official YouTube video'}</div>
-            <span class="h2cv-screen-duration">${mod.duration}</span>
+            <div class="h2cv-screen-duration ${mod.verified ? 'verified' : ''}">
+              ${mod.verified ? '<span class="h2cv-screen-dot" aria-hidden="true"></span>' : ''}
+              <span>${escapeHtml(mod.duration)}</span>
+            </div>
           </div>
         </div>
 
         <div class="h2cv-summary-box">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px;">
             <strong style="color: #92400e; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;">
-              <span>📌</span> ${mod.part || 'Lesson Plan Focus'}:
+              <span>📌</span> ${escapeHtml(mod.part || 'Lesson Plan Focus')}:
             </strong>
-            <span style="font-size: 10.5px; background: #fef3c7; color: #92400e; padding: 1px 6px; border-radius: 4px; font-weight: 600;">${mod.bookRef ? mod.bookRef.split(';')[0] : ''}</span>
+            <span style="font-size: 10.5px; background: #fef3c7; color: #92400e; padding: 1px 6px; border-radius: 4px; font-weight: 600;">${escapeHtml(mod.bookRef ? mod.bookRef.split(';')[0] : '')}</span>
           </div>
-          <div style="font-size: 12.5px; line-height: 1.45; color: #374151;">${mod.summary}</div>
+          <div style="font-size: 12.5px; line-height: 1.45; color: #374151;">${escapeHtml(mod.summary)}</div>
           <ul class="h2cv-key-points">
-            ${mod.keyPoints.map(kp => `<li>• ${kp}</li>`).join('')}
+            ${mod.keyPoints.map(kp => `<li>• ${escapeHtml(kp)}</li>`).join('')}
           </ul>
 
           <details class="h2cv-lesson-details">
@@ -1175,7 +1585,7 @@ export function openVideoDrawer(targetStep = null) {
                   <span>📖</span> <strong>Book Unit References:</strong>
                 </div>
                 <div style="font-size: 11.5px; color: #475569; padding-left: 20px;">
-                  ${mod.bookRef}
+                  ${escapeHtml(mod.bookRef)}
                 </div>
               </div>
 
@@ -1185,7 +1595,7 @@ export function openVideoDrawer(targetStep = null) {
                   <span>🎯</span> <strong>Student / Learner Objectives:</strong>
                 </div>
                 <ul style="margin: 2px 0 0; padding-left: 28px; font-size: 11.5px; color: #475569; display: flex; flex-direction: column; gap: 2px;">
-                  ${mod.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                  ${mod.objectives.map(obj => `<li>${escapeHtml(obj)}</li>`).join('')}
                 </ul>
               </div>` : ''}
 
@@ -1195,7 +1605,7 @@ export function openVideoDrawer(targetStep = null) {
                   <span>🔍</span> <strong>Gano's Book Case Studies:</strong>
                 </div>
                 <ul style="margin: 2px 0 0; padding-left: 28px; font-size: 11.5px; color: #475569; display: flex; flex-direction: column; gap: 2px;">
-                  ${mod.bookExamples.map(ex => `<li>${ex}</li>`).join('')}
+                  ${mod.bookExamples.map(ex => `<li>${escapeHtml(ex)}</li>`).join('')}
                 </ul>
               </div>` : ''}
 
@@ -1205,7 +1615,7 @@ export function openVideoDrawer(targetStep = null) {
                   <span>⏱</span> <strong>YouTube Video Segments:</strong>
                 </div>
                 <ul style="margin: 2px 0 0; padding-left: 28px; font-size: 11px; color: #475569; font-family: ui-monospace, SFMono-Regular, monospace; display: flex; flex-direction: column; gap: 2px;">
-                  ${mod.youtubeOutline.map(seg => `<li>${seg}</li>`).join('')}
+                  ${mod.youtubeOutline.map(seg => `<li>${escapeHtml(seg)}</li>`).join('')}
                 </ul>
               </div>` : ''}
 
@@ -1223,7 +1633,7 @@ export function openVideoDrawer(targetStep = null) {
             ${jumpLabels[mod.step] || `🎯 Jump to Step ${mod.step} in Workspace &rarr;`}
           </button>
           <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-            <a href="https://youtu.be/${ytId}" target="_blank" rel="noopener noreferrer" class="h2cv-yt-link-btn" style="display: inline-flex; align-items: center; gap: 5px; background: #fff5f5; border: 1px solid #fca5a5; color: #dc2626; border-radius: 6px; padding: 6px 10px; font: 700 11.5px system-ui; text-decoration: none;">
+            <a href="https://youtu.be/${encodeURIComponent(ytId)}" target="_blank" rel="noopener noreferrer" class="h2cv-yt-link-btn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="#dc2626" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
               Watch on YouTube &rarr;
             </a>
@@ -1263,21 +1673,31 @@ export function openVideoDrawer(targetStep = null) {
         };
       }
 
-      // Play button click handler
+      // Play button click & keyboard handler (Strict Lazy Loading - NO iframe until interaction)
       const screen = card.querySelector('.h2cv-screen');
-      screen.onclick = () => {
+      const startPlayback = () => {
         const box = card.querySelector(`#h2cv-player-box-${mod.step}`);
         if (!box) return;
         const currentId = getStoredVideos()[mod.step] || mod.defaultYtId;
+        const safeId = encodeURIComponent(sanitizeVideoId(currentId, mod.defaultYtId));
+        const safeTitle = escapeHtml(mod.title);
         box.innerHTML = `
           <iframe 
-            src="https://www.youtube-nocookie.com/embed/${currentId}?autoplay=1&rel=0" 
-            title="${mod.title}" 
+            src="https://www.youtube-nocookie.com/embed/${safeId}?autoplay=1&rel=0&modestbranding=1" 
+            title="${safeTitle}" 
             style="width: 100%; height: 100%; border: 0;" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
+            allowfullscreen
+            loading="lazy">
           </iframe>
         `;
+      };
+      screen.onclick = startPlayback;
+      screen.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          startPlayback();
+        }
       };
 
       // Jump to step
@@ -1318,6 +1738,7 @@ export function openVideoDrawer(targetStep = null) {
   }
 
   function filterStep(num) {
+    currentFilter = num;
     [...tabs.querySelectorAll('.h2cv-tab-btn')].forEach((btn, idx) => {
       if (num === null && idx === 0) btn.classList.add('active');
       else if (num !== null && idx === num) btn.classList.add('active');
@@ -1340,23 +1761,34 @@ export function openVideoDrawer(targetStep = null) {
   const foot = document.createElement('div');
   foot.className = 'h2cv-foot';
   foot.innerHTML = `
-    <span>7 Video Modules • Apollo RCA &amp; RealityCharting Academy</span>
-    <a href="https://realitycharting.com/home/" target="_blank" rel="noopener noreferrer" style="color: #b91c1c; font-weight: 700; text-decoration: underline;">
-      Official RealityCharting&reg; Website &rarr;
-    </a>
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+      <span>7 Video Modules • Apollo RCA &amp; RealityCharting Academy</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <a href="${OFFICIAL_CHANNEL_URL}" target="_blank" rel="noopener noreferrer" class="h2cv-foot-yt-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#dc2626" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
+        <span>@h2c_Learnings YouTube</span> ↗
+      </a>
+      <span style="color: #cbd5e1;">•</span>
+      <a href="https://realitycharting.com/home/" target="_blank" rel="noopener noreferrer" style="color: #991b1b; font-weight: 700; text-decoration: underline;">
+        Official RealityCharting&reg; ↗
+      </a>
+    </div>
   `;
 
-  panel.append(head, tabs, body, foot);
+  panel.append(head, syncBar, tabs, body, foot);
   document.body.append(back, panel);
   closeBtn.focus();
 
-  // Escape & Tab Trap
+  // Escape & Accessible Tab Trap
   panel.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeVideoDrawer();
     if (e.key === 'Tab') {
-      const focusables = [...panel.querySelectorAll('button, input, [tabindex="0"]')];
+      const focusables = [...panel.querySelectorAll('button, input, a[href], details summary, [tabindex="0"]')].filter(el => !el.disabled && el.offsetParent !== null);
+      if (!focusables.length) return;
       const i = focusables.indexOf(document.activeElement);
-      if (e.shiftKey && i <= 0) {
+      if (e.shiftKey && (i <= 0 || i === -1)) {
         e.preventDefault();
         focusables.at(-1)?.focus();
       } else if (!e.shiftKey && i === focusables.length - 1) {
@@ -1371,7 +1803,6 @@ export function openVideoDrawer(targetStep = null) {
   }
 }
 
-// Mount the Toolbar Button and Floating FAB
 export function mountVideoButtons() {
   if (!document.body) return;
 
@@ -1407,6 +1838,7 @@ export function mountVideoButtons() {
 }
 
 export function initVideos() {
+  if (typeof document === 'undefined') return;
   if (!document.head.contains(css)) document.head.append(css);
   window.h2cOpenVideoDrawer = openVideoDrawer;
   mountVideoButtons();
@@ -1419,8 +1851,10 @@ export function initVideos() {
 }
 
 // Auto-run if loaded
-if (document.readyState === 'loading') {
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => setTimeout(initVideos, 60));
 } else {
   setTimeout(initVideos, 60);
+}
 }

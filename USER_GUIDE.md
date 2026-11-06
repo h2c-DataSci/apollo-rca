@@ -70,7 +70,7 @@ Click the `▶ 7 Videos (Training)` button in the top toolbar to access the offi
 - **Episode 1 of 7** (⏱ **55:50**): [Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)](https://youtu.be/IXXgr85wO74)
   - *Lesson Alignment:* **PART 1: Foundations** (RC Intro & Chs. 1–3, pp. 13–69; AR Chs. 1–2, Appendix)
   - *Core Concepts:* Common reality, 3 failed strategies, the single root cause myth, 6 RCA criteria, 4 Principles of Cause and Effect, Action & Condition causal sets.
-- **Episode 2 of 7** (⏱ **22:02**): [Defining the Problem — The 4-Element Formula Without Placing Blame](https://youtu.be/tCQuu_rvSJ8)
+- **Episode 2 of 7** (⏱ **20:22**): [Defining the Problem — The 4-Element Formula Without Placing Blame](https://youtu.be/tCQuu_rvSJ8)
   - *Lesson Alignment:* **PART 2: Step 1, Define the Problem** (RC Ch. 4, pp. 70–77; AR Ch. 3, pp. 61–66)
   - *Core Concepts:* 4-element formula (What, When, Where, Significance), noun-verb primary effect (2–4 words), Zero Blame rule (no Who/no Why), 95% failure rule.
 - **Episode 3 of 7** (⏱ **07:57**): [Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)](https://youtu.be/8y501jMIS7k)

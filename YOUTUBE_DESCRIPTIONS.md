@@ -70,14 +70,14 @@ Why do recurring problems keep happening in organizations despite endless invest
 
 ## Episode 2 of 7
 ### Title: `Episode 2 of 7: Defining the Problem — The 4-Element Formula Without Placing Blame`
-**Duration:** `22:02`  
+**Duration:** `20:22`  
 **Official Link:** https://youtu.be/tCQuu_rvSJ8  
 **Lesson Plan:** PART 2 — Step 1, Define the Problem (RC Ch. 4, pp. 70–77; AR Ch. 3, pp. 61–66)
 
 ```text
 Episode 2 of 7: Defining the Problem — The 4-Element Formula Without Placing Blame
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 22:02 | Official URL: https://youtu.be/tCQuu_rvSJ8
+Duration: 20:22 | Official URL: https://youtu.be/tCQuu_rvSJ8
 
 📌 LESSON PLAN ALIGNMENT: PART 2 — STEP 1, DEFINE THE PROBLEM
 Main Text: Dean L. Gano, RealityCharting® (2011), Ch. 4, pp. 70–77.

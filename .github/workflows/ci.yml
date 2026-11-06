@@ -35,3 +35,6 @@ jobs:
 
       - name: Verify End-to-End Workflow & Integrity
         run: node --test e2e-workflow.test.mjs
+
+      - name: Verify Stress and Stability Suite
+        run: node --test test/test-stress-stability.mjs
