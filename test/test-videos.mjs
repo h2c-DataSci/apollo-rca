@@ -338,7 +338,7 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       const ep6 = VIDEO_MODULES.find(m => m.step === 6);
       const ep7 = VIDEO_MODULES.find(m => m.step === 7);
 
-      assert.strictEqual(ep5.duration, '15:10', 'Episode 5 duration must be 15:10');
+      assert.strictEqual(ep5.duration, '08:45', 'Episode 5 duration must be 08:45');
       assert.strictEqual(ep6.duration, '16:30', 'Episode 6 duration must be 16:30');
       assert.strictEqual(ep7.duration, '14:45', 'Episode 7 duration must be 14:45');
     });
@@ -384,12 +384,12 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.strictEqual(ep4.defaultYtId, 'lppZuZFyHzM');
     });
 
-    it('Assert that Episodes 5, 6, and 7 have structured placeholders', () => {
+    it('Assert that Episode 5 has official YouTube ID and Episodes 6 and 7 have structured placeholders', () => {
       const ep5 = VIDEO_MODULES.find(m => m.step === 5);
       const ep6 = VIDEO_MODULES.find(m => m.step === 6);
       const ep7 = VIDEO_MODULES.find(m => m.step === 7);
 
-      assert.strictEqual(ep5.defaultYtId, 'PLACEHOLDER_EPISODE5');
+      assert.strictEqual(ep5.defaultYtId, 'yBVaGu31ik8');
       assert.strictEqual(ep6.defaultYtId, 'PLACEHOLDER_EPISODE6');
       assert.strictEqual(ep7.defaultYtId, 'PLACEHOLDER_EPISODE7');
     });
@@ -414,6 +414,8 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.strictEqual(OFFICIAL_VIDEOS[3].duration, '07:57');
       assert.strictEqual(OFFICIAL_VIDEOS[4].id, 'lppZuZFyHzM');
       assert.strictEqual(OFFICIAL_VIDEOS[4].duration, '06:59');
+      assert.strictEqual(OFFICIAL_VIDEOS[5].id, 'yBVaGu31ik8');
+      assert.strictEqual(OFFICIAL_VIDEOS[5].duration, '08:45');
     });
   });
 
@@ -595,7 +597,7 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.strictEqual(stored[2], 'tCQuu_rvSJ8');
       assert.strictEqual(stored[3], '8y501jMIS7k');
       assert.strictEqual(stored[4], 'lppZuZFyHzM');
-      assert.strictEqual(stored[5], 'PLACEHOLDER_EPISODE5');
+      assert.strictEqual(stored[5], 'yBVaGu31ik8');
     });
 
     it('persists and retrieves user-configured video IDs', () => {
@@ -630,14 +632,16 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       const legacyState = {
         1: 'PLACEHOLDER_EPISODE1',
         2: 'PLACEHOLDER_EPISODE2',
-        5: 'PLACEHOLDER_EPISODE5'
+        5: 'PLACEHOLDER_EPISODE5',
+        6: 'PLACEHOLDER_EPISODE6'
       };
       mockLocalStorageObj.setItem(STORAGE_KEY, JSON.stringify(legacyState));
 
       const migrated = getStoredVideos();
       assert.strictEqual(migrated[1], 'IXXgr85wO74', 'Episode 1 placeholder must upgrade to official ID');
       assert.strictEqual(migrated[2], 'tCQuu_rvSJ8', 'Episode 2 placeholder must upgrade to official ID');
-      assert.strictEqual(migrated[5], 'PLACEHOLDER_EPISODE5', 'Episode 5 remains placeholder until published');
+      assert.strictEqual(migrated[5], 'yBVaGu31ik8', 'Episode 5 placeholder must upgrade to official ID');
+      assert.strictEqual(migrated[6], 'PLACEHOLDER_EPISODE6', 'Episode 6 remains placeholder until published');
     });
 
     it('syncOfficialVideos synchronizes official videos and handles version migrations', () => {
@@ -742,20 +746,22 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.ok(desc.includes('tCQuu_rvSJ8'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 2 ID');
       assert.ok(desc.includes('8y501jMIS7k'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 3 ID');
       assert.ok(desc.includes('lppZuZFyHzM'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 4 ID');
+      assert.ok(desc.includes('yBVaGu31ik8'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 5 ID');
       assert.ok(desc.includes('Duration: 55:50'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 1 duration');
       assert.ok(desc.includes('Duration: 20:22'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 2 duration');
       assert.ok(desc.includes('Duration: 07:57'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 3 duration');
       assert.ok(desc.includes('Duration: 06:59'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 4 duration');
+      assert.ok(desc.includes('Duration: 08:45'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 5 duration');
       assert.ok(!desc.includes('Duration: 22:02'), 'YOUTUBE_DESCRIPTIONS.md must not contain 22:02');
     });
 
-    it('Cache busting query parameters (v=16) are synchronized across index.html and h2c-help.js', () => {
+    it('Cache busting query parameters (v=17) are synchronized across index.html and h2c-help.js', () => {
       const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-      assert.ok(indexHtml.includes('/apollo-rca/h2c-shell.js?v=16'), 'index.html must load h2c-shell.js?v=16');
-      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=16'), 'index.html must load h2c-help.js?v=16');
+      assert.ok(indexHtml.includes('/apollo-rca/h2c-shell.js?v=17'), 'index.html must load h2c-shell.js?v=17');
+      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=17'), 'index.html must load h2c-help.js?v=17');
 
       const helpJs = readFileSync(new URL('../h2c-help.js', import.meta.url), 'utf8');
-      assert.ok(helpJs.includes("./h2c-videos.js?v=16'"), 'h2c-help.js must import h2c-videos.js?v=16');
+      assert.ok(helpJs.includes("./h2c-videos.js?v=17'"), 'h2c-help.js must import h2c-videos.js?v=17');
     });
 
     it('Episode tier descriptors and glowing badge formatting match 10x UX specifications', () => {
@@ -779,6 +785,11 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.strictEqual(ep4.tier, 'Essential Lab');
       assert.strictEqual(ep4.badgeText, '06:59 • Essential Lab');
       assert.strictEqual(ep4.verified, true);
+
+      const ep5 = VIDEO_MODULES.find(m => m.step === 5);
+      assert.strictEqual(ep5.tier, 'Action Framework');
+      assert.strictEqual(ep5.badgeText, '08:45 • Action Framework');
+      assert.strictEqual(ep5.verified, true);
     });
   });
 });

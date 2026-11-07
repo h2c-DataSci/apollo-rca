@@ -2,9 +2,9 @@
 
 **Target Project**: H2C Root Cause Analyst (`apollo-rca`)  
 **Workspace**: `d:\GitHub-Antigravity\apollo-rca`  
-**Current Phase**: Phase 16: Production Deployment & GitHub Pages Verification  
+**Current Phase**: Phase 17: Official Episode 5 Integration & Release Verification  
 **Lead Orchestrator**: Senior Full-Stack Engineering, Quality, Security, and Design Team  
-**Last Updated**: 2026-11-06 18:52 UTC+8  
+**Last Updated**: 2026-11-07 22:55 UTC+8  
 **Active Git Branch**: `main`  
 
 ---
@@ -21,7 +21,8 @@
 | **Phase 6** | Verification, CI/CD & Documentation | **COMPLETED** | 100% | GitHub Actions CI matrix, ARCHITECTURE.md, USER_GUIDE.md, and Final Walkthrough Artifact published |
 | **Phase 14** | Lesson Plan v3 Alignment & Video Outlines | **COMPLETED** | 100% | Integrated Dean L. Gano's *Thinking in Causes (v3)* lesson plan, book citations, objectives, and YouTube outline chapters |
 | **Phase 15** | Live YouTube Durations & 10x UX Polish | **COMPLETED** | 100% | Synchronized 55:50, 20:22, 07:57, 06:59; v16 cache-busting; glowing badges; sync status bar; 124/124 tests PASS |
-| **Phase 16** | Production Deployment & GitHub Pages Verification | **IN PROGRESS** | 90% | Staging, committing, pushing to main, and verifying GitHub Pages deployment |
+| **Phase 16** | Production Deployment & GitHub Pages Verification | **COMPLETED** | 100% | Verified GitHub Actions CI & Pages deployment; live site confirmed 200 OK |
+| **Phase 17** | Official Episode 5 Integration & Release | **COMPLETED** | 100% | Integrated Episode 5 (yBVaGu31ik8), 08:45 duration, v17 cache-busting, 124/124 tests PASS |
 
 ---
 
@@ -321,6 +322,13 @@
   - **Seamless LocalStorage Auto-Sync**: Dual-key migration (`STORAGE_KEY` and legacy key) with `SYNC_VERSION` check automatically resets stale placeholder data to official verified values.
   - **Zero Network Leakage**: Lazy-loaded `youtube-nocookie.com` iframes instantiate exclusively upon explicit user click/interaction.
   - **Automated Quality Verification**: All 32 automated unit/integration tests and 8 stress benchmarks pass with zero warnings.
+
+- [x] **Phase 17: Official Episode 5 Integration & Release (Active)**:
+  - **Live YouTube Video 5 Integration**: Replaced Episode 5 placeholder with official published video `https://youtu.be/yBVaGu31ik8` (ID: `yBVaGu31ik8`).
+  - **Duration & Chapters Harmonization**: Set duration to `08:45` (`08:45 • Action Framework`), marked `verified: true`, and synchronized `youtubeOutline` with the 8 published chapters (00:00–07:40).
+  - **Cache-Busting & Auto-Sync**: Bumped to `v=17` across `index.html` (`h2c-shell.js?v=17`, `h2c-help.js?v=17`), `h2c-help.js` (`./h2c-videos.js?v=17`), and `h2c-videos.js` (`SYNC_VERSION = 'v17-20261107'`) ensuring returning users automatically sync to the newly published official video.
+  - **Cross-Documentation Updates**: Synchronized `README.md`, `USER_GUIDE.md`, and `YOUTUBE_DESCRIPTIONS.md` with Episode 5 live link and chapters.
+  - **Automated QA Verification**: Updated `test/test-videos.mjs` with Episode 5 assertions. Verified 124/124 automated tests passing across 11 suites with zero regressions.
 
 - [x] **Phase 16: Production Deployment & GitHub Pages Verification**:
   - **Pre-Deployment Build & Test Verification**: Confirmed 124/124 automated tests passing across 11 suites. Confirmed zero compilation or runtime syntax errors.

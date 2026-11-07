@@ -79,7 +79,7 @@ Click the `▶ 7 Videos (Training)` button in the top toolbar to access the offi
 - **Episode 4 of 7** (⏱ **06:59**): [Evidence; Sufficient and Necessary — How to Test and Prove Causes](https://youtu.be/lppZuZFyHzM)
   - *Lesson Alignment:* **PART 4: Steps 4–5, Evidence; Sufficient and Necessary** (RC Chs. 7–8, pp. 97–111; AR Ch. 3, pp. 74–81)
   - *Core Concepts:* 4 Evidence Quality Tiers (Sensed, Inferred, Intuited, Emotional), Fact = cause supported by evidence, Sufficiency test, Necessity test (Remove-It Test), Sagan's Baloney Detection Kit.
-- **Episode 5 of 7** (⏱ **15:10**): Effective Solutions, Implementation, and Tracking (Preventing Recurrence) *(Ready for upload)*
+- **Episode 5 of 7** (⏱ **08:45**): Effective Solutions, Implementation, and Tracking (Preventing Recurrence) ([yBVaGu31ik8](https://youtu.be/yBVaGu31ik8))
   - *Lesson Alignment:* **PART 5: Steps 6–7, Solutions, Implement and Track** (RC Chs. 9–10, pp. 112–131; AR Chs. 4–5)
   - *Core Concepts:* Root causes defined by solutions, challenge causes right-to-left, 4 Solution Criteria, eliminating "re" traps (retrain, rewrite), Rapid Response brainstorming, corrective-action log & trending.
 - **Episode 6 of 7** (⏱ **16:30**): Culture and Facilitation — Fix the Cause, Not the Blame *(Ready for upload)*

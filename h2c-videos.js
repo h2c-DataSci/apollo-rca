@@ -5,7 +5,7 @@
 
 export const STORAGE_KEY = 'h2c-youtube-training-videos-v2';
 export const LEGACY_STORAGE_KEY = 'h2c-youtube-training-videos-v1';
-export const SYNC_VERSION = 'v16-20261106';
+export const SYNC_VERSION = 'v17-20261107';
 export const SYNC_KEY = 'h2c-yt-sync-ver';
 
 export const OFFICIAL_CHANNEL_URL = 'https://www.youtube.com/@h2c_Learnings';
@@ -15,7 +15,7 @@ export const OFFICIAL_VIDEOS = {
   2: { id: 'tCQuu_rvSJ8', duration: '20:22', tier: 'Deep Dive' },
   3: { id: '8y501jMIS7k', duration: '07:57', tier: 'Focused Guide' },
   4: { id: 'lppZuZFyHzM', duration: '06:59', tier: 'Essential Lab' },
-  5: { id: 'PLACEHOLDER_EPISODE5', duration: '15:10', tier: 'Action Framework' },
+  5: { id: 'yBVaGu31ik8', duration: '08:45', tier: 'Action Framework' },
   6: { id: 'PLACEHOLDER_EPISODE6', duration: '16:30', tier: 'Culture & Alignment' },
   7: { id: 'PLACEHOLDER_EPISODE7', duration: '14:45', tier: 'Proactive Mastery' }
 };
@@ -362,14 +362,14 @@ How do you prove that your causes are real and avoid jumping to ungrounded concl
     step: 5,
     episode: 'Episode 5 of 7',
     tier: 'Action Framework',
-    badgeText: '15:10 • Action Framework',
-    verified: false,
+    badgeText: '08:45 • Action Framework',
+    verified: true,
     part: 'Part 5: Steps 6–7, Solutions, Implement and Track',
     title: 'Episode 5 of 7: Effective Solutions, Implementation, and Tracking (Preventing Recurrence)',
     shortTitle: 'Effective Solutions & Tracking',
     subtitle: 'Targeted corrective actions, 4 prevention criteria, owner tracking, and ROI verification',
-    duration: '15:10',
-    defaultYtId: 'PLACEHOLDER_EPISODE5',
+    duration: '08:45',
+    defaultYtId: 'yBVaGu31ik8', // Official Video 5: https://youtu.be/yBVaGu31ik8
     targetId: 'section-solutions',
     bookRef: 'RC Chs. 9–10 (pp. 112–131); AR Ch. 4 (pp. 89–108), Ch. 5 (pp. 109–130)',
     summary: 'Discover why root causes are defined by the solutions we attach to them, not discovered through independent search. Learn how to challenge causes from right to left, screen ideas against the 4 Solution Criteria, run blameless Rapid Response brainstorming, dismantle ineffective "re" traps (retrain, rewrite), and build a living tracking log with weekly reviews to guarantee recurrence prevention.',
@@ -394,16 +394,18 @@ How do you prove that your causes are real and avoid jumping to ungrounded concl
       'The Fire Root Cause Re-examined: Quenching heat vs. removing fuel vs. blocking oxygen — choice of solution dictates the root cause (RC Ch. 9, p. 113).'
     ],
     youtubeOutline: [
-      '00:00 - Hook: The elevator maintenance near-miss (AR Ch. 5, p. 123)',
-      '02:30 - Segment 1: The Big Paradigm Shift: Root causes come from solutions (RC Ch. 9, p. 112)',
-      '06:00 - Segment 2: Challenging causes right-to-left with the 4 Solution Criteria (RC Ch. 9, pp. 114–116)',
-      '09:30 - Segment 3: The Favorite Solutions Blooper Reel: Why retraining fails (RC Ch. 9, pp. 119–120)',
-      '12:15 - Segment 4: Rapid Response rules & Step 7 tracking logs (RC Ch. 9, p. 124; Ch. 10, pp. 128–131)',
-      '14:30 - Close: Solution screening worksheet download'
+      '00:00 - Introduction: Steps 6 & 7 of RealityCharting',
+      '00:58 - The Paradigm Shift: Root Causes Are Defined by Solutions',
+      '02:10 - How to Challenge Causes (Working from Right to Left)',
+      '03:25 - The 4 Criteria for Screening Effective Solutions',
+      '04:45 - Why "Retraining" and "Punishment" Fail',
+      '05:55 - Rapid Response Rules & Solution Generation',
+      '06:50 - Step 7: Implementation, Action Tracking & Review Logs',
+      '07:40 - Summary, Web App Demonstration & What\'s Next in Episode 6'
     ],
     fullDescription: `Episode 5 of 7: Effective Solutions, Implementation, and Tracking (Preventing Recurrence)
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 15:10 | Official URL: [Placeholder - Series Episode 5]
+Duration: 08:45 | Official URL: https://youtu.be/yBVaGu31ik8
 
 📌 LESSON PLAN ALIGNMENT: PART 5 — STEPS 6–7, SOLUTIONS, IMPLEMENT AND TRACK
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 9–10, pp. 112–131.
@@ -413,12 +415,14 @@ Support Text: Dean L. Gano, Apollo Root Cause Analysis (2003), Ch. 4 (pp. 89–1
 Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 of Gano's Seven Steps, understand the profound paradigm shift: root causes are not uncovered by search, but are defined by the solutions we attach to causes. Learn how to challenge causes from right to left, screen candidate fixes against the 4 Solution Criteria, conduct rapid blameless brainstorming, eliminate lazy "re" solutions (retrain, rewrite), and run a living corrective-action tracking log.
 
 ⏱ CHAPTERS & TIMESTAMPS:
-00:00 Hook: The elevator maintenance near-miss (AR Ch. 5, p. 123)
-02:30 Segment 1: The Big Paradigm Shift: Root causes come from solutions (RC Ch. 9, p. 112)
-06:00 Segment 2: Challenging causes right-to-left with the 4 Solution Criteria (RC Ch. 9, pp. 114–116)
-09:30 Segment 3: The Favorite Solutions Blooper Reel: Why retraining fails (RC Ch. 9, pp. 119–120)
-12:15 Segment 4: Rapid Response rules & Step 7 tracking logs (RC Ch. 9, p. 124; Ch. 10, pp. 128–131)
-14:30 Close: Solution screening worksheet download
+00:00 Introduction: Steps 6 & 7 of RealityCharting
+00:58 The Paradigm Shift: Root Causes Are Defined by Solutions
+02:10 How to Challenge Causes (Working from Right to Left)
+03:25 The 4 Criteria for Screening Effective Solutions
+04:45 Why "Retraining" and "Punishment" Fail
+05:55 Rapid Response Rules & Solution Generation
+06:50 Step 7: Implementation, Action Tracking & Review Logs
+07:40 Summary, Web App Demonstration & What's Next in Episode 6
 
 🔑 CORE BOOK CONCEPTS & DIRECT QUOTES:
 • Root Causes From Solutions: "If we must retain the notion of 'root causes,' then they are the ones to which we attach solutions." (RC, Ch. 9, p. 112).
