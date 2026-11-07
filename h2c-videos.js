@@ -5,7 +5,7 @@
 
 export const STORAGE_KEY = 'h2c-youtube-training-videos-v2';
 export const LEGACY_STORAGE_KEY = 'h2c-youtube-training-videos-v1';
-export const SYNC_VERSION = 'v17-20261107';
+export const SYNC_VERSION = 'v18-20261108';
 export const SYNC_KEY = 'h2c-yt-sync-ver';
 
 export const OFFICIAL_CHANNEL_URL = 'https://www.youtube.com/@h2c_Learnings';
@@ -16,8 +16,8 @@ export const OFFICIAL_VIDEOS = {
   3: { id: '8y501jMIS7k', duration: '07:57', tier: 'Focused Guide' },
   4: { id: 'lppZuZFyHzM', duration: '06:59', tier: 'Essential Lab' },
   5: { id: 'yBVaGu31ik8', duration: '08:45', tier: 'Action Framework' },
-  6: { id: 'PLACEHOLDER_EPISODE6', duration: '16:30', tier: 'Culture & Alignment' },
-  7: { id: 'PLACEHOLDER_EPISODE7', duration: '14:45', tier: 'Proactive Mastery' }
+  6: { id: 'lj2e9A-qmVA', duration: '08:19', tier: 'Culture & Alignment' },
+  7: { id: '_w5WUcNRYWU', duration: '07:10', tier: 'Proactive Mastery' }
 };
 
 export const VIDEO_MODULES = [
@@ -450,14 +450,14 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
     step: 6,
     episode: 'Episode 6 of 7',
     tier: 'Culture & Alignment',
-    badgeText: '16:30 • Culture & Alignment',
-    verified: false,
+    badgeText: '08:19 • Culture & Alignment',
+    verified: true,
     part: 'Part 6: Culture and Facilitation, Light',
     title: 'Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame',
     shortTitle: 'Culture & Facilitation',
     subtitle: 'Facilitating blameless investigations, team alignment, and overcoming organizational resistance',
-    duration: '16:30',
-    defaultYtId: 'PLACEHOLDER_EPISODE6',
+    duration: '08:19',
+    defaultYtId: 'lj2e9A-qmVA', // Official Video 6: https://youtu.be/lj2e9A-qmVA
     targetId: 'section-timeline',
     bookRef: 'RC Chs. 11–12 (pp. 132–174); AR Ch. 1 (p. 15), Chs. 5–6 (pp. 109–134)',
     summary: 'Transform organizational culture by replacing fear and finger-pointing with blameless causal inquiry. Understand the role of the skilled facilitator, pack an evidence go-bag, conduct non-antagonistic interviews ("Please help me understand what happened"), steer clear of group traps (Consensus, Groupthink, treating time as a cause), and embrace Dean Gano\'s rallying principle: "Fix the cause, not the blame."',
@@ -482,16 +482,18 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
       'The Reliability Engineer whose equipment failed 35 times across its lifetime (RC Ch. 11, p. 139).'
     ],
     youtubeOutline: [
-      '00:00 - Hook: The 1926 steering knuckles mystery & the rusted hydrant (RC Ch. 11, pp. 135–138; Ch. 12, p. 146)',
-      '03:00 - Segment 1: Evidence preservation and the investigator\'s go-bag (RC Ch. 12, pp. 146–148)',
-      '06:30 - Segment 2: The No-Blame Interview: "Please help me understand..." (RC Ch. 12, pp. 155–159)',
-      '10:00 - Segment 3: Group Traps: Consensus, Groupthink, and Time as a Cause (RC Ch. 12, pp. 162–167)',
-      '13:30 - Segment 4: Culture of Freedom: "Fix the cause, not the blame" (RC Ch. 11, p. 138; AR Ch. 1, p. 15)',
-      '15:45 - Close: Facilitation role-play script and team ground rules'
+      '00:00 - Introduction: Culture & Facilitation in Root Cause Analysis',
+      '01:05 - Evidence Preservation: Preparing Your Go-Bag & Securing the Scene',
+      '02:25 - The Blame-Free Interview: "Please Help Me Understand What Happened"',
+      '03:45 - Why Workers Are Set Up to Fail: Task Conditions vs. Human Error',
+      '05:00 - Investigation Traps: The Danger of Consensus & Groupthink',
+      '06:15 - Why Time Is Not a Cause: Events Happen in Time, Not Because of Time',
+      '07:15 - Lessons from Experience: The 1926 Steering Knuckles & Inferred Evidence',
+      '08:10 - Summary, Web App Demonstration & What\'s Ahead in Episode 7'
     ],
     fullDescription: `Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 16:30 | Official URL: [Placeholder - Series Episode 6]
+Duration: 08:19 | Official URL: https://youtu.be/lj2e9A-qmVA
 
 📌 LESSON PLAN ALIGNMENT: PART 6 — CULTURE AND FACILITATION, LIGHT
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 11–12, pp. 132–174.
@@ -501,12 +503,14 @@ Support Text: Dean L. Gano, Apollo Root Cause Analysis (2003), Ch. 1 (p. 15), Ch
 Why do so many RCA meetings degenerate into finger-pointing, defensiveness, and consensus politics? In this masterclass on facilitation and culture, learn how to build an organizational environment focused on fixing causes rather than assigning human blame. Discover how to pack an evidence go-bag, run non-antagonistic interviews that open with "Please help me understand what happened," dismantle groupthink and consensus traps, and replace the fear of failure with genuine freedom.
 
 ⏱ CHAPTERS & TIMESTAMPS:
-00:00 Hook: The 1926 steering knuckles mystery & the rusted hydrant (RC Ch. 11, pp. 135–138; Ch. 12, p. 146)
-03:00 Segment 1: Evidence preservation and the investigator's go-bag (RC Ch. 12, pp. 146–148)
-06:30 Segment 2: The No-Blame Interview: "Please help me understand..." (RC Ch. 12, pp. 155–159)
-10:00 Segment 3: Group Traps: Consensus, Groupthink, and Time as a Cause (RC Ch. 12, pp. 162–167)
-13:30 Segment 4: Culture of Freedom: "Fix the cause, not the blame" (RC Ch. 11, p. 138; AR Ch. 1, p. 15)
-15:45 Close: Facilitation role-play script and team ground rules
+00:00 Introduction: Culture & Facilitation in Root Cause Analysis
+01:05 Evidence Preservation: Preparing Your Go-Bag & Securing the Scene
+02:25 The Blame-Free Interview: "Please Help Me Understand What Happened"
+03:45 Why Workers Are Set Up to Fail: Task Conditions vs. Human Error
+05:00 Investigation Traps: The Danger of Consensus & Groupthink
+06:15 Why Time Is Not a Cause: Events Happen in Time, Not Because of Time
+07:15 Lessons from Experience: The 1926 Steering Knuckles & Inferred Evidence
+08:10 Summary, Web App Demonstration & What's Ahead in Episode 7
 
 🔑 CORE BOOK CONCEPTS & DIRECT QUOTES:
 • The Facilitator: "A group without a leader is a mob, and a problem-solving team without a skilled facilitator is just another group." (RC, Ch. 12, p. 144).
@@ -533,14 +537,14 @@ Why do so many RCA meetings degenerate into finger-pointing, defensiveness, and 
     step: 7,
     episode: 'Episode 7 of 7',
     tier: 'Proactive Mastery',
-    badgeText: '14:45 • Proactive Mastery',
-    verified: false,
+    badgeText: '07:10 • Proactive Mastery',
+    verified: true,
     part: 'Part 7: Success and a New Way of Thinking',
     title: 'Episode 7 of 7: Success and a New Way of Thinking (Why Success Is Planned)',
     shortTitle: 'Success & A New Way of Thinking',
     subtitle: 'Proactive problem-solving, planning success, and institutionalizing Apollo RCA mastery',
-    duration: '14:45',
-    defaultYtId: 'PLACEHOLDER_EPISODE7',
+    duration: '07:10',
+    defaultYtId: '_w5WUcNRYWU', // Official Video 7: https://youtu.be/_w5WUcNRYWU
     targetId: 'section-track',
     bookRef: 'RC Chs. 13–14 (pp. 175–194)',
     summary: 'Elevate root cause analysis from incident post-mortems into a proactive strategy for personal and organizational success. Learn how to chart successes ("Success is planned and failure is not"), decouple colliding systems in time and space, apply solutions to conditions rather than human actions, and embrace Gano\'s vision for a mind permanently expanded by causal thinking.',
@@ -564,16 +568,17 @@ Why do so many RCA meetings degenerate into finger-pointing, defensiveness, and 
       'High-Reliability Operations: Documenting 30-day zero-stoppage equipment runs as repeatable causal successes (RC Ch. 11, p. 134; Ch. 13, p. 189).'
     ],
     youtubeOutline: [
-      '00:00 - Hook: The candy bar that melted in Percy Spencer\'s pocket (RC Ch. 13, p. 177)',
-      '02:30 - Segment 1: Systems meeting in time and space (The Drowning Model; RC Ch. 13, pp. 179–181)',
-      '05:45 - Segment 2: Charting a success: Why success is planned, not accidental (RC Ch. 13, p. 189)',
-      '09:15 - Segment 3: The Caveman Dilemma: Leaving stories to entertainment (RC Ch. 14, pp. 191–193)',
-      '12:00 - Segment 4: A mind permanently expanded — course capstone',
-      '14:00 - Close: Series recap, references card, and celebratory wrap-up'
+      '00:00 - Introduction: Thinking in Causes & The Series Finale',
+      '00:55 - Serendipity & The Melted Candy Bar (Percy Spencer Case)',
+      '02:05 - Intersecting Systems: How Independent Causes Meet in Time & Space',
+      '03:15 - Breaking System Overlaps: Acting on Conditional Causes',
+      '04:20 - Why Success Is Planned: Charting Positive Outcomes',
+      '05:30 - Chapter 14: Moving Past Storytelling to Causal Thinking',
+      '06:25 - Series Recap, Web App Companion & Final Takeaway'
     ],
     fullDescription: `Episode 7 of 7: Success and a New Way of Thinking (Why Success Is Planned)
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 14:45 | Official URL: [Placeholder - Series Episode 7]
+Duration: 07:10 | Official URL: https://youtu.be/_w5WUcNRYWU
 
 📌 LESSON PLAN ALIGNMENT: PART 7 — SUCCESS AND A NEW WAY OF THINKING
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 13–14, pp. 175–194.
@@ -582,12 +587,13 @@ Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 13–14, pp. 175–194.
 Why do we only investigate failures when we could be charting and replicating our greatest successes? In the capstone episode of Thinking in Causes, learn how Apollo RCA and Realitycharting elevate problem solving into a life-changing framework for personal and operational excellence. Discover why success is always planned, how to keep hazardous systems from colliding in time and space, why the best solutions target conditions, and how to permanently replace caveman storytelling with scientific causal thinking.
 
 ⏱ CHAPTERS & TIMESTAMPS:
-00:00 Hook: The candy bar that melted in Percy Spencer's pocket (RC Ch. 13, p. 177)
-02:30 Segment 1: Systems meeting in time and space (The Drowning Model; RC Ch. 13, pp. 179–181)
-05:45 Segment 2: Charting a success: Why success is planned, not accidental (RC Ch. 13, p. 189)
-09:15 Segment 3: The Caveman Dilemma: Leaving stories to entertainment (RC Ch. 14, pp. 191–193)
-12:00 Segment 4: A mind permanently expanded — course capstone
-14:00 Close: Series recap, references card, and celebratory wrap-up
+00:00 Introduction: Thinking in Causes & The Series Finale
+00:55 Serendipity & The Melted Candy Bar (Percy Spencer Case)
+02:05 Intersecting Systems: How Independent Causes Meet in Time & Space
+03:15 Breaking System Overlaps: Acting on Conditional Causes
+04:20 Why Success Is Planned: Charting Positive Outcomes
+05:30 Chapter 14: Moving Past Storytelling to Causal Thinking
+06:25 Series Recap, Web App Companion & Final Takeaway
 
 🔑 CORE BOOK CONCEPTS & DIRECT QUOTES:
 • Serendipity: Serendipity needs "the intelligence to ask why, the knowledge to find the answers, and the tenacity to do something with the newfound knowledge" (RC, Ch. 13, p. 178).

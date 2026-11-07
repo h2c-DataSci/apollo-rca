@@ -268,14 +268,14 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
 
 ## Episode 6 of 7
 ### Title: `Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame`
-**Duration:** `16:30`  
-**Official Link:** *(Ready for Upload)*  
+**Duration:** `08:19`  
+**Official Link:** https://youtu.be/lj2e9A-qmVA  
 **Lesson Plan:** PART 6 — Culture and Facilitation, Light (RC Chs. 11–12, pp. 132–174; AR Chs. 5–6)
 
 ```text
 Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 16:30 | Official URL: [Placeholder - Series Episode 6]
+Duration: 08:19 | Official URL: https://youtu.be/lj2e9A-qmVA
 
 📌 LESSON PLAN ALIGNMENT: PART 6 — CULTURE AND FACILITATION, LIGHT
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 11–12, pp. 132–174.
@@ -285,12 +285,14 @@ Support Text: Dean L. Gano, Apollo Root Cause Analysis (2003), Ch. 1 (p. 15), Ch
 Why do so many RCA meetings degenerate into finger-pointing, defensiveness, and consensus politics? In this masterclass on facilitation and culture, learn how to build an organizational environment focused on fixing causes rather than assigning human blame. Discover how to pack an evidence go-bag, run non-antagonistic interviews that open with "Please help me understand what happened," dismantle groupthink and consensus traps, and replace the fear of failure with genuine freedom.
 
 ⏱ CHAPTERS & TIMESTAMPS:
-00:00 Hook: The 1926 steering knuckles mystery & the rusted hydrant (RC Ch. 11, pp. 135–138; Ch. 12, p. 146)
-03:00 Segment 1: Evidence preservation and the investigator's go-bag (RC Ch. 12, pp. 146–148)
-06:30 Segment 2: The No-Blame Interview: "Please help me understand..." (RC Ch. 12, pp. 155–159)
-10:00 Segment 3: Group Traps: Consensus, Groupthink, and Time as a Cause (RC Ch. 12, pp. 162–167)
-13:30 Segment 4: Culture of Freedom: "Fix the cause, not the blame" (RC Ch. 11, p. 138; AR Ch. 1, p. 15)
-15:45 Close: Facilitation role-play script and team ground rules
+00:00 Introduction: Culture & Facilitation in Root Cause Analysis
+01:05 Evidence Preservation: Preparing Your Go-Bag & Securing the Scene
+02:25 The Blame-Free Interview: "Please Help Me Understand What Happened"
+03:45 Why Workers Are Set Up to Fail: Task Conditions vs. Human Error
+05:00 Investigation Traps: The Danger of Consensus & Groupthink
+06:15 Why Time Is Not a Cause: Events Happen in Time, Not Because of Time
+07:15 Lessons from Experience: The 1926 Steering Knuckles & Inferred Evidence
+08:10 Summary, Web App Demonstration & What's Ahead in Episode 7
 
 🔑 CORE BOOK CONCEPTS & DIRECT QUOTES:
 • The Facilitator: "A group without a leader is a mob, and a problem-solving team without a skilled facilitator is just another group." (RC, Ch. 12, p. 144).
@@ -318,14 +320,14 @@ Why do so many RCA meetings degenerate into finger-pointing, defensiveness, and 
 
 ## Episode 7 of 7
 ### Title: `Episode 7 of 7: Success and a New Way of Thinking (Why Success Is Planned)`
-**Duration:** `14:45`  
-**Official Link:** *(Ready for Upload)*  
+**Duration:** `07:10`  
+**Official Link:** https://youtu.be/_w5WUcNRYWU  
 **Lesson Plan:** PART 7 — Success and a New Way of Thinking (RC Chs. 13–14, pp. 175–194)
 
 ```text
 Episode 7 of 7: Success and a New Way of Thinking (Why Success Is Planned)
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 14:45 | Official URL: [Placeholder - Series Episode 7]
+Duration: 07:10 | Official URL: https://youtu.be/_w5WUcNRYWU
 
 📌 LESSON PLAN ALIGNMENT: PART 7 — SUCCESS AND A NEW WAY OF THINKING
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 13–14, pp. 175–194.
@@ -334,12 +336,13 @@ Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 13–14, pp. 175–194.
 Why do we only investigate failures when we could be charting and replicating our greatest successes? In the capstone episode of Thinking in Causes, learn how Apollo RCA and Realitycharting elevate problem solving into a life-changing framework for personal and operational excellence. Discover why success is always planned, how to keep hazardous systems from colliding in time and space, why the best solutions target conditions, and how to permanently replace caveman storytelling with scientific causal thinking.
 
 ⏱ CHAPTERS & TIMESTAMPS:
-00:00 Hook: The candy bar that melted in Percy Spencer's pocket (RC Ch. 13, p. 177)
-02:30 Segment 1: Systems meeting in time and space (The Drowning Model; RC Ch. 13, pp. 179–181)
-05:45 Segment 2: Charting a success: Why success is planned, not accidental (RC Ch. 13, p. 189)
-09:15 Segment 3: The Caveman Dilemma: Leaving stories to entertainment (RC Ch. 14, pp. 191–193)
-12:00 Segment 4: A mind permanently expanded — course capstone
-14:00 Close: Series recap, references card, and celebratory wrap-up
+00:00 Introduction: Thinking in Causes & The Series Finale
+00:55 Serendipity & The Melted Candy Bar (Percy Spencer Case)
+02:05 Intersecting Systems: How Independent Causes Meet in Time & Space
+03:15 Breaking System Overlaps: Acting on Conditional Causes
+04:20 Why Success Is Planned: Charting Positive Outcomes
+05:30 Chapter 14: Moving Past Storytelling to Causal Thinking
+06:25 Series Recap, Web App Companion & Final Takeaway
 
 🔑 CORE BOOK CONCEPTS & DIRECT QUOTES:
 • Serendipity: Serendipity needs "the intelligence to ask why, the knowledge to find the answers, and the tenacity to do something with the newfound knowledge" (RC, Ch. 13, p. 178).

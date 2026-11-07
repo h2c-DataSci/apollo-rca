@@ -46,8 +46,8 @@
      - **Episode 3 of 7** (`07:57`): *Causal Relationships & The RealityChart (Actions, Conditions, and Stop Reasons)* (`8y501jMIS7k`)
      - **Episode 4 of 7** (`06:59`): *Evidence; Sufficient and Necessary — How to Test and Prove Causes* (`lppZuZFyHzM`)
      - **Episode 5 of 7** (`08:45`): *Effective Solutions, Implementation, and Tracking (Preventing Recurrence)* (`yBVaGu31ik8`)
-     - **Episode 6 of 7** (`16:30`): *Culture and Facilitation — Fix the Cause, Not the Blame*
-     - **Episode 7 of 7** (`14:45`): *Success and a New Way of Thinking (Why Success Is Planned)*
+     - **Episode 6 of 7** (`08:19`): *Culture and Facilitation — Fix the Cause, Not the Blame* (`lj2e9A-qmVA`)
+     - **Episode 7 of 7** (`07:10`): *Success and a New Way of Thinking (Why Success Is Planned)* (`_w5WUcNRYWU`)
    - Dynamic 16:9 responsive embeds with zero third-party tracking on page load (lazy-loaded upon explicit user click).
    - Expandable Lesson Plan outlines with exact Dean L. Gano book page citations (RC 2011, AR 2003), student objectives, and `📋 Copy Full YouTube Description` button.
 

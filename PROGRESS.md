@@ -2,9 +2,9 @@
 
 **Target Project**: H2C Root Cause Analyst (`apollo-rca`)  
 **Workspace**: `d:\GitHub-Antigravity\apollo-rca`  
-**Current Phase**: Phase 17: Official Episode 5 Integration & Release Verification  
+**Current Phase**: Phase 18: Full 7-Episode Curriculum Completion & Production Release  
 **Lead Orchestrator**: Senior Full-Stack Engineering, Quality, Security, and Design Team  
-**Last Updated**: 2026-11-07 22:55 UTC+8  
+**Last Updated**: 2026-11-08 00:20 UTC+8  
 **Active Git Branch**: `main`  
 
 ---
@@ -23,6 +23,7 @@
 | **Phase 15** | Live YouTube Durations & 10x UX Polish | **COMPLETED** | 100% | Synchronized 55:50, 20:22, 07:57, 06:59; v16 cache-busting; glowing badges; sync status bar; 124/124 tests PASS |
 | **Phase 16** | Production Deployment & GitHub Pages Verification | **COMPLETED** | 100% | Verified GitHub Actions CI & Pages deployment; live site confirmed 200 OK |
 | **Phase 17** | Official Episode 5 Integration & Release | **COMPLETED** | 100% | Integrated Episode 5 (yBVaGu31ik8), 08:45 duration, v17 cache-busting, 124/124 tests PASS |
+| **Phase 18** | Full 7-Episode Curriculum Completion & Release | **COMPLETED** | 100% | 100% of 7 episodes live (Ep 6: lj2e9A-qmVA 08:19, Ep 7: _w5WUcNRYWU 07:10); v18 cache-busting; 0 placeholders remain; 124/124 tests PASS |
 
 ---
 
@@ -323,7 +324,16 @@
   - **Zero Network Leakage**: Lazy-loaded `youtube-nocookie.com` iframes instantiate exclusively upon explicit user click/interaction.
   - **Automated Quality Verification**: All 32 automated unit/integration tests and 8 stress benchmarks pass with zero warnings.
 
-- [x] **Phase 17: Official Episode 5 Integration & Release (Active)**:
+- [x] **Phase 18: Full 7-Episode Curriculum Completion & Production Release (Completed)**:
+  - **100% Video Series Completion**: Replaced all remaining placeholders with official published videos:
+    - **Episode 6 of 7**: `https://youtu.be/lj2e9A-qmVA` (ID: `lj2e9A-qmVA`, Duration: `08:19`, Tier: `Culture & Alignment`) — *Culture and Facilitation — Fix the Cause, Not the Blame*. 8 real chapters synchronized (00:00–08:10).
+    - **Episode 7 of 7**: `https://youtu.be/_w5WUcNRYWU` (ID: `_w5WUcNRYWU`, Duration: `07:10`, Tier: `Proactive Mastery`) — *Success and a New Way of Thinking (Why Success Is Planned)*. 7 real chapters synchronized (00:00–06:25).
+  - **Zero Placeholders**: The entire 7-step Apollo RCA and RealityCharting video curriculum on `@h2c_Learnings` is now fully published and linked. 0 placeholders remain across the entire codebase.
+  - **Cache-Busting & Auto-Sync**: Bumped version to `v=18` across `index.html` (`h2c-shell.js?v=18`, `h2c-help.js?v=18`), `h2c-help.js` (`./h2c-videos.js?v=18`, `./help-kb.js?v=18`, `./help-diagrams.js?v=18`), and `h2c-videos.js` (`SYNC_VERSION = 'v18-20261108'`) guaranteeing instant client-side migration for all returning users.
+  - **Cross-Documentation Harmonization**: Synchronized `README.md`, `USER_GUIDE.md`, and `YOUTUBE_DESCRIPTIONS.md` with Episode 6 and 7 verified URLs, durations, and chapters.
+  - **Comprehensive QA/QC & Test Coverage**: Updated `test/test-videos.mjs` with Episode 6 and 7 assertions, local storage upgrade tests, and cache busting assertions. Ran full test suite: **124/124 automated tests passing across 11 suites with 100% success rate**.
+
+- [x] **Phase 17: Official Episode 5 Integration & Release (Completed)**:
   - **Live YouTube Video 5 Integration**: Replaced Episode 5 placeholder with official published video `https://youtu.be/yBVaGu31ik8` (ID: `yBVaGu31ik8`).
   - **Duration & Chapters Harmonization**: Set duration to `08:45` (`08:45 • Action Framework`), marked `verified: true`, and synchronized `youtubeOutline` with the 8 published chapters (00:00–07:40).
   - **Cache-Busting & Auto-Sync**: Bumped to `v=17` across `index.html` (`h2c-shell.js?v=17`, `h2c-help.js?v=17`), `h2c-help.js` (`./h2c-videos.js?v=17`), and `h2c-videos.js` (`SYNC_VERSION = 'v17-20261107'`) ensuring returning users automatically sync to the newly published official video.
