@@ -25,6 +25,16 @@ css.textContent = `
 .h2c-new-prominent{background:linear-gradient(180deg,#f6dd7a,#c9a227)!important;color:#043d2e!important;border:2px solid #8c6a1a!important;font-weight:700!important}
 .h2c-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:10000;background:#043d2e;color:#f1d16b;border:2px solid #c9a227;border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;font:600 14px system-ui;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 .h2c-toast button{background:#f1d16b;color:#043d2e;border:0;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer}.h2c-toast button:focus-visible{outline:3px solid #fff}
+.h2c-browser-ai-dialog{border:2px solid #c9a227;border-radius:12px;padding:0;max-width:34rem;background:#fffdf8;color:#1c1915;box-shadow:0 12px 40px rgba(0,0,0,.28)}
+.h2c-browser-ai-dialog::backdrop{background:rgba(4,28,22,.45)}
+.h2c-browser-ai-dialog h2{margin:0;padding:14px 16px;background:#043d2e;color:#f1d16b;font:700 16px system-ui}
+.h2c-browser-ai-dialog .body{padding:14px 16px 16px;display:grid;gap:10px;font:14px/1.45 system-ui}
+.h2c-browser-ai-dialog p{margin:0}
+.h2c-browser-ai-dialog code{font-size:12px}
+.h2c-browser-ai-dialog .row{display:flex;flex-wrap:wrap;gap:8px}
+.h2c-browser-ai-dialog button{min-height:40px;border-radius:8px;padding:0 12px;font:600 13px system-ui;cursor:pointer}
+.h2c-browser-ai-dialog .go{background:#043d2e;color:#f1d16b;border:1px solid #c9a227}
+.h2c-browser-ai-dialog .stop{background:#fff;color:#043d2e;border:1px solid #c9a227}
 
 /* Elegant, Eye-Friendly Methodology & Attribution Ribbon (Top) */
 .h2c-top-ribbon {
@@ -1427,6 +1437,83 @@ function ensureLocalBridgeUI() {
   }
 }
 
+function ensureBrowserAiButton() {
+  if (document.querySelector('.h2c-browser-ai-btn')) return;
+  const anchor = [...document.querySelectorAll('header button')].find((b) => /RCA Coach/i.test(b.textContent));
+  if (!anchor) return;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = anchor.className + ' h2c-browser-ai-btn';
+  btn.textContent = 'Browser AI';
+  btn.setAttribute('aria-haspopup', 'dialog');
+  btn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openBrowserAiDialog();
+  });
+  anchor.insertAdjacentElement('afterend', btn);
+}
+
+function openBrowserAiDialog() {
+  let dialog = document.getElementById('h2c-browser-ai-dialog');
+  if (!dialog) {
+    dialog = document.createElement('dialog');
+    dialog.id = 'h2c-browser-ai-dialog';
+    dialog.className = 'h2c-browser-ai-dialog';
+    dialog.innerHTML = `
+      <h2 id="h2c-browser-ai-title">Browser AI</h2>
+      <div class="body">
+        <p>Only <strong>onnx-community/Qwen2.5-0.5B-Instruct</strong> runs inside this browser. It is an ONNX q4 model, about 790 MB, under Apache-2.0. The page loads it in a worker and uses WebGPU, or WASM if the browser has no WebGPU. Your case text stays on this device.</p>
+        <p>A browser cannot start Ollama or run GGUF weights. Gemma 2 (2B), Qwen 2.5 (1.5B), and Llama 3.2 (1B) stay on your computer. Install Ollama, then run one of these, and leave the endpoint at <code>http://127.0.0.1:11434</code>. Use Test Connection on the Local AI card.</p>
+        <ul></ul>
+        <p class="h2c-browser-ai-status" role="status"></p>
+        <div class="row">
+          <button type="button" class="go">Download and run in this browser</button>
+          <button type="button" class="stop">Close</button>
+        </div>
+      </div>`;
+    const list = dialog.querySelector('ul');
+    RECOMMENDED_LOCAL_MODELS.forEach((model) => {
+      const item = document.createElement('li');
+      const code = document.createElement('code');
+      code.textContent = model.cmd;
+      item.append(model.name + ': ', code);
+      list.append(item);
+    });
+    dialog.querySelector('.stop').onclick = () => dialog.close();
+    dialog.querySelector('.go').onclick = () => startBrowserModel(dialog);
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+    document.body.append(dialog);
+  }
+  const status = dialog.querySelector('.h2c-browser-ai-status');
+  const coach = document.querySelector('section[aria-label="RCA coach"]');
+  const ready = coach && /AI Ready|AI Working|AI Loading/i.test(coach.textContent);
+  status.textContent = ready ? 'This browser model is already on or loading in the RCA Coach section.' : '';
+  dialog.showModal();
+}
+
+async function startBrowserModel(dialog) {
+  const status = dialog.querySelector('.h2c-browser-ai-status');
+  status.textContent = 'Looking for the in-browser coach…';
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const coach = document.querySelector('section[aria-label="RCA coach"]');
+    const enable = coach && [...coach.querySelectorAll('button')].find((b) => /Enable AI Assistant/.test(b.textContent));
+    if (enable) {
+      enable.click();
+      coach.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      dialog.close();
+      return;
+    }
+    if (coach && [...coach.querySelectorAll('button')].some((b) => /Unload|Disable AI/.test(b.textContent))) {
+      coach.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      status.textContent = 'The browser model is already enabled. Progress stays in the RCA Coach section.';
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  status.textContent = 'The coach has not finished loading. Wait a moment and press the button again. Nothing else on the page was changed.';
+}
+
 function refreshAll() {
   if (updating) return;
   updating = true;
@@ -1436,6 +1523,7 @@ function refreshAll() {
     updateStepsHub();
     updateColorCodedValidation();
     ensureLocalBridgeUI();
+    ensureBrowserAiButton();
   } finally {
     updating = false;
   }
