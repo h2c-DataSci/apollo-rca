@@ -12,7 +12,8 @@ function escapeHtml(str) {
 // interactive lively 7-step Apollo RCA workflow hub, real-time color-coded validation,
 // and local AI daemon bridge for low-resource hardware.
 
-import { getBridgeConfig, saveBridgeConfig, testLocalDaemonConnection, executeLocalChat, RECOMMENDED_LOCAL_MODELS } from './local-ai-bridge.js';
+import { MODEL_CONFIG } from './ai-config.js';
+import { getBridgeConfig, saveBridgeConfig, testLocalDaemonConnection, executeLocalChat, RECOMMENDED_LOCAL_MODELS } from './local-ai-bridge.js?v=21';
 
 const KEYS = ['realitychart-intake-v1', 'realitychart-hypotheses-v1', 'realitychart-raw-notes-v1'];
 const BACKUP = 'h2c-last-cleared-v1';
@@ -1148,6 +1149,7 @@ function placeOfficialCoach() {
   const coach = document.querySelector('section[aria-label="RCA coach"]');
   const hub = document.querySelector('.h2c-workflow-hub');
   if (!coach || !hub || !hub.parentNode) return;
+  if (coach.contains(document.activeElement)) return;
   coach.classList.add('h2c-official-coach');
   if (coach.parentNode !== hub.parentNode || coach.nextElementSibling !== hub) {
     hub.parentNode.insertBefore(coach, hub);
@@ -1234,28 +1236,47 @@ function ensureLocalBridgeUI() {
       pill.style.background = '#fef3c7';
       pill.style.color = '#92400e';
       feedback.style.display = 'block';
+      feedback.replaceChildren();
       feedback.style.color = '#4b5563';
       feedback.textContent = 'Pinging local daemon at ' + endpointInput.value + '...';
 
       saveChanges();
-      const res = await testLocalDaemonConnection(endpointInput.value);
-
-      testBtn.disabled = false;
-      testBtn.textContent = '⚡ Test Connection';
-
-      if (res.online) {
-        pill.textContent = `🟢 Connected (${res.type})`;
-        pill.style.background = '#d1fae5';
-        pill.style.color = '#065f46';
-        feedback.style.color = '#065f46';
-        feedback.innerHTML = `<strong>✓ Connection Verified!</strong> ${res.message}. Models available: [${res.models.join(', ')}]`;
-        saveBridgeConfig({ enabled: true });
-      } else {
+      try {
+        const res = await testLocalDaemonConnection(endpointInput.value);
+        feedback.replaceChildren();
+        if (res.online) {
+          pill.textContent = '🟢 Connected (' + String(res.type || 'local') + ')';
+          pill.style.background = '#d1fae5';
+          pill.style.color = '#065f46';
+          feedback.style.color = '#065f46';
+          const title = document.createElement('strong');
+          title.textContent = '✓ Connection verified. ';
+          feedback.append(title, document.createTextNode(String(res.message || '')));
+          if (Array.isArray(res.models) && res.models.length) {
+            feedback.append(document.createTextNode(' Models: ' + res.models.join(', ')));
+          }
+          saveBridgeConfig({ enabled: true });
+        } else {
+          pill.textContent = '⚪ Daemon Offline';
+          pill.style.background = '#fee2e2';
+          pill.style.color = '#991b1b';
+          feedback.style.color = '#b91c1c';
+          const title = document.createElement('strong');
+          title.textContent = '✕ Local daemon not detected. ';
+          const hint = document.createElement('span');
+          hint.style.color = '#4b5563';
+          hint.textContent = 'On this computer run: ollama run ' + modelSelect.value;
+          feedback.append(title, document.createTextNode(String(res.error || res.message || '')), document.createElement('br'), hint);
+        }
+      } catch (error) {
         pill.textContent = '⚪ Daemon Offline';
         pill.style.background = '#fee2e2';
         pill.style.color = '#991b1b';
         feedback.style.color = '#b91c1c';
-        feedback.innerHTML = `<strong>✕ Local daemon not detected:</strong> ${res.error || res.message}.<br><span style="color:#4b5563;">To start locally, open your terminal and run: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#0f172a;font-weight:700;">ollama run ${modelSelect.value}</code></span>`;
+        feedback.textContent = error && error.message ? error.message : 'Connection check failed.';
+      } finally {
+        testBtn.disabled = false;
+        testBtn.textContent = '⚡ Test Connection';
       }
     };
   }
@@ -1287,7 +1308,7 @@ function openBrowserAiDialog() {
     dialog.innerHTML = `
       <h2 id="h2c-browser-ai-title">Browser AI</h2>
       <div class="body">
-        <p>Only <strong>onnx-community/Qwen2.5-0.5B-Instruct</strong> runs inside this browser. It is an ONNX q4 model, about 790 MB, under Apache-2.0. The page loads it in a worker and uses WebGPU, or WASM if the browser has no WebGPU. Your case text stays on this device.</p>
+        <p>Only <strong data-model></strong> runs inside this browser. It is an ONNX q4 model, about 790 MB, under Apache-2.0. The page loads it in a worker and uses WebGPU, or WASM if the browser has no WebGPU. Your case text stays on this device.</p>
         <p>A browser cannot start Ollama or run GGUF weights. Gemma 2 (2B), Qwen 2.5 (1.5B), and Llama 3.2 (1B) stay on your computer. Install Ollama, then run one of these, and leave the endpoint at <code>http://127.0.0.1:11434</code>. Use Test Connection on the Local AI card.</p>
         <ul></ul>
         <p class="h2c-browser-ai-status" role="status"></p>
@@ -1296,6 +1317,7 @@ function openBrowserAiDialog() {
           <button type="button" class="stop">Close</button>
         </div>
       </div>`;
+    dialog.querySelector('[data-model]').textContent = MODEL_CONFIG.id;
     const list = dialog.querySelector('ul');
     RECOMMENDED_LOCAL_MODELS.forEach((model) => {
       const item = document.createElement('li');
@@ -1342,16 +1364,19 @@ function refreshAll() {
   if (updating) return;
   updating = true;
   try {
-    updateTopAttributionRibbon();
-    ensureBottomLegalShowcase();
-    updateStepsHub();
-    updateColorCodedValidation();
-    placeOfficialCoach();
-    ensureLocalBridgeUI();
-    ensureBrowserAiButton();
+    const steps = [updateTopAttributionRibbon, ensureBottomLegalShowcase, updateStepsHub, updateColorCodedValidation, placeOfficialCoach, ensureLocalBridgeUI, ensureBrowserAiButton];
+    for (const step of steps) {
+      try { step(); } catch (error) { console.error('[h2c]', error); }
+    }
   } finally {
     updating = false;
   }
+}
+
+let refreshTimer = 0;
+function scheduleRefresh() {
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(refreshAll, 150);
 }
 
 function initShell() {
@@ -1368,9 +1393,9 @@ function initShell() {
   refreshAll();
 
   // Listen to input, change, and click events for real-time reactivity
-  document.addEventListener('input', refreshAll);
-  document.addEventListener('change', refreshAll);
-  document.addEventListener('click', () => setTimeout(refreshAll, 60));
+  document.addEventListener('input', scheduleRefresh);
+  document.addEventListener('change', scheduleRefresh);
+  document.addEventListener('click', () => setTimeout(scheduleRefresh, 60));
 
   if (document.body) {
     new MutationObserver(applyProminent).observe(document.body, { childList: true });

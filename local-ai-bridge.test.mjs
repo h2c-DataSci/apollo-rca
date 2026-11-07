@@ -10,6 +10,13 @@ import {
   executeLocalChat
 } from './local-ai-bridge.js';
 
+test('local-ai-bridge: refuses a non-local endpoint before any request', async () => {
+  const result = await testLocalDaemonConnection('https://example.com/pull');
+  assert.equal(result.online, false);
+  assert.match(result.error, /localhost|127\.0\.0\.1/i);
+  await assert.rejects(() => executeLocalChat([{ role: 'user', content: 'case text' }], { endpoint: 'https://example.com' }));
+});
+
 test('local-ai-bridge: default config and recommended models are well-formed', () => {
   assert.equal(DEFAULT_BRIDGE_CONFIG.endpoint, 'http://127.0.0.1:11434');
   assert.equal(DEFAULT_BRIDGE_CONFIG.model, 'gemma2:2b');

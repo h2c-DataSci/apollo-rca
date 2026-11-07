@@ -59,11 +59,48 @@ export function saveBridgeConfig(cfg) {
   }
 }
 
+export function localDaemonUrl(endpoint) {
+  let parsed;
+  try {
+    parsed = new URL(String(endpoint || '').trim());
+  } catch {
+    throw new Error('Endpoint must be a local address such as http://127.0.0.1:11434');
+  }
+  const host = parsed.hostname.replace(/^\[|\]$/g, '').toLowerCase();
+  const loopback = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+  if (!loopback || (parsed.protocol !== 'http:' && parsed.protocol !== 'https:')) {
+    throw new Error('Only a daemon on 127.0.0.1 or localhost is allowed.');
+  }
+  if (parsed.username || parsed.password) {
+    throw new Error('Credentials in the endpoint are not allowed.');
+  }
+  return parsed.origin;
+}
+
+function modelNames(list, pick) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .map((item) => {
+      const value = pick(item);
+      return typeof value === 'string' ? value.slice(0, 120) : '';
+    })
+    .filter(Boolean);
+}
+
+function offline(endpoint, error) {
+  return { online: false, endpoint: String(endpoint || ''), models: [], error, message: error };
+}
+
 /**
  * Health-check the local daemon (Ollama / OpenAI-compatible local bridge)
  */
 export async function testLocalDaemonConnection(endpoint = 'http://127.0.0.1:11434') {
-  const url = endpoint.replace(/\/+$/, '');
+  let url;
+  try {
+    url = localDaemonUrl(endpoint);
+  } catch (error) {
+    return offline(endpoint, error.message);
+  }
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 4000);
 
@@ -78,7 +115,7 @@ export async function testLocalDaemonConnection(endpoint = 'http://127.0.0.1:114
 
     if (res.ok) {
       const data = await res.json();
-      const models = Array.isArray(data.models) ? data.models.map(m => m.name || m.model) : [];
+      const models = modelNames(data.models, (m) => m && (m.name || m.model));
       return {
         online: true,
         type: 'ollama',
@@ -104,7 +141,7 @@ export async function testLocalDaemonConnection(endpoint = 'http://127.0.0.1:114
 
       if (res2.ok) {
         const data2 = await res2.json();
-        const models2 = Array.isArray(data2.data) ? data2.data.map(m => m.id) : [];
+        const models2 = modelNames(data2.data, (m) => m && m.id);
         return {
           online: true,
           type: 'openai-compatible',
@@ -136,7 +173,7 @@ export async function testLocalDaemonConnection(endpoint = 'http://127.0.0.1:114
  */
 export async function executeLocalChat(messages, options = {}) {
   const cfg = { ...getBridgeConfig(), ...options };
-  const url = cfg.endpoint.replace(/\/+$/, '');
+  const url = localDaemonUrl(cfg.endpoint);
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), cfg.timeoutMs || 25000);
 
