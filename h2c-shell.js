@@ -318,6 +318,28 @@ css.textContent = `
 }
 
 /* 7-Step Interactive Workflow Hub */
+.h2c-official-coach {
+  margin: 0 0 1.5rem 0 !important;
+  border: 2px solid #c9a227 !important;
+  background: linear-gradient(180deg, #fffdfa 0%, #fbf7ee 100%) !important;
+  border-radius: 12px !important;
+  padding: 16px 18px !important;
+  box-shadow: 0 4px 18px rgba(4, 61, 46, 0.08), 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+.h2c-official-coach.h2c-coach-focus { outline: 3px solid #c9a227; outline-offset: 3px; }
+.h2c-official-coach > div:first-child h2,
+.h2c-official-coach h2 {
+  font: 700 15px/1.3 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  color: #14261c !important;
+}
+.h2c-official-coach .h2c-local-bridge-card {
+  margin-top: 12px !important;
+  background: #fff !important;
+  border: 1px solid #e7ded0 !important;
+  border-left: 4px solid #c9a227 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
 .h2c-workflow-hub {
   margin-bottom: 2rem;
   border: 2px solid #c9a227;
@@ -1121,224 +1143,26 @@ function updateColorCodedValidation() {
   }
 }
 
-let coachWorkbenchVisible = false;
-
-function toggleCoachWorkbench(force) {
-  coachWorkbenchVisible = typeof force === 'boolean' ? force : !coachWorkbenchVisible;
-  
-  // Update toolbar button visual state
-  const coachBtns = [...document.querySelectorAll('button')].filter(b => /RCA Coach/i.test(b.textContent));
-  coachBtns.forEach(btn => {
-    if (coachWorkbenchVisible) {
-      btn.className = 'inline-flex h-11 items-center gap-2 rounded-md border px-3 text-sm border-ink bg-ink text-on-solid shadow-sm';
-    } else {
-      btn.className = 'inline-flex h-11 items-center gap-2 rounded-md border px-3 text-sm border-line bg-surface';
-    }
-  });
-
-  let workbench = document.querySelector('#h2c-coach-workbench');
-  if (!coachWorkbenchVisible) {
-    if (workbench) workbench.style.display = 'none';
-    return;
+function placeOfficialCoach() {
+  document.getElementById('h2c-coach-workbench')?.remove();
+  const coach = document.querySelector('section[aria-label="RCA coach"]');
+  const hub = document.querySelector('.h2c-workflow-hub');
+  if (!coach || !hub || !hub.parentNode) return;
+  coach.classList.add('h2c-official-coach');
+  if (coach.parentNode !== hub.parentNode || coach.nextElementSibling !== hub) {
+    hub.parentNode.insertBefore(coach, hub);
   }
+}
 
-  if (!workbench) {
-    const hub = document.querySelector('.h2c-workflow-hub') || document.querySelector('ol.grid-cols-2, ol.sm\\:grid-cols-7');
-    if (!hub) return;
-
-    const cfg = getBridgeConfig();
-    workbench = document.createElement('div');
-    workbench.id = 'h2c-coach-workbench';
-    workbench.className = 'no-print h2c-local-bridge-card';
-    workbench.style.cssText = 'margin-bottom: 1.5rem; background: linear-gradient(180deg, #fffdf8 0%, #fbf5e6 100%); border: 2px solid #c9a227; border-radius: 12px; padding: 18px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); font-family: system-ui, sans-serif;';
-    
-    workbench.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-        <div>
-          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <span style="font-size: 20px;">🤖</span>
-            <h2 style="font-size: 16px; font-weight: 700; color: #102033; margin: 0;">Apollo RCA Coach &amp; Local AI Daemon Bridge</h2>
-            <span style="font-size: 11px; background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 999px; font-weight: 700;">Older Laptop Optimized (0 MB Browser RAM)</span>
-          </div>
-          <p style="font-size: 12.5px; color: #4a5568; margin: 4px 0 0 0; line-height: 1.45;">
-            Local offline assistance running on your machine (Ollama / Google Gemma 2 / Qwen 2.5 / LiteRT). 100% private, zero network leakage, and adheres to Apollo RCA principles. Standard Mode always available.
-          </p>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="h2c-bridge-status-pill" style="font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: #f3f4f6; color: #4b5563; border: 1px solid #e2e8f0;">⚪ Daemon Inactive</span>
-          <button type="button" class="h2c-bridge-close-btn" style="background: none; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; padding: 3px 8px; cursor: pointer; color: #64748b;" title="Close Coach Workbench">✕</button>
-        </div>
-      </div>
-
-      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
-        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-          <label style="font-size: 12px; font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 6px;">
-            Endpoint:
-            <input type="text" class="h2c-bridge-endpoint" value="${cfg.endpoint}" style="font-size: 12px; padding: 5px 8px; border: 1.5px solid #cbd5e1; border-radius: 5px; width: 180px; font-family: monospace;" />
-          </label>
-          <label style="font-size: 12px; font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 6px;">
-            Model:
-            <select class="h2c-bridge-model" style="font-size: 12px; padding: 5px 8px; border: 1.5px solid #cbd5e1; border-radius: 5px; background: #fff;">
-              <option value="gemma2:2b" ${cfg.model === 'gemma2:2b' ? 'selected' : ''}>Google Gemma 2 (2B) - Recommended (1.6 GB RAM)</option>
-              <option value="qwen2.5:1.5b" ${cfg.model === 'qwen2.5:1.5b' ? 'selected' : ''}>Qwen 2.5 (1.5B) - Fast &amp; Compact (1.2 GB RAM)</option>
-              <option value="llama3.2:1b" ${cfg.model === 'llama3.2:1b' ? 'selected' : ''}>Llama 3.2 (1B) - Lowest Resource (0.9 GB RAM)</option>
-            </select>
-          </label>
-          <button type="button" class="h2c-bridge-test-btn" style="font-size: 12px; font-weight: 700; background: #043d2e; color: #f1d16b; border: 1.5px solid #c9a227; padding: 6px 14px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-            ⚡ Test Connection
-          </button>
-        </div>
-        <div class="h2c-bridge-feedback" style="margin-top: 8px; font-size: 12px; line-height: 1.45; display: none;"></div>
-      </div>
-
-      <div style="margin-bottom: 10px;">
-        <label style="display: block; font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">Context to Review (e.g. Primary Effect, Action, or Cause Statement):</label>
-        <textarea class="h2c-coach-input-text" style="width: 100%; min-height: 56px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; font-size: 13px; font-family: inherit; resize: vertical;" placeholder="Type statement or click any task below to review investigation state..."></textarea>
-      </div>
-
-      <div style="margin-bottom: 12px;">
-        <span style="font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 6px; display: block;">Coach Assistance Actions:</span>
-        <div class="h2c-coach-action-buttons" style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <button type="button" data-task="reviewPrimaryEffect" class="h2c-task-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 5px; cursor: pointer;">Review wording</button>
-          <button type="button" data-task="rewritePrimaryEffect" class="h2c-task-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 5px; cursor: pointer;">Suggest rewrite</button>
-          <button type="button" data-task="extractTimelineCandidates" class="h2c-task-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 5px; cursor: pointer;">Extract timeline</button>
-          <button type="button" data-task="reviewCauseStatement" class="h2c-task-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 5px; cursor: pointer;">Ask RCA Coach</button>
-          <button type="button" data-task="identifyEvidenceGaps" class="h2c-task-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 5px; cursor: pointer;">Check evidence gap</button>
-          <button type="button" data-task="generateClarifyingQuestions" class="h2c-task-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 5px; cursor: pointer;">Clarifying questions</button>
-          <button type="button" data-task="suggestHypothesisBranches" class="h2c-task-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 5px; cursor: pointer;">Hypothesis branches</button>
-          <button type="button" data-task="reviewCorrectiveActionAlignment" class="h2c-task-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 5px; cursor: pointer;">Review solution alignment</button>
-          <button type="button" data-task="reviewAnalysisIntegrity" class="h2c-task-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 5px; cursor: pointer;">Validate integrity</button>
-        </div>
-      </div>
-
-      <div class="h2c-coach-output-area" style="display: none; background: #fff; border: 1.5px solid #d4c5a9; border-radius: 8px; padding: 12px; margin-top: 10px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span class="h2c-coach-output-badge" style="font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;">PASS</span>
-          <span style="font-size: 11px; color: #64748b;">Advisory Only &bull; Investigator Decides</span>
-        </div>
-        <div class="h2c-coach-output-content" style="font-size: 13px; color: #1e293b; line-height: 1.5;"></div>
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
-          <button type="button" class="h2c-coach-accept-btn" style="font-size: 12px; font-weight: 700; background: #043d2e; color: #f1d16b; border: 1px solid #c9a227; padding: 5px 12px; border-radius: 5px; cursor: pointer;">✓ Accept into Case</button>
-          <button type="button" class="h2c-coach-dismiss-btn" style="font-size: 12px; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; padding: 5px 12px; border-radius: 5px; cursor: pointer;">Dismiss</button>
-        </div>
-      </div>
-    `;
-
-    hub.parentNode.insertBefore(workbench, hub);
-
-    // Wire up events
-    workbench.querySelector('.h2c-bridge-close-btn').onclick = () => toggleCoachWorkbench(false);
-
-    const testBtn = workbench.querySelector('.h2c-bridge-test-btn');
-    const endpointInput = workbench.querySelector('.h2c-bridge-endpoint');
-    const modelSelect = workbench.querySelector('.h2c-bridge-model');
-    const pill = workbench.querySelector('.h2c-bridge-status-pill');
-    const feedback = workbench.querySelector('.h2c-bridge-feedback');
-    const inputArea = workbench.querySelector('.h2c-coach-input-text');
-    const outputArea = workbench.querySelector('.h2c-coach-output-area');
-    const outputBadge = workbench.querySelector('.h2c-coach-output-badge');
-    const outputContent = workbench.querySelector('.h2c-coach-output-content');
-    const acceptBtn = workbench.querySelector('.h2c-coach-accept-btn');
-    const dismissBtn = workbench.querySelector('.h2c-coach-dismiss-btn');
-
-    // Default text from active primary effect
-    const state = getAppState();
-    if (state.primaryEffectWhats && state.primaryEffectWhats[0]) {
-      inputArea.value = state.primaryEffectWhats[0];
-    }
-
-    const saveChanges = () => {
-      saveBridgeConfig({
-        endpoint: endpointInput.value.trim(),
-        model: modelSelect.value
-      });
-    };
-
-    endpointInput.addEventListener('change', saveChanges);
-    modelSelect.addEventListener('change', saveChanges);
-
-    testBtn.onclick = async () => {
-      testBtn.disabled = true;
-      testBtn.textContent = 'Testing...';
-      pill.textContent = '⏳ Checking...';
-      pill.style.background = '#fef3c7';
-      pill.style.color = '#92400e';
-      feedback.style.display = 'block';
-      feedback.style.color = '#4b5563';
-      feedback.textContent = 'Pinging local daemon at ' + endpointInput.value + '...';
-
-      saveChanges();
-      const res = await testLocalDaemonConnection(endpointInput.value);
-
-      testBtn.disabled = false;
-      testBtn.textContent = '⚡ Test Connection';
-
-      if (res.online) {
-        pill.textContent = `🟢 Connected (${res.type})`;
-        pill.style.background = '#d1fae5';
-        pill.style.color = '#065f46';
-        feedback.style.color = '#065f46';
-        feedback.innerHTML = `<strong>✓ Connection Verified!</strong> ${res.message}. Models available: [${res.models.join(', ')}]`;
-        saveBridgeConfig({ enabled: true });
-      } else {
-        pill.textContent = '⚪ Daemon Offline';
-        pill.style.background = '#fee2e2';
-        pill.style.color = '#991b1b';
-        feedback.style.color = '#b91c1c';
-        feedback.innerHTML = `<strong>✕ Local daemon not detected:</strong> ${res.error || res.message}.<br><span style="color:#4b5563;">To start locally on CPU with zero browser RAM, open terminal and run: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#0f172a;font-weight:700;">ollama run ${modelSelect.value}</code></span>`;
-      }
-    };
-
-    // Task actions
-    workbench.querySelectorAll('.h2c-task-btn').forEach(btn => {
-      btn.onclick = async () => {
-        const task = btn.dataset.task;
-        const text = inputArea.value.trim() || 'Oil Released';
-        
-        outputArea.style.display = 'block';
-        outputBadge.textContent = 'ANALYZING...';
-        outputBadge.style.background = '#fef3c7';
-        outputBadge.style.color = '#92400e';
-        outputContent.textContent = `Running ${btn.textContent} under Apollo RCA principles...`;
-
-        // Check if daemon is active
-        const cfg = getBridgeConfig();
-        const check = await testLocalDaemonConnection(cfg.endpoint);
-        
-        if (check.online) {
-          try {
-            const prompt = `Task: ${task}. Statement to review: "${text}". Follow Apollo Root Cause Analysis principles. Return recommendations.`;
-            const chatRes = await executeLocalChat([{ role: 'user', content: prompt }], { timeoutMs: 15000 });
-            outputBadge.textContent = 'AI SUGGESTION';
-            outputBadge.style.background = '#dbeafe';
-            outputBadge.style.color = '#1e40af';
-            const chatText = typeof chatRes === 'string' ? chatRes : (chatRes?.content || '');
-            outputContent.innerHTML = `<strong>Local AI (${cfg.model}):</strong><br>${chatText.replace(/\n/g, '<br>')}`;
-          } catch (e) {
-            outputBadge.textContent = 'RULE FALLBACK';
-            outputBadge.style.background = '#fef3c7';
-            outputBadge.style.color = '#92400e';
-            outputContent.innerHTML = `<strong>Apollo Heuristic Rule Check:</strong> Statement "${text}" reviewed. Ensure it contains a noun and an active verb without assigning blame or presuming causation.`;
-          }
-        } else {
-          // Deterministic fallback rule check
-          outputBadge.textContent = 'RULE PASS';
-          outputBadge.style.background = '#d1fae5';
-          outputBadge.style.color = '#065f46';
-          outputContent.innerHTML = `<strong>Apollo Deterministic Check (${task}):</strong><br>&bull; <em>Noun-Verb Structure:</em> Validated.<br>&bull; <em>Blame Neutrality:</em> No culpable persons named.<br>&bull; <em>Standard Mode Advice:</em> Always verify causes against sensed or inferred evidence.`;
-        }
-      };
-    });
-
-    dismissBtn.onclick = () => { outputArea.style.display = 'none'; };
-    acceptBtn.onclick = () => {
-      outputArea.style.display = 'none';
-      if (typeof toast === 'function') toast();
-    };
-  }
-
-  workbench.style.display = 'block';
-  workbench.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+function focusOfficialCoach() {
+  placeOfficialCoach();
+  const coach = document.querySelector('section[aria-label="RCA coach"]');
+  const headerBtn = [...document.querySelectorAll('header button')].find((b) => /RCA Coach/i.test(b.textContent));
+  if (headerBtn) headerBtn.className = 'inline-flex h-11 items-center gap-2 rounded-md border px-3 text-sm border-ink bg-ink text-on-solid shadow-sm';
+  if (!coach) return;
+  coach.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  coach.classList.add('h2c-coach-focus');
+  setTimeout(() => coach.classList.remove('h2c-coach-focus'), 1600);
 }
 
 function ensureLocalBridgeUI() {
@@ -1350,7 +1174,7 @@ function ensureLocalBridgeUI() {
     const cfg = getBridgeConfig();
     bridge = document.createElement('div');
     bridge.className = 'no-print h2c-local-bridge-card';
-    bridge.style.cssText = 'margin-top: 14px; margin-bottom: 12px; background: #fffdf9; border: 1.5px solid #d4c5a9; border-radius: 8px; padding: 12px 14px; font-family: system-ui, sans-serif;';
+    bridge.style.cssText = 'margin-top: 12px; margin-bottom: 12px; background: #fff; border: 1px solid #e7ded0; border-left: 4px solid #c9a227; border-radius: 8px; padding: 12px 14px; font-family: system-ui, sans-serif;';
     bridge.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 8px;">
@@ -1522,6 +1346,7 @@ function refreshAll() {
     ensureBottomLegalShowcase();
     updateStepsHub();
     updateColorCodedValidation();
+    placeOfficialCoach();
     ensureLocalBridgeUI();
     ensureBrowserAiButton();
   } finally {
@@ -1568,9 +1393,9 @@ function toast() {
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('button');
   if (!b) return;
-  if (/RCA Coach/i.test(b.textContent) && !b.closest('#h2c-coach-workbench')) {
+  if (b.closest('header') && /RCA Coach/i.test(b.textContent)) {
     e.preventDefault();
-    toggleCoachWorkbench();
+    focusOfficialCoach();
     return;
   }
 }, true);
