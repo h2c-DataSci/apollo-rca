@@ -390,7 +390,7 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       const ep7 = VIDEO_MODULES.find(m => m.step === 7);
 
       assert.strictEqual(ep5.defaultYtId, 'yBVaGu31ik8');
-      assert.strictEqual(ep6.defaultYtId, 'lj2e9A-qmVA');
+      assert.strictEqual(ep6.defaultYtId, 'Q4-Bu2qUaaE');
       assert.strictEqual(ep7.defaultYtId, '_w5WUcNRYWU');
     });
 
@@ -416,7 +416,7 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.strictEqual(OFFICIAL_VIDEOS[4].duration, '06:59');
       assert.strictEqual(OFFICIAL_VIDEOS[5].id, 'yBVaGu31ik8');
       assert.strictEqual(OFFICIAL_VIDEOS[5].duration, '08:45');
-      assert.strictEqual(OFFICIAL_VIDEOS[6].id, 'lj2e9A-qmVA');
+      assert.strictEqual(OFFICIAL_VIDEOS[6].id, 'Q4-Bu2qUaaE');
       assert.strictEqual(OFFICIAL_VIDEOS[6].duration, '08:19');
       assert.strictEqual(OFFICIAL_VIDEOS[7].id, '_w5WUcNRYWU');
       assert.strictEqual(OFFICIAL_VIDEOS[7].duration, '07:10');
@@ -602,7 +602,7 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.strictEqual(stored[3], '8y501jMIS7k');
       assert.strictEqual(stored[4], 'lppZuZFyHzM');
       assert.strictEqual(stored[5], 'yBVaGu31ik8');
-      assert.strictEqual(stored[6], 'lj2e9A-qmVA');
+      assert.strictEqual(stored[6], 'Q4-Bu2qUaaE');
       assert.strictEqual(stored[7], '_w5WUcNRYWU');
     });
 
@@ -648,7 +648,7 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.strictEqual(migrated[1], 'IXXgr85wO74', 'Episode 1 placeholder must upgrade to official ID');
       assert.strictEqual(migrated[2], 'tCQuu_rvSJ8', 'Episode 2 placeholder must upgrade to official ID');
       assert.strictEqual(migrated[5], 'yBVaGu31ik8', 'Episode 5 placeholder must upgrade to official ID');
-      assert.strictEqual(migrated[6], 'lj2e9A-qmVA', 'Episode 6 placeholder must upgrade to official ID');
+      assert.strictEqual(migrated[6], 'Q4-Bu2qUaaE', 'Episode 6 placeholder must upgrade to official ID');
       assert.strictEqual(migrated[7], '_w5WUcNRYWU', 'Episode 7 placeholder must upgrade to official ID');
     });
 
@@ -758,7 +758,7 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.ok(desc.includes('8y501jMIS7k'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 3 ID');
       assert.ok(desc.includes('lppZuZFyHzM'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 4 ID');
       assert.ok(desc.includes('yBVaGu31ik8'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 5 ID');
-      assert.ok(desc.includes('lj2e9A-qmVA'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 6 ID');
+      assert.ok(desc.includes('Q4-Bu2qUaaE'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 6 ID');
       assert.ok(desc.includes('_w5WUcNRYWU'), 'YOUTUBE_DESCRIPTIONS.md must contain Episode 7 ID');
       assert.ok(desc.includes('Duration: 55:50'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 1 duration');
       assert.ok(desc.includes('Duration: 20:22'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 2 duration');
@@ -773,10 +773,10 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
     it('Cache busting query parameters (v=22) are synchronized across index.html and h2c-help.js', () => {
       const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
       assert.ok(indexHtml.includes('/apollo-rca/h2c-shell.js?v=22'), 'index.html must load h2c-shell.js?v=22');
-      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=22'), 'index.html must load h2c-help.js?v=22');
+      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=23'), 'index.html must load h2c-help.js?v=23');
 
       const helpJs = readFileSync(new URL('../h2c-help.js', import.meta.url), 'utf8');
-      assert.ok(helpJs.includes("./h2c-videos.js?v=22'"), 'h2c-help.js must import h2c-videos.js?v=22');
+      assert.ok(helpJs.includes("./h2c-videos.js?v=23'"), 'h2c-help.js must import h2c-videos.js?v=23');
     });
 
     it('Episode tier descriptors and glowing badge formatting match 10x UX specifications', () => {

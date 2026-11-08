@@ -5,7 +5,7 @@
 
 export const STORAGE_KEY = 'h2c-youtube-training-videos-v2';
 export const LEGACY_STORAGE_KEY = 'h2c-youtube-training-videos-v1';
-export const SYNC_VERSION = 'v18-20261108';
+export const SYNC_VERSION = 'v19-20261108';
 export const SYNC_KEY = 'h2c-yt-sync-ver';
 
 export const OFFICIAL_CHANNEL_URL = 'https://www.youtube.com/@h2c_Learnings';
@@ -16,7 +16,7 @@ export const OFFICIAL_VIDEOS = {
   3: { id: '8y501jMIS7k', duration: '07:57', tier: 'Focused Guide' },
   4: { id: 'lppZuZFyHzM', duration: '06:59', tier: 'Essential Lab' },
   5: { id: 'yBVaGu31ik8', duration: '08:45', tier: 'Action Framework' },
-  6: { id: 'lj2e9A-qmVA', duration: '08:19', tier: 'Culture & Alignment' },
+  6: { id: 'Q4-Bu2qUaaE', duration: '08:19', tier: 'Culture & Alignment' },
   7: { id: '_w5WUcNRYWU', duration: '07:10', tier: 'Proactive Mastery' }
 };
 
@@ -457,7 +457,7 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
     shortTitle: 'Culture & Facilitation',
     subtitle: 'Facilitating blameless investigations, team alignment, and overcoming organizational resistance',
     duration: '08:19',
-    defaultYtId: 'lj2e9A-qmVA', // Official Video 6: https://youtu.be/lj2e9A-qmVA
+    defaultYtId: 'Q4-Bu2qUaaE', // Official Video 6: https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG
     targetId: 'section-timeline',
     bookRef: 'RC Chs. 11–12 (pp. 132–174); AR Ch. 1 (p. 15), Chs. 5–6 (pp. 109–134)',
     summary: 'Transform organizational culture by replacing fear and finger-pointing with blameless causal inquiry. Understand the role of the skilled facilitator, pack an evidence go-bag, conduct non-antagonistic interviews ("Please help me understand what happened"), steer clear of group traps (Consensus, Groupthink, treating time as a cause), and embrace Dean Gano\'s rallying principle: "Fix the cause, not the blame."',
@@ -493,7 +493,7 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
     ],
     fullDescription: `Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 08:19 | Official URL: https://youtu.be/lj2e9A-qmVA
+Duration: 08:19 | Official URL: https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG
 
 📌 LESSON PLAN ALIGNMENT: PART 6 — CULTURE AND FACILITATION, LIGHT
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 11–12, pp. 132–174.
@@ -719,7 +719,7 @@ export function syncOfficialVideos(force = false) {
       // Auto-migrate: ensure verified official videos 1-4 take precedence
       Object.entries(OFFICIAL_VIDEOS).forEach(([stepStr, info]) => {
         const step = Number(stepStr);
-        if (force || !data[step] || data[step].startsWith('PLACEHOLDER') || data[step] === 'dQw4w9WgXcQ') {
+        if (force || !data[step] || data[step].startsWith('PLACEHOLDER') || data[step] === 'dQw4w9WgXcQ' || data[step] === 'lj2e9A-qmVA') {
           data[step] = info.id;
         }
       });

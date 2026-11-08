@@ -269,13 +269,13 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
 ## Episode 6 of 7
 ### Title: `Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame`
 **Duration:** `08:19`  
-**Official Link:** https://youtu.be/lj2e9A-qmVA  
+**Official Link:** https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG  
 **Lesson Plan:** PART 6 — Culture and Facilitation, Light (RC Chs. 11–12, pp. 132–174; AR Chs. 5–6)
 
 ```text
 Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 08:19 | Official URL: https://youtu.be/lj2e9A-qmVA
+Duration: 08:19 | Official URL: https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG
 
 📌 LESSON PLAN ALIGNMENT: PART 6 — CULTURE AND FACILITATION, LIGHT
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 11–12, pp. 132–174.
