@@ -9,6 +9,13 @@ Independent, privacy-first web tool for investigations that follow Apollo RCA an
 - Training channel: [youtube.com/@h2c_Learnings](https://www.youtube.com/@h2c_Learnings)
 - Current handoff: [PROGRESS.md](PROGRESS.md)
 
+## Documentation rule
+
+Hard rule for this project: every task updates both files before the work is called done.
+
+- [PROGRESS.md](PROGRESS.md) is the running log. Update it on every task so the next session can see where the work stopped.
+- This README is the standing description of the product. Update it when behavior, commands, or file roles change.
+
 This repository is the GitHub Pages app. It is a static site at the repo root. It is not the separate Grok Build workspace that may sit next to this clone.
 
 ## Legal
@@ -58,7 +65,7 @@ Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/). The live Pages site adds 
 node --test
 ```
 
-On 2026-11-09 the suite was **139 passed, 0 failed** at `9704444`. Node 18, 20, and 22 are the CI matrix (Ubuntu and Windows).
+On 2026-11-09 the suite was **139 passed, 0 failed** at `651f478`. Node 18, 20, and 22 are the CI matrix (Ubuntu and Windows).
 
 ## Files that matter
 
@@ -70,13 +77,27 @@ On 2026-11-09 the suite was **139 passed, 0 failed** at `9704444`. Node 18, 20, 
 | `h2c-shell.js` | Toolbar, workflow hub, sanitizer, chart-color enforcement |
 | `h2c-help.js` | Help drawer, developer credit, Feedback link |
 | `help-kb.js` / `help-diagrams.js` | Knowledge text and original diagrams |
-| `h2c-videos.js` | Seven lazy YouTube episodes (`youtube-nocookie.com` only after click) |
+| `h2c-videos.js` | Seven YouTube episodes. Players load from `youtube-nocookie.com` only after a click. Sync Official Durations reads the player length. |
 | `browser-ai.js` | In-browser ONNX loader |
 | `local-ai-bridge.js` | Loopback daemon client |
 | `sw.js` | App-shell cache. Install fails if a shell file is missing. Runtime cache is capped. |
 | `rca.test.mjs` and `test/` | Node test runner. No package install required. |
 
 There is no `local-bridge.js` or `ai-coach.js`. Those names in older notes are wrong.
+
+## Training videos
+
+Official series on [@h2c_Learnings](https://www.youtube.com/@h2c_Learnings). Lengths below are the player durations checked on 2026-11-09. Sync Official Durations refreshes them from YouTube.
+
+| Ep | Duration | Video |
+|---|---|---|
+| 1 | 55:50 | [IXXgr85wO74](https://youtu.be/IXXgr85wO74) |
+| 2 | 20:22 | [tCQuu_rvSJ8](https://youtu.be/tCQuu_rvSJ8) |
+| 3 | 07:57 | [8y501jMIS7k](https://youtu.be/8y501jMIS7k) |
+| 4 | 06:59 | [lppZuZFyHzM](https://youtu.be/lppZuZFyHzM) |
+| 5 | 08:19 | [yBVaGu31ik8](https://youtu.be/yBVaGu31ik8) |
+| 6 | 07:20 | [Q4-Bu2qUaaE](https://youtu.be/Q4-Bu2qUaaE) |
+| 7 | 07:10 | [_w5WUcNRYWU](https://youtu.be/_w5WUcNRYWU) |
 
 ## Invariants
 

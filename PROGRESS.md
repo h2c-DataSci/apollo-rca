@@ -1,71 +1,64 @@
-# Where this repo is
+# Progress
 
-Read this file first. Older phase notes that used to live here contradicted `main` (wrong test totals, placeholder videos, grey STOP nodes). Git history is the audit trail. This file is the handoff.
+Hard rule: update this file after every task, and update [README.md](README.md) when the product description changes. This file is how the next session avoids getting lost. README keeps the standing context.
+
+## Now
 
 | | |
 |---|---|
 | Product | H2C Root Cause Analyst |
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
-| Local clone | `/workspace/apollo-rca` (this checkout) |
+| Clone | `/workspace/apollo-rca` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `9704444` Merge pull request #2 (2026-11-09) |
-| Live | https://h2c-datasci.github.io/apollo-rca/ (Pages from `main` root) |
-| Tests | `node --test` → **139 passed, 0 failed**, 11 suites, about 4.3s |
-| Not this app | `/workspace` outside this folder is a separate Grok Build TanStack app. Do not treat it as the Pages site. |
+| HEAD | Last code change `651f478`. This file's own commit is the documentation rule. Confirm with `git rev-parse --short HEAD`. |
+| Live | https://h2c-datasci.github.io/apollo-rca/ |
+| Tests | `node --test` → 139 passed, 0 failed (11 suites, about 4s) at `651f478` |
+| Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
-## Latest commits
+## Work log
 
-| SHA | What it did |
-|---|---|
-| `9704444` | Merge PR #2. Service worker keeps cache writes alive and bounds streamed copies. |
-| `6950f70` | Merge PR #1. CI pins `actions/checkout` and `actions/setup-node`, `contents: read`, `persist-credentials: false`, 10-minute timeout, Dependabot for Actions. |
-| `11034a2` | `apollo-rca-` cache prefix only, install fails if a shell asset is missing, runtime cache capped (40 entries, 7 days, 1.5 MB), nested HTML sanitizer, `frame-src` limited to YouTube nocookie, Feedback link. |
-| `8a7b120` | STOP nodes `#d32f2f` white text. `?` nodes `#fbc02d` black text. |
-| `2399a76` | Layout reservation, hydration date fix, offline shell, CSP, non-blocking Browser AI. Its message still says "grey STOP"; `8a7b120` replaced that color. |
-| `e228805` | Local daemon stays on loopback. |
-| `4552793` | Duplicate top RCA Coach panel removed. Bottom coach remains. |
-| `c092be3` | Browser AI button for in-browser ONNX Qwen2.5-0.5B-Instruct. |
+Newest first. Add a row for each task. Do not delete older rows.
 
-PR #1 and PR #2 are **merged**. Do not reopen that CI work unless asked. Do not edit `.github/` as a side effect of an app change.
+| When | SHA | Done |
+|---|---|---|
+| 2026-11-09 | docs | Hard rule recorded: update PROGRESS.md after every task and README.md when the product description changes. |
+| 2026-11-09 | `651f478` | Sync Official Durations now reads the YouTube player length. Corrected Episode 5 to 08:19 and Episode 6 to 07:20. Cache bust `h2c-help.js` and `h2c-videos.js` to `v=24`. Tests 139/139. |
+| 2026-11-09 | `1153bc2` | Episode 6 video set to `Q4-Bu2qUaaE` (`https://youtu.be/Q4-Bu2qUaaE`). Old stored id `lj2e9A-qmVA` migrates forward. |
+| 2026-11-09 | `5cb16c9` | Replaced the stale phase diary with this handoff and a factual README. |
+| 2026-11-09 | `9704444` | Merged PR #2. Service worker keeps cache writes alive and bounds streamed copies. |
+| 2026-11-09 | `6950f70` | Merged PR #1. CI pins checkout and setup-node, `contents: read`, no persisted credentials, 10-minute timeout, Dependabot for Actions. |
+| 2026-11-08 | `11034a2` | `apollo-rca-` cache prefix, failed shell install if an asset is missing, runtime cache cap, HTML sanitizer, YouTube nocookie frame-src, Feedback link. |
+| 2026-11-08 | `8a7b120` | STOP `#d32f2f` white text. Unknown `?` `#fbc02d` black text. |
+| 2026-11-08 | `2399a76` | Layout reservation, hydration date, offline shell, CSP, non-blocking Browser AI. Commit message still says grey STOP. Color authority is `8a7b120`. |
+| 2026-11-08 | `4552793` | Removed the duplicate top RCA Coach. Bottom coach remains. |
+| 2026-11-08 | `c092be3` | Browser AI button for in-browser ONNX Qwen2.5-0.5B-Instruct. |
 
-## Behavior that must stay
+## Must stay true
 
 - Subtitle: "Analysis based on Apollo RCA or RealityCharting principles and is an opensourced AI-aided Web Tool for RCA."
-- About the developer: https://www.haroldhenrycabanilla.com (`h2c-help.js`, footer and Help drawer).
-- Feedback, next to that credit, new tab, `rel="noopener noreferrer"`: https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform
-- Chart: black primary effect, red action `#dc2626`, green condition `#16a34a`, red STOP `#d32f2f` + white text, yellow `?` `#fbc02d` + black text. Legend matches. `h2c-shell.js` `enforceChartColors` reapplies this. Do not paint STOP or `?` grey.
-- Help knowledge base stays. No copyrighted book images. Diagrams are original (`help-diagrams.js`).
-- One-click New analysis with confirm and undo.
-- Standard Mode works with AI off.
-- Browser AI popup is dismissible. 150+ cause rows stay usable (`content-visibility` on those rows).
-- CSP meta in `index.html`. `frame-src` is only `https://www.youtube-nocookie.com`. Iframes are created on click inside `h2c-videos.js`.
-- Service worker cache names start with `apollo-rca-`. `activate` deletes only that prefix, and it keeps `apollo-rca-shell-v24` and `apollo-rca-runtime-v1`. A failed shell precache fails install.
-
-## How to work
-
-```bash
-cd /workspace/apollo-rca
-git status -sb          # must be even with origin/main before editing
-node --test             # expect 139 pass unless you added tests
-python3 -m http.server 8080
-```
-
-App source is the static root (`index.html`, `h2c-*.js`, `routes-v13.js`, `styles-v13.css`, `sw.js`). Bundled `routes-v13.js` is edited in place; there is no separate app build step in this repo.
-
-Cache-bust query: `h2c-shell.js` is `v=22`, `h2c-help.js` and `h2c-videos.js` are `v=24`, `local-ai-bridge.js` is `v=21`. Bump the query when that file changes. Episode 6 is `https://youtu.be/Q4-Bu2qUaaE` (`Q4-Bu2qUaaE`, `07:20`). Sync Official Durations reads the YouTube player length. Verified lengths: `55:50`, `20:22`, `07:57`, `06:59`, `08:19`, `07:20`, `07:10`.
-
-## Known gaps
-
-- No `LICENSE` file in the tree, though the UI and README say MIT.
-- `index.html` script and stylesheet URLs use the `/apollo-rca/` prefix, so a server started at the repo root does not match Pages path-for-path unless a prefix is added.
-- Commit `2399a76` message is historically wrong about STOP color. Trust `8a7b120` and the colors above.
-- An older `h2c-rca-shell-*` Cache Storage entry, if a browser still has it, is not deleted, because it does not use the `apollo-rca-` prefix.
-- Pages deployment is the built-in branch deployment from `main`. It is not the CI workflow.
+- About the developer: https://www.haroldhenrycabanilla.com
+- Feedback (new tab, `noopener`): https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform
+- Chart: black primary effect, red action `#dc2626`, green condition `#16a34a`, red STOP `#d32f2f` with white text, yellow `?` `#fbc02d` with black text. Do not paint STOP or `?` grey.
+- Help knowledge base stays. No copyrighted book images.
+- Standard Mode works with AI off. AI never writes the case until the investigator accepts.
+- `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v24` and `apollo-rca-runtime-v1`.
+- Cache bust: shell `v=22`, help and videos `v=24`, local bridge `v=21`. Bump the query of a file when that file changes.
+- Episode lengths last read from the player: 55:50, 20:22, 07:57, 06:59, 08:19, 07:20, 07:10. Episode 6 id is `Q4-Bu2qUaaE`.
 
 ## Do not
 
-- Change workflows, Dependabot, or branch protection unless the task is CI.
-- Merge a PR or click Publish unless asked.
-- Point the daemon at anything except loopback `127.0.0.1:11434` or `localhost:11434`.
-- Let AI write authoritative case state without an explicit accept.
-- Reintroduce a second RCA Coach panel at the top.
+- Edit `.github/workflows`, Dependabot, or branch protection unless that is the task.
+- Merge or publish unless asked.
+- Point the local daemon anywhere except `127.0.0.1:11434` or `localhost:11434`.
+- Add a second RCA Coach panel at the top.
+
+## Known gaps
+
+- No `LICENSE` file, though the UI says MIT.
+- `index.html` asset URLs use the `/apollo-rca/` prefix, so a server at the repo root is not path-identical to Pages.
+- An old `h2c-rca-shell-*` cache is not deleted, because it lacks the `apollo-rca-` prefix.
+
+## Next session
+
+Read this file, then `git status -sb`. If this table's HEAD is not `git rev-parse --short HEAD`, update the Now section before starting new work.
