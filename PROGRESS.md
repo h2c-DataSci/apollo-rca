@@ -10,7 +10,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `/workspace/apollo-rca` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `755af2c` docs: require PROGRESS and README updates. If `git rev-parse --short HEAD` differs, read the work log before editing. |
+| HEAD | `b1afdd3` — **baseline**. Later commits are changes on top of this tree unless a newer baseline is recorded here. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
 | Tests | `node --test` → 139 passed, 0 failed (11 suites, about 4s) at `651f478` |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-09 | `b1afdd3` | **Baseline.** This tree is the latest accepted state: docs rule, live duration sync, Episode 6 `Q4-Bu2qUaaE`. Do not roll back past it. |
 | 2026-11-09 | `755af2c` | Hard rule recorded: update PROGRESS.md after every task and README.md when the product description changes. |
 | 2026-11-09 | `651f478` | Sync Official Durations now reads the YouTube player length. Corrected Episode 5 to 08:19 and Episode 6 to 07:20. Cache bust `h2c-help.js` and `h2c-videos.js` to `v=24`. Tests 139/139. |
 | 2026-11-09 | `1153bc2` | Episode 6 video set to `Q4-Bu2qUaaE` (`https://youtu.be/Q4-Bu2qUaaE`). Old stored id `lj2e9A-qmVA` migrates forward. |
@@ -61,4 +62,4 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 ## Next session
 
-Read this file, then `git status -sb`. If this table's HEAD is not `git rev-parse --short HEAD`, update the Now section before starting new work.
+Read this file, then `git status -sb`. The baseline stays `b1afdd3` until the user names a new one. If `git rev-parse --short HEAD` is newer, the work log must explain those commits. Do not move the baseline on your own.

@@ -8,6 +8,7 @@ Independent, privacy-first web tool for investigations that follow Apollo RCA an
 - Feedback: [Google Form](https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform)
 - Training channel: [youtube.com/@h2c_Learnings](https://www.youtube.com/@h2c_Learnings)
 - Current handoff: [PROGRESS.md](PROGRESS.md)
+- Baseline: `b1afdd3` on `main` (2026-11-09). That commit is the accepted starting point. Later work is a change on top of it.
 
 ## Documentation rule
 
