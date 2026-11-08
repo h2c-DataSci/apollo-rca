@@ -84,3 +84,27 @@ test('one-click New analysis: shared clear path with confirm + undo backup, visi
   assert.ok(s.includes('id: \'h2c-new\'') && s.includes('Clear analysis and start new?') && s.includes('BACKUP_KEY') && s.includes('undoClear'));
   assert.equal((s.match(/removeItem\(APP_KEY\)/g) || []).length, 1, 'single clear implementation');
 });
+test('chart colors: STOP is red with white text, unknown is yellow with black text', () => {
+  const routes = readFileSync(new URL('./routes-v13.js', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('./styles-v13.css', import.meta.url), 'utf8');
+  const help = readFileSync(new URL('./help-diagrams.js', import.meta.url), 'utf8');
+  const shell = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
+  assert.match(routes, /un=`#d32f2f`/);
+  assert.match(routes, /hex:`#111827`/);
+  assert.match(routes, /hex:`#dc2626`/);
+  assert.match(routes, /hex:`#16a34a`/);
+  assert.match(routes, /fill:`#fbc02d`,stroke:`#fbc02d`,className:`fill-unknown`/);
+  assert.match(routes, /fill:`#000000`,className:`fill-unknown-ink`,fontSize:18,fontWeight:700,children:`\?`/);
+  assert.match(routes, /Red — STOP/);
+  assert.match(routes, /Yellow — \? unknown/);
+  assert.doesNotMatch(routes, /Grey — STOP|Grey — \?/);
+  assert.match(css, /\.fill-stop\{fill:#d32f2f\}/);
+  assert.match(css, /\.bg-unknown\{background-color:#fbc02d\}/);
+  assert.match(css, /\.fill-unknown-ink\{fill:#000\}/);
+  assert.match(help, /stop: '#d32f2f'/);
+  assert.match(help, /unknown: '#fbc02d'/);
+  assert.match(shell, /'#d32f2f'/);
+  assert.match(shell, /'#fbc02d'/);
+  assert.match(shell, /'#ffffff'/);
+  assert.match(shell, /'#000000'/);
+});

@@ -1320,22 +1320,28 @@ function ensureBrowserAiButton() {
 }
 
 function enforceChartColors() {
-  const grey = '#6b7280';
   document.querySelectorAll('svg text').forEach((label) => {
     const word = (label.textContent || '').trim();
     if (word !== 'STOP' && word !== '?') return;
     const shape = label.previousElementSibling;
-    if (!shape) return;
+    if (!shape || shape.classList?.contains('fill-surface')) return;
     const tag = (shape.tagName || '').toLowerCase();
     if (tag !== 'polygon' && tag !== 'rect' && tag !== 'circle') return;
-    shape.setAttribute('fill', grey);
-    shape.setAttribute('stroke', grey);
+    const stop = word === 'STOP';
+    const color = stop ? '#d32f2f' : '#fbc02d';
+    const ink = stop ? '#ffffff' : '#000000';
+    shape.setAttribute('fill', color);
+    shape.setAttribute('stroke', color);
     if (shape.style) {
-      shape.style.fill = grey;
-      shape.style.stroke = grey;
+      shape.style.fill = color;
+      shape.style.stroke = color;
     }
-    shape.classList?.remove('fill-action', 'fill-warn', 'stroke-action', 'stroke-warn');
-    shape.classList?.add('fill-stop');
+    shape.classList?.remove('fill-action', 'fill-warn', 'stroke-action', 'stroke-warn', 'fill-stop', 'fill-unknown');
+    shape.classList?.add(stop ? 'fill-stop' : 'fill-unknown');
+    label.setAttribute('fill', ink);
+    if (label.style) label.style.fill = ink;
+    label.classList?.remove('fill-ink', 'fill-on-solid', 'fill-unknown-ink');
+    label.classList?.add(stop ? 'fill-on-solid' : 'fill-unknown-ink');
   });
 }
 
