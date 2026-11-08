@@ -52,7 +52,7 @@ python3 -m http.server 8080
 
 App source is the static root (`index.html`, `h2c-*.js`, `routes-v13.js`, `styles-v13.css`, `sw.js`). Bundled `routes-v13.js` is edited in place; there is no separate app build step in this repo.
 
-Cache-bust query: `h2c-shell.js` is `v=22`, `h2c-help.js` and `h2c-videos.js` are `v=23`, `local-ai-bridge.js` is `v=21`. Bump the query when that file changes. Episode 6 is `https://youtu.be/Q4-Bu2qUaaE` (`Q4-Bu2qUaaE`).
+Cache-bust query: `h2c-shell.js` is `v=22`, `h2c-help.js` and `h2c-videos.js` are `v=24`, `local-ai-bridge.js` is `v=21`. Bump the query when that file changes. Episode 6 is `https://youtu.be/Q4-Bu2qUaaE` (`Q4-Bu2qUaaE`, `07:20`). Sync Official Durations reads the YouTube player length. Verified lengths: `55:50`, `20:22`, `07:57`, `06:59`, `08:19`, `07:20`, `07:10`.
 
 ## Known gaps
 

@@ -215,14 +215,14 @@ How do you prove that your causes are real and avoid jumping to ungrounded concl
 
 ## Episode 5 of 7
 ### Title: `Episode 5 of 7: Effective Solutions, Implementation, and Tracking (Preventing Recurrence)`
-**Duration:** `08:45`  
+**Duration:** `08:19`  
 **Official Link:** `https://youtu.be/yBVaGu31ik8`  
 **Lesson Plan:** PART 5 — Steps 6–7, Solutions, Implement and Track (RC Chs. 9–10, pp. 112–131; AR Chs. 4–5)
 
 ```text
 Episode 5 of 7: Effective Solutions, Implementation, and Tracking (Preventing Recurrence)
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 08:45 | Official URL: https://youtu.be/yBVaGu31ik8
+Duration: 08:19 | Official URL: https://youtu.be/yBVaGu31ik8
 
 📌 LESSON PLAN ALIGNMENT: PART 5 — STEPS 6–7, SOLUTIONS, IMPLEMENT AND TRACK
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 9–10, pp. 112–131.
@@ -238,7 +238,7 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
 03:25 The 4 Criteria for Screening Effective Solutions
 04:45 Why "Retraining" and "Punishment" Fail
 05:55 Rapid Response Rules & Solution Generation
-06:50 Step 7: Implementation, Action Tracking & Review Logs
+06:59 Step 7: Implementation, Action Tracking & Review Logs
 07:40 Summary, Web App Demonstration & What's Next in Episode 6
 
 🔑 CORE BOOK CONCEPTS & DIRECT QUOTES:
@@ -268,14 +268,14 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
 
 ## Episode 6 of 7
 ### Title: `Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame`
-**Duration:** `08:19`  
+**Duration:** `07:20`  
 **Official Link:** https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG  
 **Lesson Plan:** PART 6 — Culture and Facilitation, Light (RC Chs. 11–12, pp. 132–174; AR Chs. 5–6)
 
 ```text
 Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 08:19 | Official URL: https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG
+Duration: 07:20 | Official URL: https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG
 
 📌 LESSON PLAN ALIGNMENT: PART 6 — CULTURE AND FACILITATION, LIGHT
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 11–12, pp. 132–174.

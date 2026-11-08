@@ -79,10 +79,10 @@ Click the `▶ 7 Videos (Training)` button in the top toolbar to access the offi
 - **Episode 4 of 7** (⏱ **06:59**): [Evidence; Sufficient and Necessary — How to Test and Prove Causes](https://youtu.be/lppZuZFyHzM)
   - *Lesson Alignment:* **PART 4: Steps 4–5, Evidence; Sufficient and Necessary** (RC Chs. 7–8, pp. 97–111; AR Ch. 3, pp. 74–81)
   - *Core Concepts:* 4 Evidence Quality Tiers (Sensed, Inferred, Intuited, Emotional), Fact = cause supported by evidence, Sufficiency test, Necessity test (Remove-It Test), Sagan's Baloney Detection Kit.
-- **Episode 5 of 7** (⏱ **08:45**): Effective Solutions, Implementation, and Tracking (Preventing Recurrence) ([yBVaGu31ik8](https://youtu.be/yBVaGu31ik8))
+- **Episode 5 of 7** (⏱ **08:19**): Effective Solutions, Implementation, and Tracking (Preventing Recurrence) ([yBVaGu31ik8](https://youtu.be/yBVaGu31ik8))
   - *Lesson Alignment:* **PART 5: Steps 6–7, Solutions, Implement and Track** (RC Chs. 9–10, pp. 112–131; AR Chs. 4–5)
   - *Core Concepts:* Root causes defined by solutions, challenge causes right-to-left, 4 Solution Criteria, eliminating "re" traps (retrain, rewrite), Rapid Response brainstorming, corrective-action log & trending.
-- **Episode 6 of 7** (⏱ **08:19**): [Culture and Facilitation — Fix the Cause, Not the Blame](https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG)
+- **Episode 6 of 7** (⏱ **07:20**): [Culture and Facilitation — Fix the Cause, Not the Blame](https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG)
   - *Lesson Alignment:* **PART 6: Culture and Facilitation, Light** (RC Chs. 11–12, pp. 132–174; AR Chs. 5–6)
   - *Core Concepts:* Facilitator role (< 8 members), evidence go-bag & checklist, no-blame interview ("Please help me understand..."), 3 group traps (Consensus, Groupthink, Time as a cause), "Fix the cause, not the blame".
 - **Episode 7 of 7** (⏱ **07:10**): [Success and a New Way of Thinking (Why Success Is Planned)](https://youtu.be/_w5WUcNRYWU)

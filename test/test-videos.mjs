@@ -338,8 +338,8 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       const ep6 = VIDEO_MODULES.find(m => m.step === 6);
       const ep7 = VIDEO_MODULES.find(m => m.step === 7);
 
-      assert.strictEqual(ep5.duration, '08:45', 'Episode 5 duration must be 08:45');
-      assert.strictEqual(ep6.duration, '08:19', 'Episode 6 duration must be 08:19');
+      assert.strictEqual(ep5.duration, '08:19', 'Episode 5 duration must be 08:19');
+      assert.strictEqual(ep6.duration, '07:20', 'Episode 6 duration must be 07:20');
       assert.strictEqual(ep7.duration, '07:10', 'Episode 7 duration must be 07:10');
     });
 
@@ -415,9 +415,9 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.strictEqual(OFFICIAL_VIDEOS[4].id, 'lppZuZFyHzM');
       assert.strictEqual(OFFICIAL_VIDEOS[4].duration, '06:59');
       assert.strictEqual(OFFICIAL_VIDEOS[5].id, 'yBVaGu31ik8');
-      assert.strictEqual(OFFICIAL_VIDEOS[5].duration, '08:45');
+      assert.strictEqual(OFFICIAL_VIDEOS[5].duration, '08:19');
       assert.strictEqual(OFFICIAL_VIDEOS[6].id, 'Q4-Bu2qUaaE');
-      assert.strictEqual(OFFICIAL_VIDEOS[6].duration, '08:19');
+      assert.strictEqual(OFFICIAL_VIDEOS[6].duration, '07:20');
       assert.strictEqual(OFFICIAL_VIDEOS[7].id, '_w5WUcNRYWU');
       assert.strictEqual(OFFICIAL_VIDEOS[7].duration, '07:10');
     });
@@ -745,8 +745,8 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.ok(guide.includes('20:22'), 'USER_GUIDE.md must contain 20:22 for Episode 2');
       assert.ok(guide.includes('07:57'), 'USER_GUIDE.md must contain 07:57 for Episode 3');
       assert.ok(guide.includes('06:59'), 'USER_GUIDE.md must contain 06:59 for Episode 4');
-      assert.ok(guide.includes('08:45'), 'USER_GUIDE.md must contain 08:45 for Episode 5');
-      assert.ok(guide.includes('08:19'), 'USER_GUIDE.md must contain 08:19 for Episode 6');
+      assert.ok(guide.includes('08:19'), 'USER_GUIDE.md must contain 08:19 for Episode 5');
+      assert.ok(guide.includes('07:20'), 'USER_GUIDE.md must contain 07:20 for Episode 6');
       assert.ok(guide.includes('07:10'), 'USER_GUIDE.md must contain 07:10 for Episode 7');
       assert.ok(!guide.includes('22:02'), 'USER_GUIDE.md must not contain typo 22:02');
     });
@@ -764,8 +764,8 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.ok(desc.includes('Duration: 20:22'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 2 duration');
       assert.ok(desc.includes('Duration: 07:57'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 3 duration');
       assert.ok(desc.includes('Duration: 06:59'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 4 duration');
-      assert.ok(desc.includes('Duration: 08:45'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 5 duration');
-      assert.ok(desc.includes('Duration: 08:19'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 6 duration');
+      assert.ok(desc.includes('Duration: 08:19'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 5 duration');
+      assert.ok(desc.includes('Duration: 07:20'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 6 duration');
       assert.ok(desc.includes('Duration: 07:10'), 'YOUTUBE_DESCRIPTIONS.md must have Episode 7 duration');
       assert.ok(!desc.includes('Duration: 22:02'), 'YOUTUBE_DESCRIPTIONS.md must not contain 22:02');
     });
@@ -773,10 +773,10 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
     it('Cache busting query parameters (v=22) are synchronized across index.html and h2c-help.js', () => {
       const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
       assert.ok(indexHtml.includes('/apollo-rca/h2c-shell.js?v=22'), 'index.html must load h2c-shell.js?v=22');
-      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=23'), 'index.html must load h2c-help.js?v=23');
+      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=24'), 'index.html must load h2c-help.js?v=24');
 
       const helpJs = readFileSync(new URL('../h2c-help.js', import.meta.url), 'utf8');
-      assert.ok(helpJs.includes("./h2c-videos.js?v=23'"), 'h2c-help.js must import h2c-videos.js?v=23');
+      assert.ok(helpJs.includes("./h2c-videos.js?v=24'"), 'h2c-help.js must import h2c-videos.js?v=24');
     });
 
     it('Episode tier descriptors and glowing badge formatting match 10x UX specifications', () => {
@@ -803,12 +803,12 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
 
       const ep5 = VIDEO_MODULES.find(m => m.step === 5);
       assert.strictEqual(ep5.tier, 'Action Framework');
-      assert.strictEqual(ep5.badgeText, '08:45 • Action Framework');
+      assert.strictEqual(ep5.badgeText, '08:19 • Action Framework');
       assert.strictEqual(ep5.verified, true);
 
       const ep6 = VIDEO_MODULES.find(m => m.step === 6);
       assert.strictEqual(ep6.tier, 'Culture & Alignment');
-      assert.strictEqual(ep6.badgeText, '08:19 • Culture & Alignment');
+      assert.strictEqual(ep6.badgeText, '07:20 • Culture & Alignment');
       assert.strictEqual(ep6.verified, true);
 
       const ep7 = VIDEO_MODULES.find(m => m.step === 7);

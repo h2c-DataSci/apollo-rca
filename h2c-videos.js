@@ -15,8 +15,8 @@ export const OFFICIAL_VIDEOS = {
   2: { id: 'tCQuu_rvSJ8', duration: '20:22', tier: 'Deep Dive' },
   3: { id: '8y501jMIS7k', duration: '07:57', tier: 'Focused Guide' },
   4: { id: 'lppZuZFyHzM', duration: '06:59', tier: 'Essential Lab' },
-  5: { id: 'yBVaGu31ik8', duration: '08:45', tier: 'Action Framework' },
-  6: { id: 'Q4-Bu2qUaaE', duration: '08:19', tier: 'Culture & Alignment' },
+  5: { id: 'yBVaGu31ik8', duration: '08:19', tier: 'Action Framework' },
+  6: { id: 'Q4-Bu2qUaaE', duration: '07:20', tier: 'Culture & Alignment' },
   7: { id: '_w5WUcNRYWU', duration: '07:10', tier: 'Proactive Mastery' }
 };
 
@@ -362,13 +362,13 @@ How do you prove that your causes are real and avoid jumping to ungrounded concl
     step: 5,
     episode: 'Episode 5 of 7',
     tier: 'Action Framework',
-    badgeText: '08:45 • Action Framework',
+    badgeText: '08:19 • Action Framework',
     verified: true,
     part: 'Part 5: Steps 6–7, Solutions, Implement and Track',
     title: 'Episode 5 of 7: Effective Solutions, Implementation, and Tracking (Preventing Recurrence)',
     shortTitle: 'Effective Solutions & Tracking',
     subtitle: 'Targeted corrective actions, 4 prevention criteria, owner tracking, and ROI verification',
-    duration: '08:45',
+    duration: '08:19',
     defaultYtId: 'yBVaGu31ik8', // Official Video 5: https://youtu.be/yBVaGu31ik8
     targetId: 'section-solutions',
     bookRef: 'RC Chs. 9–10 (pp. 112–131); AR Ch. 4 (pp. 89–108), Ch. 5 (pp. 109–130)',
@@ -400,12 +400,12 @@ How do you prove that your causes are real and avoid jumping to ungrounded concl
       '03:25 - The 4 Criteria for Screening Effective Solutions',
       '04:45 - Why "Retraining" and "Punishment" Fail',
       '05:55 - Rapid Response Rules & Solution Generation',
-      '06:50 - Step 7: Implementation, Action Tracking & Review Logs',
+      '06:59 - Step 7: Implementation, Action Tracking & Review Logs',
       '07:40 - Summary, Web App Demonstration & What\'s Next in Episode 6'
     ],
     fullDescription: `Episode 5 of 7: Effective Solutions, Implementation, and Tracking (Preventing Recurrence)
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 08:45 | Official URL: https://youtu.be/yBVaGu31ik8
+Duration: 08:19 | Official URL: https://youtu.be/yBVaGu31ik8
 
 📌 LESSON PLAN ALIGNMENT: PART 5 — STEPS 6–7, SOLUTIONS, IMPLEMENT AND TRACK
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 9–10, pp. 112–131.
@@ -421,7 +421,7 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
 03:25 The 4 Criteria for Screening Effective Solutions
 04:45 Why "Retraining" and "Punishment" Fail
 05:55 Rapid Response Rules & Solution Generation
-06:50 Step 7: Implementation, Action Tracking & Review Logs
+06:59 Step 7: Implementation, Action Tracking & Review Logs
 07:40 Summary, Web App Demonstration & What's Next in Episode 6
 
 🔑 CORE BOOK CONCEPTS & DIRECT QUOTES:
@@ -450,13 +450,13 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
     step: 6,
     episode: 'Episode 6 of 7',
     tier: 'Culture & Alignment',
-    badgeText: '08:19 • Culture & Alignment',
+    badgeText: '07:20 • Culture & Alignment',
     verified: true,
     part: 'Part 6: Culture and Facilitation, Light',
     title: 'Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame',
     shortTitle: 'Culture & Facilitation',
     subtitle: 'Facilitating blameless investigations, team alignment, and overcoming organizational resistance',
-    duration: '08:19',
+    duration: '07:20',
     defaultYtId: 'Q4-Bu2qUaaE', // Official Video 6: https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG
     targetId: 'section-timeline',
     bookRef: 'RC Chs. 11–12 (pp. 132–174); AR Ch. 1 (p. 15), Chs. 5–6 (pp. 109–134)',
@@ -493,7 +493,7 @@ Why do most corrective action plans fail to prevent recurrence? In Steps 6 & 7 o
     ],
     fullDescription: `Episode 6 of 7: Culture and Facilitation — Fix the Cause, Not the Blame
 Series: Thinking in Causes — A YouTube Series on Dean L. Gano's RealityCharting® for h2c_Learnings
-Duration: 08:19 | Official URL: https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG
+Duration: 07:20 | Official URL: https://youtu.be/Q4-Bu2qUaaE?si=6ju-eC5xKdL6avPG
 
 📌 LESSON PLAN ALIGNMENT: PART 6 — CULTURE AND FACILITATION, LIGHT
 Main Text: Dean L. Gano, RealityCharting® (2011), Chs. 11–12, pp. 132–174.
@@ -702,6 +702,88 @@ export function sanitizeVideoId(id, fallback = '') {
     if (trimmed.startsWith('PLACEHOLDER') && /^[a-zA-Z0-9_-]+$/.test(trimmed)) return trimmed;
   }
   return fallback;
+}
+
+export function formatClock(totalSeconds) {
+  const seconds = Math.round(Number(totalSeconds));
+  if (!Number.isFinite(seconds) || seconds <= 0) throw new Error('No duration');
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`;
+}
+
+export function applyOfficialDuration(step, label) {
+  const info = OFFICIAL_VIDEOS[step];
+  if (info) info.duration = label;
+  const mod = VIDEO_MODULES.find((item) => item.step === step);
+  if (!mod) return;
+  mod.duration = label;
+  mod.badgeText = `${label} • ${mod.tier}`;
+  if (typeof mod.fullDescription === 'string') {
+    mod.fullDescription = mod.fullDescription.replace(/Duration:\s*\d{1,3}:\d{2}/, `Duration: ${label}`);
+  }
+}
+
+export function readOfficialDuration(videoId) {
+  return new Promise((resolve, reject) => {
+    if (typeof document === 'undefined') {
+      reject(new Error('No document'));
+      return;
+    }
+    const iframe = document.createElement('iframe');
+    iframe.title = 'YouTube duration check';
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.style.cssText = 'position:absolute;width:1px;height:1px;left:-9999px;border:0';
+    iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
+    let settled = false;
+    const finish = (error, seconds) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      window.removeEventListener('message', onMessage);
+      iframe.remove();
+      if (error) reject(error);
+      else resolve(seconds);
+    };
+    const timer = setTimeout(() => finish(new Error('Timed out waiting for YouTube duration')), 8000);
+    const onMessage = (event) => {
+      const origin = String(event.origin || '');
+      if (origin !== 'https://www.youtube-nocookie.com' && origin !== 'https://www.youtube.com') return;
+      let data = event.data;
+      if (typeof data === 'string') {
+        try { data = JSON.parse(data); } catch { return; }
+      }
+      const info = data?.info;
+      const seconds = typeof info?.duration === 'number' ? info.duration : (typeof info === 'number' ? info : 0);
+      if (seconds > 1) finish(null, seconds);
+      if (data?.event === 'onReady') {
+        iframe.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'getDuration', args: [], id: 1, channel: 'widget' }), '*');
+      }
+    };
+    window.addEventListener('message', onMessage);
+    iframe.addEventListener('load', () => {
+      const target = iframe.contentWindow;
+      const send = (payload) => target?.postMessage(JSON.stringify(payload), '*');
+      send({ event: 'listening', id: 1, channel: 'widget' });
+      send({ event: 'command', func: 'addEventListener', args: ['onReady'], id: 1, channel: 'widget' });
+    });
+    document.body.appendChild(iframe);
+  });
+}
+
+export async function syncLiveDurations() {
+  let updated = 0;
+  for (const mod of VIDEO_MODULES) {
+    const id = OFFICIAL_VIDEOS[mod.step]?.id || mod.defaultYtId;
+    if (!id || String(id).startsWith('PLACEHOLDER')) continue;
+    try {
+      applyOfficialDuration(mod.step, formatClock(await readOfficialDuration(id)));
+      updated += 1;
+    } catch {
+      /* keep the last verified duration */
+    }
+  }
+  return updated;
 }
 
 export function syncOfficialVideos(force = false) {
@@ -1529,7 +1611,7 @@ export function openVideoDrawer(targetStep = null) {
   adoptSafe(syncBar, `
     <div class="h2cv-sync-status">
       <span class="h2cv-sync-status-icon">✓</span>
-      <span>Live Official YouTube Durations Active (v16)</span>
+      <span class="h2cv-sync-label">Verified YouTube durations</span>
     </div>
     <div class="h2cv-sync-actions">
       <button type="button" class="h2cv-sync-btn" title="Force sync and verify official video IDs and durations">
@@ -1555,10 +1637,16 @@ export function openVideoDrawer(targetStep = null) {
   }
 
   const syncBtn = syncBar.querySelector('.h2cv-sync-btn');
-  syncBtn.onclick = () => {
+  syncBtn.onclick = async () => {
+    syncBtn.disabled = true;
+    const label = syncBar.querySelector('.h2cv-sync-label');
+    if (label) label.textContent = 'Checking live YouTube durations…';
+    const updated = await syncLiveDurations();
     syncOfficialVideos(true);
     renderCards(currentFilter);
-    showSyncToast('Official YouTube Durations & IDs Synchronized!');
+    if (label) label.textContent = updated ? `Live YouTube durations updated (${updated}/7)` : 'Verified YouTube durations';
+    showSyncToast(updated ? `Updated ${updated} of 7 durations from YouTube.` : 'YouTube did not answer. Showing the last verified durations.');
+    syncBtn.disabled = false;
   };
 
   // Tabs
