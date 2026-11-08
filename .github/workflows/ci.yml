@@ -6,10 +6,15 @@ on:
   pull_request:
     branches: [ main ]
 
+# Generated branch-based GitHub Pages deployment is managed separately.
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Node ${{ matrix.node-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -17,12 +22,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
 
       - name: Run Test Suite (node --test)
         run: node --test
