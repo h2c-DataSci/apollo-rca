@@ -2,6 +2,7 @@ import { KB, KB_VERSION } from './help-kb.js?v=22';
 import { DIAGRAMS, DIAGRAM_FOR } from './help-diagrams.js?v=22';
 import './h2c-videos.js?v=22';
 const SITE = 'https://www.haroldhenrycabanilla.com';
+const FEEDBACK = 'https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform';
 const css = document.createElement('style');
 css.textContent = `
 .h2ch-fab{position:fixed;left:16px;bottom:16px;z-index:9998;background:#043d2e;color:#f1d16b;border:2px solid #c9a227;border-radius:999px;padding:10px 16px;font:700 14px system-ui;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.35)}
@@ -25,11 +26,12 @@ css.textContent = `
 
 const el = (t, props = {}, ...kids) => { const n = Object.assign(document.createElement(t), props); n.append(...kids); return n; };
 const devLine = () => { const d = el('span'); d.append('Developed by Engr. Harold Henry G. Cabanilla · ', el('a', { href: SITE, target: '_blank', rel: 'noopener noreferrer', textContent: 'www.haroldhenrycabanilla.com' })); return d; };
+const feedbackLink = () => el('a', { href: FEEDBACK, target: '_blank', rel: 'noopener noreferrer', textContent: 'Feedback' });
 
 function ensureFoot() {
   if (document.querySelector('.h2c-devfoot') || !document.body) return;
   const f = el('footer', { className: 'h2c-devfoot' });
-  const row1 = el('div', {}, 'H2C Root Cause Analyst · h2c_Creates · ', devLine());
+  const row1 = el('div', {}, 'H2C Root Cause Analyst · h2c_Creates · ', devLine(), ' · ', feedbackLink());
   const row2 = el('div', { style: 'font-size: 11px; margin-top: 5px; color: #fdf6d8; line-height: 1.4;' },
     'Trademarks Notice: Apollo RCA™ & RealityCharting® are registered trademarks of Apollonian Publications, LLC / Dean L. Gano. ',
     'This vibe coded work is an independent educational prototype, not affiliated with or endorsed by them. ',
@@ -55,7 +57,7 @@ function open() {
     'Disclaimer: Apollo RCA™ and RealityCharting® are trademarks of Dean L. Gano / Apollonian Publications, LLC. Not affiliated with or endorsed by them. Official software: ',
     el('a', { href: 'https://realitycharting.com/home/', target: '_blank', rel: 'noopener noreferrer', style: 'color: #0a5c45; font-weight: 700; text-decoration: underline;' }, 'realitycharting.com')
   );
-  dev.append(el('strong', { textContent: 'About the developer: ' }), devLine(), el('div', { textContent: 'Help text is original summary guidance (' + KB_VERSION + '), not a copy of any book.' }), dNotice);
+  dev.append(el('strong', { textContent: 'About the developer: ' }), devLine(), ' · ', feedbackLink(), el('div', { textContent: 'Help text is original summary guidance (' + KB_VERSION + '), not a copy of any book.' }), dNotice);
   
   const vidBanner = el('button', {
     type: 'button',

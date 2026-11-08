@@ -1,4 +1,9 @@
-const CACHE = 'h2c-rca-shell-v23';
+const CACHE = 'apollo-rca-shell-v24';
+const RUNTIME = 'apollo-rca-runtime-v1';
+const OWN_PREFIX = 'apollo-rca-';
+const RUNTIME_MAX_ENTRIES = 40;
+const RUNTIME_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const RUNTIME_MAX_BYTES = 1500000;
 const SHELL = [
   './',
   './index.html',
@@ -21,18 +26,69 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE).then(async (cache) => {
-      await Promise.all(SHELL.map((url) => cache.add(url).catch(() => {})));
-    }).then(() => self.skipWaiting()),
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await Promise.all(SHELL.map((url) => cache.add(url)));
+    await self.skipWaiting();
+  })());
 });
 
+async function trimRuntime() {
+  const cache = await caches.open(RUNTIME);
+  const keys = await cache.keys();
+  const now = Date.now();
+  const fresh = [];
+  for (const key of keys) {
+    const hit = await cache.match(key);
+    const at = Number(hit?.headers.get('x-apollo-cached-at') || 0);
+    if (!hit || !at || now - at > RUNTIME_MAX_AGE_MS) {
+      await cache.delete(key);
+      continue;
+    }
+    fresh.push(key);
+  }
+  while (fresh.length > RUNTIME_MAX_ENTRIES) {
+    await cache.delete(fresh.shift());
+  }
+}
+
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))).then(() => self.clients.claim()),
-  );
+  event.waitUntil((async () => {
+    const keep = new Set([CACHE, RUNTIME]);
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter((key) => key.startsWith(OWN_PREFIX) && !keep.has(key))
+        .map((key) => caches.delete(key)),
+    );
+    await trimRuntime();
+    await self.clients.claim();
+  })());
 });
+
+async function putRuntime(request, response) {
+  const bytes = await response.clone().arrayBuffer();
+  if (bytes.byteLength > RUNTIME_MAX_BYTES) return;
+  const headers = new Headers(response.headers);
+  headers.set('x-apollo-cached-at', String(Date.now()));
+  const cache = await caches.open(RUNTIME);
+  await cache.put(request, new Response(bytes, { status: response.status, statusText: response.statusText, headers }));
+  await trimRuntime();
+}
+
+async function matchCached(request) {
+  const shell = await caches.open(CACHE).then((cache) => cache.match(request));
+  if (shell) return shell;
+  const cache = await caches.open(RUNTIME);
+  const hit = await cache.match(request);
+  if (!hit) return null;
+  const at = Number(hit.headers.get('x-apollo-cached-at') || 0);
+  if (!at || Date.now() - at > RUNTIME_MAX_AGE_MS) {
+    await cache.delete(request);
+    return null;
+  }
+  return hit;
+}
 
 self.addEventListener('fetch', (event) => {
   const request = event.request;
@@ -42,14 +98,13 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(request)
       .then((response) => {
-        if (response && response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
+        if (response && response.ok && response.type === 'basic') {
+          putRuntime(request, response.clone()).catch(() => undefined);
         }
         return response;
       })
       .catch(async () => {
-        const hit = await caches.match(request);
+        const hit = await matchCached(request);
         if (hit) return hit;
         if (request.mode === 'navigate') {
           return (await caches.match('./index.html')) || (await caches.match('./'));

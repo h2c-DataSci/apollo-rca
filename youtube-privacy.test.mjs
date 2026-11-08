@@ -107,8 +107,12 @@ describe('YouTube Video Integration, Privacy & OWASP Security Audit', () => {
     );
     // index.html must not contain youtube or google tags
     const indexHtml = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
-    assert.ok(!indexHtml.includes('youtube.com'), 'index.html must not contain eager youtube.com embeds');
-    assert.ok(!indexHtml.includes('youtube-nocookie.com'), 'index.html must not contain eager youtube-nocookie embeds');
+    const csp = indexHtml.match(/Content-Security-Policy" content="([^"]*)"/)?.[1] || '';
+    assert.match(csp, /frame-src https:\/\/www\.youtube-nocookie\.com;/);
+    assert.ok(!/frame-src https:(?:;|\s|$)/.test(csp), 'frame-src must name the embed host, not every https origin');
+    const withoutCsp = indexHtml.replace(csp, '');
+    assert.ok(!withoutCsp.includes('youtube.com'), 'index.html must not contain eager youtube.com embeds');
+    assert.ok(!withoutCsp.includes('youtube-nocookie.com'), 'index.html must not contain eager youtube-nocookie embeds');
     assert.ok(!indexHtml.includes('googletagmanager.com'), 'index.html must not contain tracking scripts');
   });
 

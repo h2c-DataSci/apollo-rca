@@ -72,7 +72,7 @@ test('base path: router basepath is /apollo-rca and no URL-rewrite hack remains'
 test('no root-absolute asset URLs in built JS', () => { const j = readFileSync(new URL('./index-v12.js', import.meta.url), 'utf8'); assert.ok(!/[`"']\/assets\//.test(j)); });
 test('privacy: no third-party hosts referenced in index.html or app code (except documented model/library hosts)', () => {
   const h = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
-  const allowed = /^(?:https?:\/\/)(?:127\.0\.0\.1:11434|localhost:11434|cdn\.jsdelivr\.net|huggingface\.co|\*\.huggingface\.co|cdn-lfs\.huggingface\.co)(?:[/?#]|$)/;
+  const allowed = /^(?:https?:\/\/)(?:127\.0\.0\.1:11434|localhost:11434|cdn\.jsdelivr\.net|huggingface\.co|\*\.huggingface\.co|cdn-lfs\.huggingface\.co|www\.youtube-nocookie\.com)(?:[/?#]|$)/;
   const found = [...h.matchAll(/https?:\/\/(?!www\.w3\.org)[^"'\s<);]+/g)].map((m) => m[0]).filter((u) => !u.startsWith('https://h2c-datasci.github.io') && !allowed.test(u));
   assert.deepEqual(found, []);
 });
@@ -107,4 +107,39 @@ test('chart colors: STOP is red with white text, unknown is yellow with black te
   assert.match(shell, /'#fbc02d'/);
   assert.match(shell, /'#ffffff'/);
   assert.match(shell, /'#000000'/);
+});
+test('service worker keeps only this app caches and fails a broken shell install', () => {
+  const sw = readFileSync(new URL('./sw.js', import.meta.url), 'utf8');
+  assert.match(sw, /const OWN_PREFIX = 'apollo-rca-'/);
+  assert.match(sw, /key\.startsWith\(OWN_PREFIX\) && !keep\.has\(key\)/);
+  assert.ok(!sw.includes('key !== CACHE'), 'activate must not delete other origin caches');
+  assert.match(sw, /await Promise\.all\(SHELL\.map\(\(url\) => cache\.add\(url\)\)\)/);
+  assert.ok(!sw.includes('.catch(() => {})'), 'a failed shell asset must reject install');
+  assert.match(sw, /RUNTIME_MAX_ENTRIES = 40/);
+  assert.match(sw, /RUNTIME_MAX_AGE_MS = 7 \* 24 \* 60 \* 60 \* 1000/);
+  assert.match(sw, /RUNTIME_MAX_BYTES = 1500000/);
+});
+test('shell sanitizer drops nested forbidden tags and normalized javascript URLs', () => {
+  const shell = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
+  const start = shell.indexOf('function normalizedUrl');
+  const end = shell.indexOf('function setSafeHtml');
+  const api = new Function(`${shell.slice(start, end)}; return { normalizedUrl, blockedUrl };`)();
+  assert.equal(api.blockedUrl(' javascript:alert(1)'), true);
+  assert.equal(api.blockedUrl('java\nscript:alert(1)'), true);
+  assert.equal(api.blockedUrl('JaVaScRiPt:alert(1)'), true);
+  assert.equal(api.blockedUrl('java%73cript:alert(1)'), true);
+  assert.equal(api.blockedUrl('&#106;avascript:alert(1)'), true);
+  assert.equal(api.blockedUrl('https://www.haroldhenrycabanilla.com'), false);
+  assert.equal(api.blockedUrl('https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform'), false);
+  assert.match(shell, /for \(const child of \[\.\.\.node\.children\]\) visit\(child\)/);
+  assert.match(shell, /FORBIDDEN_TAGS/);
+});
+test('Feedback link sits next to About the developer and opens the form safely', () => {
+  const help = readFileSync(new URL('./h2c-help.js', import.meta.url), 'utf8');
+  assert.match(help, /About the developer:/);
+  assert.match(help, /href: SITE/);
+  assert.match(help, /www\.haroldhenrycabanilla\.com/);
+  assert.match(help, /textContent: 'Feedback'/);
+  assert.match(help, /https:\/\/docs\.google\.com\/forms\/d\/e\/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w\/viewform/);
+  assert.match(help, /target: '_blank', rel: 'noopener noreferrer', textContent: 'Feedback'/);
 });

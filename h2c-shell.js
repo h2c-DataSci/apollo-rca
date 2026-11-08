@@ -14,24 +14,55 @@ function escapeHtml(str) {
 
 import { getBridgeConfig, saveBridgeConfig, testLocalDaemonConnection } from './local-ai-bridge.js?v=21';
 
+const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
+const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
+
+function normalizedUrl(value) {
+  let v = String(value ?? '')
+    .replace(/&#(x[0-9a-f]+|\d+);?/gi, (_, n) => {
+      const code = n[0] === 'x' || n[0] === 'X' ? parseInt(n.slice(1), 16) : parseInt(n, 10);
+      return Number.isFinite(code) ? String.fromCodePoint(code) : '';
+    })
+    .replace(/&colon;/gi, ':')
+    .replace(/&(tab|newline|nbsp);/gi, '');
+  for (let i = 0; i < 2; i += 1) {
+    try {
+      const next = decodeURIComponent(v.replace(/\+/g, '%20'));
+      if (next === v) break;
+      v = next;
+    } catch {
+      break;
+    }
+  }
+  return v.replace(/[\u0000-\u0020\u00a0]+/g, '').toLowerCase();
+}
+
+function blockedUrl(value) {
+  const v = normalizedUrl(value);
+  return v.startsWith('javascript:') || v.startsWith('vbscript:') || v.startsWith('data:');
+}
+
 function setSafeHtml(el, html) {
-  const doc = new DOMParser().parseFromString(String(html), 'text/html');
-  const clean = (node) => {
-    if (node.nodeType !== 1) return;
-    [...node.attributes].forEach((attr) => {
-      const name = attr.name.toLowerCase();
-      if (name.startsWith('on') || name === 'srcdoc') node.removeAttribute(attr.name);
-      if ((name === 'href' || name === 'src') && /^\s*javascript:/i.test(attr.value)) node.removeAttribute(attr.name);
-    });
-    [...node.children].forEach(clean);
-  };
-  [...doc.body.children].forEach((node) => {
-    if (node.tagName === 'SCRIPT' || node.tagName === 'OBJECT' || node.tagName === 'EMBED' || node.tagName === 'LINK' || node.tagName === 'META') {
-      node.remove();
+  const doc = new DOMParser().parseFromString(String(html ?? ''), 'text/html');
+  const drop = [];
+  const visit = (node) => {
+    if (!node || node.nodeType !== 1) return;
+    if (FORBIDDEN_TAGS.has(node.tagName)) {
+      drop.push(node);
       return;
     }
-    clean(node);
-  });
+    for (const attr of [...node.attributes]) {
+      const name = attr.name.toLowerCase();
+      if (name.startsWith('on') || name === 'srcdoc') {
+        node.removeAttribute(attr.name);
+        continue;
+      }
+      if (URL_ATTRS.has(name) && blockedUrl(attr.value)) node.removeAttribute(attr.name);
+    }
+    for (const child of [...node.children]) visit(child);
+  };
+  for (const child of [...doc.body.children]) visit(child);
+  for (const node of drop) node.remove();
   el.replaceChildren(...doc.body.childNodes);
 }
 
