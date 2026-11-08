@@ -67,8 +67,38 @@ self.addEventListener('activate', (event) => {
 });
 
 async function putRuntime(request, response) {
-  const bytes = await response.clone().arrayBuffer();
-  if (bytes.byteLength > RUNTIME_MAX_BYTES) return;
+  // Limit bytes accumulated for caching, not browser/network internal buffers.
+  const declaredLength = Number(response.headers.get('content-length'));
+  if (Number.isFinite(declaredLength) && declaredLength > RUNTIME_MAX_BYTES) {
+    response.body?.cancel().catch(() => undefined);
+    return;
+  }
+  if (!response.body) return;
+  const reader = response.body.getReader();
+  const chunks = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > RUNTIME_MAX_BYTES) {
+        // Do not await cancellation of a tee: the page may still be reading
+        // the original response. Discard only this cache branch.
+        reader.cancel().catch(() => undefined);
+        return;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
   const headers = new Headers(response.headers);
   headers.set('x-apollo-cached-at', String(Date.now()));
   const cache = await caches.open(RUNTIME);
@@ -95,15 +125,18 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  const network = fetch(request);
+  // Register lifetime work synchronously; cache failures must not fail a
+  // successful page response or turn a quota error into an offline fallback.
+  event.waitUntil(
+    network.then(async (response) => {
+      if (response && response.ok && response.type === 'basic') {
+        await putRuntime(request, response.clone());
+      }
+    }).catch(() => undefined),
+  );
   event.respondWith(
-    fetch(request)
-      .then((response) => {
-        if (response && response.ok && response.type === 'basic') {
-          putRuntime(request, response.clone()).catch(() => undefined);
-        }
-        return response;
-      })
-      .catch(async () => {
+    network.catch(async () => {
         const hit = await matchCached(request);
         if (hit) return hit;
         if (request.mode === 'navigate') {
