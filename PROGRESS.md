@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-08 | `c8a8d94` | Synchronized clone to `origin/main` (`c8a8d94`). Verified full test suite (139/139 PASS across 11 suites). Confirmed HARD RULE: PROGRESS.md updated on every task so we do not get lost; README.md maintained as standard standing context. |
 | 2026-11-09 | `b1afdd3` | **Baseline.** This tree is the latest accepted state: docs rule, live duration sync, Episode 6 `Q4-Bu2qUaaE`. Do not roll back past it. |
 | 2026-11-09 | `755af2c` | Hard rule recorded: update PROGRESS.md after every task and README.md when the product description changes. |
 | 2026-11-09 | `651f478` | Sync Official Durations now reads the YouTube player length. Corrected Episode 5 to 08:19 and Episode 6 to 07:20. Cache bust `h2c-help.js` and `h2c-videos.js` to `v=24`. Tests 139/139. |
