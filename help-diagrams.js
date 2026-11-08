@@ -1,6 +1,6 @@
 // Original inline SVG diagrams for Help (built with DOM APIs, no innerHTML). Not derived from any book or third-party image.
 const NS = 'http://www.w3.org/2000/svg';
-const C = { pe: '#111827', act: '#dc2626', con: '#16a34a', arrow: '#2563eb', gold: '#c9a227', em: '#0a5c45', ink: '#1b2a24', amber: '#d97706', cream: '#fffdf8' };
+const C = { pe: '#111827', act: '#dc2626', con: '#16a34a', arrow: '#2563eb', gold: '#c9a227', em: '#0a5c45', ink: '#1b2a24', amber: '#d97706', cream: '#fffdf8', neutral: '#6b7280' };
 const s = (t, a = {}, txt) => { const n = document.createElementNS(NS, t); for (const k in a) n.setAttribute(k, a[k]); if (txt != null) n.textContent = txt; return n; };
 const box = (g, x, y, w, h, fill, label, fs = 13, tc = '#fff') => { g.append(s('rect', { x, y, width: w, height: h, rx: 8, fill }), s('text', { x: x + w / 2, y: y + h / 2 + fs / 3, 'text-anchor': 'middle', fill: tc, 'font-size': fs, 'font-weight': 700 }, label)); };
 const arrow = (g, x1, y1, x2, y2) => g.append(s('line', { x1, y1, x2, y2, stroke: C.arrow, 'stroke-width': 2.5, 'marker-end': 'url(#ah)' }));
@@ -25,9 +25,9 @@ export const DIAGRAMS = {
     box(g, 10, 100, 100, 44, C.pe, 'Oil released', 12); arrow(g, 110, 118, 145, 62); arrow(g, 110, 130, 145, 180);
     box(g, 148, 38, 120, 44, C.act, 'Seal failed', 12); box(g, 148, 158, 120, 44, C.con, 'Seal worn', 12);
     arrow(g, 268, 52, 300, 28); arrow(g, 268, 70, 300, 100); box(g, 302, 8, 120, 40, C.act, 'Pressure spike', 11); box(g, 302, 82, 120, 40, C.con, 'No relief path', 11);
-    balloon(g, 440, 28, 'E1'); balloon(g, 440, 102, '?', '#fde68a'); balloon(g, 288, 180, 'E2'); balloon(g, 288, 200, 'E3');
+    balloon(g, 440, 28, 'E1'); balloon(g, 440, 102, '?', C.neutral); balloon(g, 288, 180, 'E2'); balloon(g, 288, 200, 'E3');
     g.append(s('line', { x1: 422, y1: 28, x2: 431, y2: 28, stroke: '#8c6a1a' }), s('line', { x1: 422, y1: 102, x2: 431, y2: 102, stroke: '#8c6a1a' }));
-    txt(g, 240, 235, 'Black = effect, red = action, green = condition, gold = evidence, ? = no evidence yet', 11); }),
+    txt(g, 240, 235, 'Black = effect, red = action, green = condition. Grey = STOP or unknown. Gold = evidence.', 11); }),
   tests: () => frame('Diagram: three checks for each cause set', 170, (g) => {
     [['Sufficient?', 'Together, are the causes enough?'], ['Necessary?', 'Would it still happen without one?'], ['Same time + place?', 'Did they exist together?']].forEach((r, i) => { const x = 12 + i * 155; g.append(s('rect', { x, y: 20, width: 145, height: 100, rx: 10, fill: '#fff', stroke: C.gold, 'stroke-width': 2 })); txt(g, x + 72, 50, r[0], 14, C.em, 'middle', 700); const l = r[1].split(' '); const mid = Math.ceil(l.length / 2); txt(g, x + 72, 78, l.slice(0, mid).join(' '), 11); txt(g, x + 72, 94, l.slice(mid).join(' '), 11); });
     txt(g, 240, 150, 'Any "no" means a cause is missing or wrong. Revise the chart.', 12, C.act, 'middle', 700); }),
@@ -43,8 +43,8 @@ export const DIAGRAMS = {
   leaf: () => frame('Diagram: three ways a branch can end', 150, (g) => {
     box(g, 10, 50, 100, 44, C.con, 'Last cause', 12);
     arrow(g, 110, 62, 170, 30); arrow(g, 110, 72, 170, 72); arrow(g, 110, 84, 170, 118);
-    g.append(s('polygon', { points: '195,12 215,12 229,26 229,46 215,60 195,60 181,46 181,26', fill: C.act, transform: 'translate(0,-6)' })); txt(g, 205, 38, 'STOP', 11, '#fff', 'middle', 700); txt(g, 330, 32, 'out of control / policy', 11, C.ink, 'middle');
-    g.append(s('circle', { cx: 205, cy: 72, r: 20, fill: '#fde68a', stroke: '#8c6a1a' })); txt(g, 205, 80, '?', 20, '#043d2e', 'middle', 700); txt(g, 330, 76, 'information is missing', 11);
+    g.append(s('polygon', { points: '195,12 215,12 229,26 229,46 215,60 195,60 181,46 181,26', fill: C.neutral, transform: 'translate(0,-6)' })); txt(g, 205, 38, 'STOP', 11, '#fff', 'middle', 700); txt(g, 330, 32, 'out of control / policy', 11, C.ink, 'middle');
+    g.append(s('rect', { x: 181, y: 52, width: 48, height: 40, rx: 8, fill: C.neutral })); txt(g, 205, 78, '?', 20, '#fff', 'middle', 700); txt(g, 330, 76, 'information is missing', 11);
     box(g, 175, 100, 60, 36, C.arrow, 'GOTO', 11); txt(g, 330, 122, 'continues on another chart', 11); }),
   actions: () => frame('Diagram: types of action from immediate fix to consequence reduction', 200, (g) => {
     [['Correction', 'fix what is wrong now'], ['Containment', 'limit the spread'], ['Corrective', 'remove a cause'], ['Preventive / system', 'fix the conditions behind many events'], ['Mitigation', 'reduce the consequence']].forEach((r, i) => { const y = 8 + i * 37; g.append(s('rect', { x: 15, y, width: 450, height: 31, rx: 7, fill: i === 2 || i === 3 ? C.em : '#374151' })); txt(g, 28, y + 20, r[0], 13, '#fff', 'start', 700); txt(g, 452, y + 20, r[1], 11, '#f6dd7a', 'end'); });

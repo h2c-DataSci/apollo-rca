@@ -12,8 +12,28 @@ function escapeHtml(str) {
 // interactive lively 7-step Apollo RCA workflow hub, real-time color-coded validation,
 // and local AI daemon bridge for low-resource hardware.
 
-import { MODEL_CONFIG } from './ai-config.js';
-import { getBridgeConfig, saveBridgeConfig, testLocalDaemonConnection, executeLocalChat, RECOMMENDED_LOCAL_MODELS } from './local-ai-bridge.js?v=21';
+import { getBridgeConfig, saveBridgeConfig, testLocalDaemonConnection } from './local-ai-bridge.js?v=21';
+
+function setSafeHtml(el, html) {
+  const doc = new DOMParser().parseFromString(String(html), 'text/html');
+  const clean = (node) => {
+    if (node.nodeType !== 1) return;
+    [...node.attributes].forEach((attr) => {
+      const name = attr.name.toLowerCase();
+      if (name.startsWith('on') || name === 'srcdoc') node.removeAttribute(attr.name);
+      if ((name === 'href' || name === 'src') && /^\s*javascript:/i.test(attr.value)) node.removeAttribute(attr.name);
+    });
+    [...node.children].forEach(clean);
+  };
+  [...doc.body.children].forEach((node) => {
+    if (node.tagName === 'SCRIPT' || node.tagName === 'OBJECT' || node.tagName === 'EMBED' || node.tagName === 'LINK' || node.tagName === 'META') {
+      node.remove();
+      return;
+    }
+    clean(node);
+  });
+  el.replaceChildren(...doc.body.childNodes);
+}
 
 const KEYS = ['realitychart-intake-v1', 'realitychart-hypotheses-v1', 'realitychart-raw-notes-v1'];
 const BACKUP = 'h2c-last-cleared-v1';
@@ -26,8 +46,8 @@ css.textContent = `
 .h2c-new-prominent{background:linear-gradient(180deg,#f6dd7a,#c9a227)!important;color:#043d2e!important;border:2px solid #8c6a1a!important;font-weight:700!important}
 .h2c-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:10000;background:#043d2e;color:#f1d16b;border:2px solid #c9a227;border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;font:600 14px system-ui;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 .h2c-toast button{background:#f1d16b;color:#043d2e;border:0;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer}.h2c-toast button:focus-visible{outline:3px solid #fff}
-.h2c-browser-ai-dialog{border:2px solid #c9a227;border-radius:12px;padding:0;max-width:34rem;background:#fffdf8;color:#1c1915;box-shadow:0 12px 40px rgba(0,0,0,.28)}
-.h2c-browser-ai-dialog::backdrop{background:rgba(4,28,22,.45)}
+.h2c-browser-ai-dialog{position:fixed;right:16px;bottom:16px;left:auto;top:auto;margin:0;z-index:40;max-width:min(34rem,calc(100vw - 32px));max-height:min(70vh,32rem);overflow:auto;border:2px solid #c9a227;border-radius:12px;padding:0;background:#fffdf8;color:#1c1915;box-shadow:0 12px 40px rgba(0,0,0,.28);pointer-events:auto}
+.h2c-browser-ai-dialog[hidden]{display:none}
 .h2c-browser-ai-dialog h2{margin:0;padding:14px 16px;background:#043d2e;color:#f1d16b;font:700 16px system-ui}
 .h2c-browser-ai-dialog .body{padding:14px 16px 16px;display:grid;gap:10px;font:14px/1.45 system-ui}
 .h2c-browser-ai-dialog p{margin:0}
@@ -342,7 +362,7 @@ css.textContent = `
   box-shadow: none !important;
 }
 .h2c-workflow-hub {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   border: 2px solid #c9a227;
   background: linear-gradient(180deg, #fffdfa 0%, #fbf7ee 100%);
   border-radius: 12px;
@@ -725,11 +745,11 @@ function updateTopAttributionRibbon() {
   const old = document.querySelector('.h2c-header-disclosure');
   if (old) old.remove();
 
-  const sub = document.querySelector('header p.text-muted');
+  const sub = document.querySelector('main');
   if (sub && !document.querySelector('.h2c-top-ribbon')) {
     const ribbon = document.createElement('div');
     ribbon.className = 'no-print h2c-top-ribbon';
-    ribbon.innerHTML = `
+    setSafeHtml(ribbon, `
       <div class="h2c-top-ribbon-text">
         <span class="h2c-top-ribbon-badge">⚖️ METHODOLOGY ATTRIBUTION</span>
         <span>Independent study tool based on Apollo RCA&trade; principles created by <strong>Dean L. Gano</strong>.</span>
@@ -742,7 +762,7 @@ function updateTopAttributionRibbon() {
           📜 Full Legal Notice &amp; Safe Harbor &darr;
         </button>
       </div>
-    `;
+    `);
     const btn = ribbon.querySelector('#h2c-ribbon-jump-btn');
     if (btn) btn.onclick = scrollToLegal;
     sub.parentNode.appendChild(ribbon);
@@ -760,10 +780,10 @@ function mountLegalToolbarBtn() {
     tb.className = 'no-print h2c-tb-legal';
     tb.type = 'button';
     tb.setAttribute('aria-label', 'View Legal disclosure and trademark attribution');
-    tb.innerHTML = `
+    setSafeHtml(tb, `
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
       <span>⚖️ Legal &amp; Trademarks</span>
-    `;
+    `);
     tb.onclick = scrollToLegal;
     anchor.parentNode.insertBefore(tb, anchor.nextSibling);
   }
@@ -789,7 +809,7 @@ function ensureBottomLegalShowcase() {
 
   if (showcase && !showcase.dataset.rendered) {
     showcase.dataset.rendered = 'true';
-    showcase.innerHTML = `
+    setSafeHtml(showcase, `
       <div class="h2c-legal-accent-bar"></div>
       <div class="h2c-legal-showcase-inner">
         <div class="h2c-legal-header-row">
@@ -868,7 +888,7 @@ function ensureBottomLegalShowcase() {
           <span>↑ Back to Top of Analysis</span>
         </button>
       </div>
-    `;
+    `);
 
     const backBtn = showcase.querySelector('#h2c-legal-back-top-btn');
     if (backBtn) {
@@ -883,11 +903,12 @@ function updateStepsHub() {
   const existingOl = document.querySelector('ol.grid-cols-2, ol.sm\\:grid-cols-7');
   let hub = document.querySelector('.h2c-workflow-hub');
 
-  if (!hub && existingOl) {
+  if (!hub && existingOl && existingOl.parentNode) {
     hub = document.createElement('div');
     hub.className = 'no-print h2c-workflow-hub';
     existingOl.parentNode.insertBefore(hub, existingOl);
-    existingOl.style.display = 'none'; // hide the boring static ol
+    hub.append(existingOl);
+    existingOl.hidden = true;
   }
 
   if (!hub) return;
@@ -994,7 +1015,11 @@ function updateStepsHub() {
 
   const overallClass = st.pct >= 70 ? 'h2c-pill-high' : st.pct > 0 ? 'h2c-pill-med' : 'h2c-pill-low';
 
-  hub.innerHTML = `
+  const sig = steps.map((s) => `${s.num}:${s.status}:${s.isReady ? 1 : 0}`).join('|');
+  if (hub.dataset.sig === sig && hub.querySelector('.h2c-step-card')) return;
+  hub.dataset.sig = sig;
+
+  setSafeHtml(hub, `
     <div class="h2c-workflow-header">
       <div class="h2c-workflow-title">
         <span class="h2c-pulse-dot"></span>
@@ -1010,7 +1035,7 @@ function updateStepsHub() {
       <div class="h2c-progress-fill" style="width: ${Math.max(6, st.pct)}%;"></div>
     </div>
     <div class="h2c-steps-grid"></div>
-  `;
+  `);
 
   const grid = hub.querySelector('.h2c-steps-grid');
   for (const s of steps) {
@@ -1019,7 +1044,7 @@ function updateStepsHub() {
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
     card.setAttribute('aria-label', `Step ${s.num}: ${s.name} (${s.status})`);
-    card.innerHTML = `
+    setSafeHtml(card, `
       <div class="h2c-step-top">
         <span class="h2c-step-num">${s.num}</span>
         <span class="h2c-step-pill ${s.pillClass}">${s.status}</span>
@@ -1031,7 +1056,7 @@ function updateStepsHub() {
           ▶ Video Tutorial
         </button>
       </div>
-    `;
+    `);
     card.onclick = (e) => {
       if (e.target.closest && e.target.closest('.h2c-step-vid-btn')) {
         e.stopPropagation();
@@ -1078,49 +1103,49 @@ function updateColorCodedValidation() {
 
     if (count === 0) {
       input.classList.add('h2c-input-stop');
-      box.innerHTML = `
+      setSafeHtml(box, `
         <div class="h2c-val-badge h2c-val-stop">
           <strong>✕ Not Acceptable (0 words)</strong>
           <span>— Required: Enter 2–4 word noun-verb effect (e.g. "Oil Released", "Pump Tripped")</span>
         </div>
-      `;
+      `);
     } else if (blameMatch) {
       input.classList.add('h2c-input-violation');
-      box.innerHTML = `
+      setSafeHtml(box, `
         <div class="h2c-val-badge h2c-val-violation">
           <div class="h2c-val-violation-title">
             <span style="font-size: 14px;">⛔</span>
             <strong>Principle P01/P05 Violation (Not Acceptable)</strong>
           </div>
           <div style="font-size: 11.5px; line-height: 1.35;">
-            Blame / Who / Why detected: <strong>"${blameMatch[0]}"</strong>. Apollo RCA forbids blaming individuals or asking "why". Describe the physical effect only.
+            Blame / Who / Why detected: <strong>"${escapeHtml(blameMatch[0])}"</strong>. Apollo RCA forbids blaming individuals or asking "why". Describe the physical effect only.
           </div>
         </div>
-      `;
+      `);
     } else if (count >= 2 && count <= 4) {
       input.classList.add('h2c-input-ready');
-      box.innerHTML = `
+      setSafeHtml(box, `
         <div class="h2c-val-badge h2c-val-ready">
           <strong>✓ Acceptable (${count} words)</strong>
           <span>— Valid noun-verb primary effect statement. Ready for reality charting!</span>
         </div>
-      `;
+      `);
     } else if (count === 1) {
       input.classList.add('h2c-input-warn');
-      box.innerHTML = `
+      setSafeHtml(box, `
         <div class="h2c-val-badge h2c-val-warn">
           <strong>⚠ Incomplete (1 word)</strong>
           <span>— A primary effect requires both a noun and a verb (e.g. "Oil Released")</span>
         </div>
-      `;
+      `);
     } else {
       input.classList.add('h2c-input-warn');
-      box.innerHTML = `
+      setSafeHtml(box, `
         <div class="h2c-val-badge h2c-val-warn">
           <strong>⚠ Too Wordy (${count} words)</strong>
           <span>— Keep to 2–4 words. Only the first 4 content words will be charted.</span>
         </div>
-      `;
+      `);
     }
   }
 
@@ -1137,9 +1162,9 @@ function updateColorCodedValidation() {
     input.classList.remove('h2c-input-ready', 'h2c-input-warn');
     if (val.length > 0) {
       input.classList.add('h2c-input-ready');
-      box.innerHTML = `<div class="h2c-val-badge h2c-val-ready" style="padding: 3px 8px; font-size: 11px;"><strong>✓ Location specified</strong></div>`;
+      setSafeHtml(box, `<div class="h2c-val-badge h2c-val-ready" style="padding: 3px 8px; font-size: 11px;"><strong>✓ Location specified</strong></div>`);
     } else {
-      box.innerHTML = `<div class="h2c-val-badge h2c-val-warn" style="padding: 3px 8px; font-size: 11px;"><span>⚠ Location recommended (facility, unit, equipment)</span></div>`;
+      setSafeHtml(box, `<div class="h2c-val-badge h2c-val-warn" style="padding: 3px 8px; font-size: 11px;"><span>⚠ Location recommended (facility, unit, equipment)</span></div>`);
     }
   }
 }
@@ -1147,13 +1172,8 @@ function updateColorCodedValidation() {
 function placeOfficialCoach() {
   document.getElementById('h2c-coach-workbench')?.remove();
   const coach = document.querySelector('section[aria-label="RCA coach"]');
-  const hub = document.querySelector('.h2c-workflow-hub');
-  if (!coach || !hub || !hub.parentNode) return;
-  if (coach.contains(document.activeElement)) return;
+  if (!coach) return;
   coach.classList.add('h2c-official-coach');
-  if (coach.parentNode !== hub.parentNode || coach.nextElementSibling !== hub) {
-    hub.parentNode.insertBefore(coach, hub);
-  }
 }
 
 function focusOfficialCoach() {
@@ -1177,7 +1197,7 @@ function ensureLocalBridgeUI() {
     bridge = document.createElement('div');
     bridge.className = 'no-print h2c-local-bridge-card';
     bridge.style.cssText = 'margin-top: 12px; margin-bottom: 12px; background: #fff; border: 1px solid #e7ded0; border-left: 4px solid #c9a227; border-radius: 8px; padding: 12px 14px; font-family: system-ui, sans-serif;';
-    bridge.innerHTML = `
+    setSafeHtml(bridge, `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 16px;">🖥️</span>
@@ -1192,7 +1212,7 @@ function ensureLocalBridgeUI() {
       <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">
           Endpoint:
-          <input type="text" class="h2c-bridge-endpoint" value="${cfg.endpoint}" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 175px;" />
+          <input type="text" class="h2c-bridge-endpoint" value="${escapeHtml(cfg.endpoint)}" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 175px;" />
         </label>
         <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">
           Model:
@@ -1207,7 +1227,7 @@ function ensureLocalBridgeUI() {
         </button>
       </div>
       <div class="h2c-bridge-feedback" style="margin-top: 8px; font-size: 11.5px; line-height: 1.4; display: none;"></div>
-    `;
+    `);
 
     // Insert right after the top description paragraph or before the action buttons
     const target = coachSection.querySelector('.flex.flex-wrap.gap-2') || coachSection.firstChild;
@@ -1294,77 +1314,50 @@ function ensureBrowserAiButton() {
   btn.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    openBrowserAiDialog();
+    import('./browser-ai.js?v=22').then((mod) => mod.openBrowserAiDialog()).catch(() => {});
   });
   anchor.insertAdjacentElement('afterend', btn);
 }
 
-function openBrowserAiDialog() {
-  let dialog = document.getElementById('h2c-browser-ai-dialog');
-  if (!dialog) {
-    dialog = document.createElement('dialog');
-    dialog.id = 'h2c-browser-ai-dialog';
-    dialog.className = 'h2c-browser-ai-dialog';
-    dialog.innerHTML = `
-      <h2 id="h2c-browser-ai-title">Browser AI</h2>
-      <div class="body">
-        <p>Only <strong data-model></strong> runs inside this browser. It is an ONNX q4 model, about 790 MB, under Apache-2.0. The page loads it in a worker and uses WebGPU, or WASM if the browser has no WebGPU. Your case text stays on this device.</p>
-        <p>A browser cannot start Ollama or run GGUF weights. Gemma 2 (2B), Qwen 2.5 (1.5B), and Llama 3.2 (1B) stay on your computer. Install Ollama, then run one of these, and leave the endpoint at <code>http://127.0.0.1:11434</code>. Use Test Connection on the Local AI card.</p>
-        <ul></ul>
-        <p class="h2c-browser-ai-status" role="status"></p>
-        <div class="row">
-          <button type="button" class="go">Download and run in this browser</button>
-          <button type="button" class="stop">Close</button>
-        </div>
-      </div>`;
-    dialog.querySelector('[data-model]').textContent = MODEL_CONFIG.id;
-    const list = dialog.querySelector('ul');
-    RECOMMENDED_LOCAL_MODELS.forEach((model) => {
-      const item = document.createElement('li');
-      const code = document.createElement('code');
-      code.textContent = model.cmd;
-      item.append(model.name + ': ', code);
-      list.append(item);
-    });
-    dialog.querySelector('.stop').onclick = () => dialog.close();
-    dialog.querySelector('.go').onclick = () => startBrowserModel(dialog);
-    dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
-    document.body.append(dialog);
-  }
-  const status = dialog.querySelector('.h2c-browser-ai-status');
-  const coach = document.querySelector('section[aria-label="RCA coach"]');
-  const ready = coach && /AI Ready|AI Working|AI Loading/i.test(coach.textContent);
-  status.textContent = ready ? 'This browser model is already on or loading in the RCA Coach section.' : '';
-  dialog.showModal();
+function enforceChartColors() {
+  const grey = '#6b7280';
+  document.querySelectorAll('svg text').forEach((label) => {
+    const word = (label.textContent || '').trim();
+    if (word !== 'STOP' && word !== '?') return;
+    const shape = label.previousElementSibling;
+    if (!shape) return;
+    const tag = (shape.tagName || '').toLowerCase();
+    if (tag !== 'polygon' && tag !== 'rect' && tag !== 'circle') return;
+    shape.setAttribute('fill', grey);
+    shape.setAttribute('stroke', grey);
+    if (shape.style) {
+      shape.style.fill = grey;
+      shape.style.stroke = grey;
+    }
+    shape.classList?.remove('fill-action', 'fill-warn', 'stroke-action', 'stroke-warn');
+    shape.classList?.add('fill-stop');
+  });
 }
 
-async function startBrowserModel(dialog) {
-  const status = dialog.querySelector('.h2c-browser-ai-status');
-  status.textContent = 'Looking for the in-browser coach…';
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    const coach = document.querySelector('section[aria-label="RCA coach"]');
-    const enable = coach && [...coach.querySelectorAll('button')].find((b) => /Enable AI Assistant/.test(b.textContent));
-    if (enable) {
-      enable.click();
-      coach.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      dialog.close();
+function whenHydrated(run) {
+  const start = Date.now();
+  const tick = () => {
+    const tsr = globalThis.$_TSR;
+    if (tsr && !tsr.hydrated && Date.now() - start < 4000) {
+      setTimeout(tick, 40);
       return;
     }
-    if (coach && [...coach.querySelectorAll('button')].some((b) => /Unload|Disable AI/.test(b.textContent))) {
-      coach.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      status.textContent = 'The browser model is already enabled. Progress stays in the RCA Coach section.';
-      return;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 250));
-  }
-  status.textContent = 'The coach has not finished loading. Wait a moment and press the button again. Nothing else on the page was changed.';
+    run();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tick, { once: true });
+  else tick();
 }
 
 function refreshAll() {
   if (updating) return;
   updating = true;
   try {
-    const steps = [updateTopAttributionRibbon, ensureBottomLegalShowcase, updateStepsHub, updateColorCodedValidation, placeOfficialCoach, ensureLocalBridgeUI, ensureBrowserAiButton];
+    const steps = [updateTopAttributionRibbon, ensureBottomLegalShowcase, updateStepsHub, updateColorCodedValidation, placeOfficialCoach, ensureLocalBridgeUI, ensureBrowserAiButton, enforceChartColors];
     for (const step of steps) {
       try { step(); } catch (error) { console.error('[h2c]', error); }
     }
@@ -1402,11 +1395,15 @@ function initShell() {
   }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => setTimeout(initShell, 50));
-} else {
-  setTimeout(initShell, 50);
+function bootShell() {
+  initShell();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register(new URL('./sw.js', import.meta.url)).catch(() => {});
+  }
 }
+const startShell = () => whenHydrated(() => requestAnimationFrame(() => requestAnimationFrame(bootShell)));
+if (document.readyState === 'complete') startShell();
+else window.addEventListener('load', startShell, { once: true });
 
 function toast() {
   const t = document.createElement('div'); t.className = 'h2c-toast'; t.setAttribute('role', 'status');

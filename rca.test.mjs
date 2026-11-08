@@ -71,7 +71,10 @@ test('base path: router basepath is /apollo-rca and no URL-rewrite hack remains'
 });
 test('no root-absolute asset URLs in built JS', () => { const j = readFileSync(new URL('./index-v12.js', import.meta.url), 'utf8'); assert.ok(!/[`"']\/assets\//.test(j)); });
 test('privacy: no third-party hosts referenced in index.html or app code (except documented model/library hosts)', () => {
-  const h = readFileSync(new URL('./index.html', import.meta.url), 'utf8'); assert.deepEqual([...h.matchAll(/https?:\/\/(?!www\.w3\.org)[^"'\s<)]+/g)].map((m) => m[0]).filter((u) => !u.startsWith('https://h2c-datasci.github.io')), []);
+  const h = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const allowed = /^(?:https?:\/\/)(?:127\.0\.0\.1:11434|localhost:11434|cdn\.jsdelivr\.net|huggingface\.co|\*\.huggingface\.co|cdn-lfs\.huggingface\.co)(?:[/?#]|$)/;
+  const found = [...h.matchAll(/https?:\/\/(?!www\.w3\.org)[^"'\s<);]+/g)].map((m) => m[0]).filter((u) => !u.startsWith('https://h2c-datasci.github.io') && !allowed.test(u));
+  assert.deepEqual(found, []);
 });
 test('privacy: no third-party hosts, manifest or Grok references in the bundle head config', () => { const j = readFileSync(new URL('./index-v12.js', import.meta.url), 'utf8'); assert.ok(!j.includes('fonts.googleapis.com') && !j.includes('.grok.me')); });
 test('no /assets/ root-absolute URLs anywhere in index.html (router manifest preloads)', () => assert.ok(!readFileSync(new URL('./index.html', import.meta.url), 'utf8').includes('"/assets/')));

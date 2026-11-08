@@ -626,6 +626,75 @@ export function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+function clearNode(el) {
+  if (!el) return;
+  if (typeof el.replaceChildren === 'function') {
+    el.replaceChildren();
+    return;
+  }
+  if (Array.isArray(el.children)) {
+    el.children.slice().forEach((child) => child.remove?.());
+    el.children.length = 0;
+  }
+}
+
+/** Sanitized DOM fill. Drops scripts and inline event handlers. */
+function adoptSafe(parent, html) {
+  clearNode(parent);
+  const source = String(html ?? '');
+  if (typeof DOMParser === 'function') {
+    const doc = new DOMParser().parseFromString('<div id="h2c-safe-root">' + source + '</div>', 'text/html');
+    const clean = (node) => {
+      if (!node || node.nodeType !== 1) return;
+      const tag = node.tagName;
+      if (tag === 'SCRIPT' || tag === 'OBJECT' || tag === 'EMBED' || tag === 'LINK' || tag === 'META') {
+        node.remove();
+        return;
+      }
+      [...node.attributes].forEach((attr) => {
+        const name = attr.name.toLowerCase();
+        if (name.startsWith('on') || name === 'srcdoc') node.removeAttribute(attr.name);
+        if ((name === 'href' || name === 'src' || name === 'xlink:href') && /^\s*javascript:/i.test(attr.value)) node.removeAttribute(attr.name);
+      });
+      [...node.children].forEach(clean);
+    };
+    const root = doc.getElementById('h2c-safe-root') || doc.body;
+    [...root.children].forEach(clean);
+    while (root.firstChild) parent.append(root.firstChild);
+    return;
+  }
+  const tags = [...source.matchAll(/<([a-z0-9]+)\b([^>]*)>/gi)];
+  for (const tag of tags) {
+    const attrs = tag[2] || '';
+    const classMatch = attrs.match(/class="([^"]*)"/);
+    const idMatch = attrs.match(/id="([^"]*)"/);
+    if (!classMatch && !idMatch) continue;
+    const el = document.createElement(tag[1]);
+    if (classMatch) el.className = classMatch[1];
+    if (idMatch) el.setAttribute('id', idMatch[1]);
+    const dataStep = attrs.match(/data-step="([^"]*)"/);
+    const dataTarget = attrs.match(/data-target="([^"]*)"/);
+    if (dataStep) el.setAttribute('data-step', dataStep[1]);
+    if (dataTarget) el.setAttribute('data-target', dataTarget[1]);
+    parent.append(el);
+  }
+}
+
+function whenHydrated(run) {
+  const start = Date.now();
+  const tick = () => {
+    const tsr = globalThis.$_TSR;
+    if (tsr && !tsr.hydrated && Date.now() - start < 4000) {
+      setTimeout(tick, 40);
+      return;
+    }
+    run();
+  };
+  if (typeof document === 'undefined') return;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tick, { once: true });
+  else tick();
+}
+
 export function sanitizeVideoId(id, fallback = '') {
   if (typeof id === 'string') {
     const trimmed = id.trim();
@@ -1433,7 +1502,7 @@ export function openVideoDrawer(targetStep = null) {
   // Header
   const head = document.createElement('div');
   head.className = 'h2cv-head';
-  head.innerHTML = `
+  adoptSafe(head, `
     <div class="h2cv-head-title">
       <div class="h2cv-head-icon" aria-hidden="true">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
@@ -1450,14 +1519,14 @@ export function openVideoDrawer(targetStep = null) {
       </a>
       <button type="button" class="h2cv-x" aria-label="Close video training drawer">Close ✕</button>
     </div>
-  `;
+  `);
   const closeBtn = head.querySelector('.h2cv-x');
   closeBtn.onclick = closeVideoDrawer;
 
   // Sync & Status Bar
   const syncBar = document.createElement('div');
   syncBar.className = 'h2cv-sync-bar';
-  syncBar.innerHTML = `
+  adoptSafe(syncBar, `
     <div class="h2cv-sync-status">
       <span class="h2cv-sync-status-icon">✓</span>
       <span>Live Official YouTube Durations Active (v16)</span>
@@ -1472,7 +1541,7 @@ export function openVideoDrawer(targetStep = null) {
         <span>Channel</span> ↗
       </a>
     </div>
-  `;
+  `);
 
   function showSyncToast(message) {
     const existing = panel.querySelector('.h2cv-sync-toast');
@@ -1480,7 +1549,7 @@ export function openVideoDrawer(targetStep = null) {
     const toast = document.createElement('div');
     toast.className = 'h2cv-sync-toast';
     toast.setAttribute('role', 'status');
-    toast.innerHTML = `<span style="color: #34d399;">✓</span> <span>${message}</span>`;
+    adoptSafe(toast, `<span style="color: #34d399;">✓</span> <span>${message}</span>`);
     panel.appendChild(toast);
     setTimeout(() => toast.remove(), 2600);
   }
@@ -1520,7 +1589,7 @@ export function openVideoDrawer(targetStep = null) {
   body.className = 'h2cv-body';
 
   function renderCards(filterNum = null) {
-    body.innerHTML = '';
+    clearNode(body);
     const stored = getStoredVideos();
     const list = filterNum ? VIDEO_MODULES.filter(m => m.step === filterNum) : VIDEO_MODULES;
 
@@ -1542,7 +1611,7 @@ export function openVideoDrawer(targetStep = null) {
         7: '🎯 Jump to Tracking & Reports &rarr;'
       };
 
-      card.innerHTML = `
+      adoptSafe(card, `
         <div class="h2cv-card-header">
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <span class="h2cv-step-pill">${mod.episode}</span>
@@ -1652,7 +1721,7 @@ export function openVideoDrawer(targetStep = null) {
             </button>
           </div>
         </div>
-      `;
+      `);
 
       // Copy YouTube Description handler
       const copyBtn = card.querySelector('.h2cv-copy-desc-btn');
@@ -1661,10 +1730,10 @@ export function openVideoDrawer(targetStep = null) {
           try {
             await navigator.clipboard.writeText(mod.fullDescription);
             copyBtn.classList.add('copied');
-            copyBtn.innerHTML = '✓ Copied to Clipboard!';
+            copyBtn.textContent = '✓ Copied to Clipboard!';
             setTimeout(() => {
               copyBtn.classList.remove('copied');
-              copyBtn.innerHTML = '📋 Copy Full YouTube Description';
+              copyBtn.textContent = '📋 Copy Full YouTube Description';
             }, 2500);
           } catch {
             const ta = document.createElement('textarea');
@@ -1674,10 +1743,10 @@ export function openVideoDrawer(targetStep = null) {
             document.execCommand('copy');
             ta.remove();
             copyBtn.classList.add('copied');
-            copyBtn.innerHTML = '✓ Copied to Clipboard!';
+            copyBtn.textContent = '✓ Copied to Clipboard!';
             setTimeout(() => {
               copyBtn.classList.remove('copied');
-              copyBtn.innerHTML = '📋 Copy Full YouTube Description';
+              copyBtn.textContent = '📋 Copy Full YouTube Description';
             }, 2500);
           }
         };
@@ -1691,7 +1760,7 @@ export function openVideoDrawer(targetStep = null) {
         const currentId = getStoredVideos()[mod.step] || mod.defaultYtId;
         const safeId = encodeURIComponent(sanitizeVideoId(currentId, mod.defaultYtId));
         const safeTitle = escapeHtml(mod.title);
-        box.innerHTML = `
+        adoptSafe(box, `
           <iframe 
             src="https://www.youtube-nocookie.com/embed/${safeId}?autoplay=1&rel=0&modestbranding=1" 
             title="${safeTitle}" 
@@ -1700,7 +1769,7 @@ export function openVideoDrawer(targetStep = null) {
             allowfullscreen
             loading="lazy">
           </iframe>
-        `;
+        `);
       };
       screen.onclick = startPlayback;
       screen.onkeydown = (e) => {
@@ -1770,7 +1839,7 @@ export function openVideoDrawer(targetStep = null) {
   // Footer
   const foot = document.createElement('div');
   foot.className = 'h2cv-foot';
-  foot.innerHTML = `
+  adoptSafe(foot, `
     <div style="display: flex; align-items: center; gap: 6px;">
       <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
       <span>7 Video Modules • Apollo RCA &amp; RealityCharting Academy</span>
@@ -1785,7 +1854,7 @@ export function openVideoDrawer(targetStep = null) {
         Official RealityCharting&reg; ↗
       </a>
     </div>
-  `;
+  `);
 
   panel.append(head, syncBar, tabs, body, foot);
   document.body.append(back, panel);
@@ -1822,10 +1891,10 @@ export function mountVideoButtons() {
     fab.className = 'no-print h2cv-fab';
     fab.type = 'button';
     fab.setAttribute('aria-label', 'Open 7-Step Methodology Training Videos');
-    fab.innerHTML = `
+    adoptSafe(fab, `
       <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
       <span>▶ 7 Videos</span>
-    `;
+    `);
     fab.onclick = () => openVideoDrawer();
     document.body.append(fab);
   }
@@ -1838,10 +1907,10 @@ export function mountVideoButtons() {
     tbBtn.className = 'no-print h2cv-tb';
     tbBtn.type = 'button';
     tbBtn.setAttribute('aria-label', 'Open 7-Step Methodology Training Videos');
-    tbBtn.innerHTML = `
+    adoptSafe(tbBtn, `
       <svg width="16" height="16" viewBox="0 0 24 24" fill="#dc2626" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
       <span>▶ 7 Videos (Training)</span>
-    `;
+    `);
     tbBtn.onclick = () => openVideoDrawer();
     helpBtn.parentNode.insertBefore(tbBtn, helpBtn.nextSibling);
   }
@@ -1862,9 +1931,5 @@ export function initVideos() {
 
 // Auto-run if loaded
 if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => setTimeout(initVideos, 60));
-} else {
-  setTimeout(initVideos, 60);
-}
+  whenHydrated(() => setTimeout(initVideos, 60));
 }

@@ -1,6 +1,6 @@
-import { KB, KB_VERSION } from './help-kb.js?v=21';
-import { DIAGRAMS, DIAGRAM_FOR } from './help-diagrams.js?v=21';
-import './h2c-videos.js?v=21';
+import { KB, KB_VERSION } from './help-kb.js?v=22';
+import { DIAGRAMS, DIAGRAM_FOR } from './help-diagrams.js?v=22';
+import './h2c-videos.js?v=22';
 const SITE = 'https://www.haroldhenrycabanilla.com';
 const css = document.createElement('style');
 css.textContent = `
@@ -61,7 +61,10 @@ function open() {
     type: 'button',
     style: 'margin: 6px 14px 4px; padding: 8px 12px; background: linear-gradient(180deg, #fff5f5, #fee2e2); border: 1.5px solid #ef4444; border-radius: 8px; color: #b91c1c; font: 700 12.5px system-ui; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; width: calc(100% - 28px);'
   });
-  vidBanner.innerHTML = '<span>📺 <strong>Watch 7-Step Training Videos</strong></span><span style="font-size: 11px; background: #dc2626; color: #fff; padding: 2px 8px; border-radius: 4px;">▶ Open Videos</span>';
+  const vidLabel = el('span');
+  vidLabel.append(el('strong', { textContent: 'Watch 7-Step Training Videos' }));
+  const vidBadge = el('span', { textContent: 'Open Videos', style: 'font-size: 11px; background: #dc2626; color: #fff; padding: 2px 8px; border-radius: 4px;' });
+  vidBanner.append(vidLabel, vidBadge);
   vidBanner.onclick = () => { close(); window.h2cOpenVideoDrawer?.(); };
   panel.append(head, vidBanner, s, body, dev); document.body.append(back, panel); s.focus();
   const show = (a) => { body.replaceChildren(); const back2 = el('button', { className: 'h2ch-item', type: 'button', textContent: '← All topics' }); back2.onclick = () => list(s.value); body.append(back2, el('div', { className: 'h2ch-art' }, el('div', { className: 'h2ch-cat', textContent: a.cat }), el('h3', { textContent: a.title }), ...(DIAGRAMS[DIAGRAM_FOR[a.id]] ? [DIAGRAMS[DIAGRAM_FOR[a.id]]()] : []), el('p', { textContent: a.body }))); back2.focus(); };
@@ -78,20 +81,35 @@ function mount() { if (!document.body) return; if (!fab || !fab.isConnected) { f
 // Toolbar Help button next to New analysis (reuses its styling), alongside the floating button.
 function toolbar() { const nb = [...document.querySelectorAll('button')].find((b) => /^\s*New analysis\s*$/.test(b.textContent)); if (!nb || document.querySelector('.h2ch-tb')) return; const b = nb.cloneNode(false); b.className = nb.className.replace('h2c-new-prominent', '') + ' h2ch-tb'; b.type = 'button'; b.textContent = '? Help'; b.setAttribute('aria-label', 'Open help and knowledge base'); b.onclick = open; nb.parentNode.insertBefore(b, nb); }
 
+function whenHydrated(run) {
+  const start = Date.now();
+  const tick = () => {
+    const tsr = globalThis.$_TSR;
+    if (tsr && !tsr.hydrated && Date.now() - start < 4000) {
+      setTimeout(tick, 40);
+      return;
+    }
+    run();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tick, { once: true });
+  else tick();
+}
+
+let helpObserver = 0;
 function init() {
   if (!document.head.contains(css)) document.head.append(css);
   mount();
   toolbar();
-  if (document.body) {
+  if (document.body && !document.body.dataset.h2cHelpWatch) {
+    document.body.dataset.h2cHelpWatch = '1';
     new MutationObserver(() => {
-      if (!fab?.isConnected || !document.querySelector('.h2c-devfoot')) mount();
-      toolbar();
+      clearTimeout(helpObserver);
+      helpObserver = setTimeout(() => {
+        if (!fab?.isConnected || !document.querySelector('.h2c-devfoot')) mount();
+        toolbar();
+      }, 80);
     }).observe(document.body, { childList: true, subtree: true });
   }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => setTimeout(init, 50));
-} else {
-  setTimeout(init, 50);
-}
+whenHydrated(() => setTimeout(init, 50));

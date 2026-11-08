@@ -1,0 +1,12 @@
+{
+  "name": "H2C Root Cause Analyst",
+  "short_name": "H2C RCA",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffdf8",
+  "theme_color": "#047857",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

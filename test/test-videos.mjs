@@ -770,13 +770,13 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.ok(!desc.includes('Duration: 22:02'), 'YOUTUBE_DESCRIPTIONS.md must not contain 22:02');
     });
 
-    it('Cache busting query parameters (v=21) are synchronized across index.html and h2c-help.js', () => {
+    it('Cache busting query parameters (v=22) are synchronized across index.html and h2c-help.js', () => {
       const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-      assert.ok(indexHtml.includes('/apollo-rca/h2c-shell.js?v=21'), 'index.html must load h2c-shell.js?v=21');
-      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=21'), 'index.html must load h2c-help.js?v=21');
+      assert.ok(indexHtml.includes('/apollo-rca/h2c-shell.js?v=22'), 'index.html must load h2c-shell.js?v=22');
+      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=22'), 'index.html must load h2c-help.js?v=22');
 
       const helpJs = readFileSync(new URL('../h2c-help.js', import.meta.url), 'utf8');
-      assert.ok(helpJs.includes("./h2c-videos.js?v=21'"), 'h2c-help.js must import h2c-videos.js?v=21');
+      assert.ok(helpJs.includes("./h2c-videos.js?v=22'"), 'h2c-help.js must import h2c-videos.js?v=22');
     });
 
     it('Episode tier descriptors and glowing badge formatting match 10x UX specifications', () => {
