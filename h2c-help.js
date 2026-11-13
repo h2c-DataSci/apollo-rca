@@ -78,10 +78,7 @@ function open() {
   panel.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); if (e.key === 'Tab') { const f = [...panel.querySelectorAll('button,input,a')]; const i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f.at(-1).focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } } });
 }
 
-function mount() { if (!document.body) return; if (!fab || !fab.isConnected) { fab = el('button', { className: 'h2ch-fab', type: 'button', textContent: '? Help' }); fab.setAttribute('aria-label', 'Open help and knowledge base'); fab.onclick = open; document.body.append(fab); } ensureFoot(); }
-
-// Toolbar Help button next to New analysis (reuses its styling), alongside the floating button.
-function toolbar() { const nb = [...document.querySelectorAll('button')].find((b) => /^\s*New analysis\s*$/.test(b.textContent)); if (!nb || document.querySelector('.h2ch-tb')) return; const b = nb.cloneNode(false); b.className = nb.className.replace('h2c-new-prominent', '') + ' h2ch-tb'; b.type = 'button'; b.textContent = '? Help'; b.setAttribute('aria-label', 'Open help and knowledge base'); b.onclick = open; nb.parentNode.insertBefore(b, nb); }
+function mount() { if (!document.body) return; document.querySelectorAll('.h2ch-tb').forEach((button) => button.remove()); if (!fab || !fab.isConnected) { fab = el('button', { className: 'h2ch-fab', type: 'button', textContent: '? Help' }); fab.setAttribute('aria-label', 'Open help and knowledge base'); fab.onclick = open; document.body.append(fab); } ensureFoot(); }
 
 function whenHydrated(run) {
   const start = Date.now();
@@ -101,14 +98,12 @@ let helpObserver = 0;
 function init() {
   if (!document.head.contains(css)) document.head.append(css);
   mount();
-  toolbar();
   if (document.body && !document.body.dataset.h2cHelpWatch) {
     document.body.dataset.h2cHelpWatch = '1';
     new MutationObserver(() => {
       clearTimeout(helpObserver);
       helpObserver = setTimeout(() => {
         if (!fab?.isConnected || !document.querySelector('.h2c-devfoot')) mount();
-        toolbar();
       }, 80);
     }).observe(document.body, { childList: true, subtree: true });
   }

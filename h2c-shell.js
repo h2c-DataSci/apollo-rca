@@ -804,9 +804,9 @@ function updateTopAttributionRibbon() {
 }
 
 function mountLegalToolbarBtn() {
-  const anchor = document.querySelector('.h2cv-tb') || document.querySelector('.h2ch-tb') || 
-    [...document.querySelectorAll('button')].find(b => /^\s*\?\s*Help\s*$/.test(b.textContent));
-  if (anchor && anchor.parentNode && !document.querySelector('.h2c-tb-legal')) {
+  if (document.querySelector('.h2c-tb-legal')) return;
+  const anchor = [...document.querySelectorAll('button')].find((b) => /^\s*New analysis\s*$/.test(b.textContent));
+  if (!anchor?.parentNode) return;
     const tb = document.createElement('button');
     tb.className = 'no-print h2c-tb-legal';
     tb.type = 'button';
@@ -816,8 +816,7 @@ function mountLegalToolbarBtn() {
       <span>⚖️ Legal &amp; Trademarks</span>
     `);
     tb.onclick = scrollToLegal;
-    anchor.parentNode.insertBefore(tb, anchor.nextSibling);
-  }
+    anchor.parentNode.insertBefore(tb, anchor);
 }
 
 function ensureBottomLegalShowcase() {
