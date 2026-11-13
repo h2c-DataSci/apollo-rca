@@ -88,7 +88,7 @@ There is no `local-bridge.js` or `ai-coach.js`. Those names in older notes are w
 
 ## Training videos
 
-Official series on [@h2c_Learnings](https://www.youtube.com/@h2c_Learnings). Lengths below are the player durations checked on 2026-11-09. Sync Official Durations refreshes them from YouTube.
+Official series on [@h2c_Learnings](https://www.youtube.com/@h2c_Learnings). Open them from the floating **7 Videos** button. The toolbar copy and the step-card Video Tutorial buttons are not shown. Lengths below are the player durations checked on 2026-11-09. Sync Official Durations refreshes them from YouTube.
 
 | Ep | Duration | Video |
 |---|---|---|

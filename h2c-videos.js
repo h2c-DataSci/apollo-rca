@@ -1972,6 +1972,7 @@ export function openVideoDrawer(targetStep = null) {
 
 export function mountVideoButtons() {
   if (!document.body) return;
+  document.querySelectorAll('.h2cv-tb').forEach((button) => button.remove());
 
   // 1. Floating FAB (above ? Help)
   if (!fab || !fab.isConnected) {
@@ -1985,22 +1986,6 @@ export function mountVideoButtons() {
     `);
     fab.onclick = () => openVideoDrawer();
     document.body.append(fab);
-  }
-
-  // 2. Toolbar Button next to ? Help
-  const helpBtn = document.querySelector('.h2ch-tb') || 
-    [...document.querySelectorAll('button')].find(b => /^\s*\?\s*Help\s*$/.test(b.textContent));
-  if (helpBtn && !document.querySelector('.h2cv-tb')) {
-    const tbBtn = document.createElement('button');
-    tbBtn.className = 'no-print h2cv-tb';
-    tbBtn.type = 'button';
-    tbBtn.setAttribute('aria-label', 'Open 7-Step Methodology Training Videos');
-    adoptSafe(tbBtn, `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="#dc2626" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
-      <span>▶ 7 Videos (Training)</span>
-    `);
-    tbBtn.onclick = () => openVideoDrawer();
-    helpBtn.parentNode.insertBefore(tbBtn, helpBtn.nextSibling);
   }
 }
 

@@ -65,7 +65,7 @@ The interactive 7-Step Workflow Navigator at the top tracks your investigation p
 
 ## 3. Official 7-Episode Training Series & Lesson Plan (Thinking in Causes)
 
-Click the `▶ 7 Videos (Training)` button in the top toolbar to access the official video curriculum aligned with the **Thinking in Causes (v3)** lesson plan on Dean L. Gano's *RealityCharting®* (2011) and *Apollo Root Cause Analysis* (2003):
+Click the floating `▶ 7 Videos` button to access the official video curriculum aligned with the **Thinking in Causes (v3)** lesson plan on Dean L. Gano's *RealityCharting®* (2011) and *Apollo Root Cause Analysis* (2003):
 
 - **Episode 1 of 7** (⏱ **55:50**): [Introduction & Fundamentals of Apollo Root Cause Analysis (The Root Cause Myth)](https://youtu.be/IXXgr85wO74)
   - *Lesson Alignment:* **PART 1: Foundations** (RC Intro & Chs. 1–3, pp. 13–69; AR Chs. 1–2, Appendix)

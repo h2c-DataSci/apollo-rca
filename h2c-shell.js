@@ -1050,7 +1050,7 @@ function updateStepsHub() {
   const overallClass = st.pct >= 70 ? 'h2c-pill-high' : st.pct > 0 ? 'h2c-pill-med' : 'h2c-pill-low';
 
   const sig = steps.map((s) => `${s.num}:${s.status}:${s.isReady ? 1 : 0}`).join('|');
-  if (hub.dataset.sig === sig && hub.querySelector('.h2c-step-card')) return;
+  if (hub.dataset.sig === sig && hub.querySelector('.h2c-step-card') && !hub.querySelector('.h2c-step-vid-btn')) return;
   hub.dataset.sig = sig;
 
   setSafeHtml(hub, `
@@ -1085,20 +1085,8 @@ function updateStepsHub() {
       </div>
       <div class="h2c-step-name">${s.name}</div>
       <div class="h2c-step-sub">${s.sub}</div>
-      <div class="h2c-step-bot" style="margin-top: 6px; padding-top: 4px; border-top: 1px dashed rgba(0,0,0,0.08);">
-        <button type="button" class="h2c-step-vid-btn" title="Watch Step ${s.num} Video Tutorial" style="width: 100%; font-size: 10.5px; font-weight: 700; color: #b91c1c; background: #fff5f5; border: 1px solid #fca5a5; border-radius: 5px; padding: 3px 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease;">
-          ▶ Video Tutorial
-        </button>
-      </div>
     `);
-    card.onclick = (e) => {
-      if (e.target.closest && e.target.closest('.h2c-step-vid-btn')) {
-        e.stopPropagation();
-        window.h2cOpenVideoDrawer?.(s.num);
-        return;
-      }
-      s.action();
-    };
+    card.onclick = () => s.action();
     card.onkeydown = (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();

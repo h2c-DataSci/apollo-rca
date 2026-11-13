@@ -713,8 +713,7 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
       assert.strictEqual(mockDoc.querySelector('.h2cv-panel'), null, 'Panel must close on Escape key');
     });
 
-    it('mountVideoButtons creates both floating FAB and toolbar button without duplicates', () => {
-      // Create mock help button to anchor toolbar button
+    it('mountVideoButtons creates one floating FAB and no toolbar duplicate', () => {
       const helpBtn = new MockElement('button');
       helpBtn.className = 'h2ch-tb';
       helpBtn.textContent = '? Help';
@@ -722,16 +721,13 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
 
       mountVideoButtons();
       const fab1 = mockDoc.querySelector('.h2cv-fab');
-      const tb1 = mockDoc.querySelector('.h2cv-tb');
       assert.ok(fab1, 'Floating FAB must be mounted');
-      assert.ok(tb1, 'Toolbar button must be mounted');
+      assert.strictEqual(mockDoc.querySelector('.h2cv-tb'), null, 'Toolbar video button must stay removed');
 
-      // Call again to verify idempotent mount
       mountVideoButtons();
       const fabs = mockDoc.querySelectorAll('.h2cv-fab');
-      const tbs = mockDoc.querySelectorAll('.h2cv-tb');
       assert.strictEqual(fabs.length, 1, 'Duplicate FABs must not be injected');
-      assert.strictEqual(tbs.length, 1, 'Duplicate toolbar buttons must not be injected');
+      assert.strictEqual(mockDoc.querySelectorAll('.h2cv-tb').length, 0, 'Toolbar video button must not be re-injected');
     });
   });
 
@@ -772,11 +768,11 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
 
     it('Cache busting query parameters (v=22) are synchronized across index.html and h2c-help.js', () => {
       const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-      assert.ok(indexHtml.includes('/apollo-rca/h2c-shell.js?v=23'), 'index.html must load h2c-shell.js?v=23');
-      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=24'), 'index.html must load h2c-help.js?v=24');
+      assert.ok(indexHtml.includes('/apollo-rca/h2c-shell.js?v=24'), 'index.html must load h2c-shell.js?v=24');
+      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=25'), 'index.html must load h2c-help.js?v=25');
 
       const helpJs = readFileSync(new URL('../h2c-help.js', import.meta.url), 'utf8');
-      assert.ok(helpJs.includes("./h2c-videos.js?v=24'"), 'h2c-help.js must import h2c-videos.js?v=24');
+      assert.ok(helpJs.includes("./h2c-videos.js?v=25'"), 'h2c-help.js must import h2c-videos.js?v=25');
     });
 
     it('Episode tier descriptors and glowing badge formatting match 10x UX specifications', () => {
