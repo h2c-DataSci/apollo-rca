@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-13 | help | Removed the toolbar `? Help` button. The floating `? Help` button is the only Help control. |
+| 2026-11-13 | `25e69f7` | Removed the toolbar `? Help` button. The floating `? Help` button is the only Help control. |
 | 2026-11-13 | `186479a` | Removed the redundant toolbar `7 Videos (Training)` button and the step-card `Video Tutorial` buttons. The floating `7 Videos` button remains. |
 | 2026-11-13 | `fd654b4` | Header RCA Coach opens the coach section. The step list stays a child of `main`, so React no longer throws `insertBefore`. Shell cache is `v=23`. Tests 140/140. |
 | 2026-11-08 | `c8a8d94` | Synchronized clone to `origin/main` (`c8a8d94`). Verified full test suite (139/139 PASS across 11 suites). Confirmed HARD RULE: PROGRESS.md updated on every task so we do not get lost; README.md maintained as standard standing context. |
