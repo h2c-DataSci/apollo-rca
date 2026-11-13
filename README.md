@@ -66,7 +66,7 @@ Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/). The live Pages site adds 
 node --test
 ```
 
-On 2026-11-09 the suite was **139 passed, 0 failed** at `651f478`. Node 18, 20, and 22 are the CI matrix (Ubuntu and Windows).
+On 2026-11-13 the suite was **140 passed, 0 failed**. Node 18, 20, and 22 are the CI matrix (Ubuntu and Windows). The accepted baseline remains `b1afdd3`; later commits are fixes on top of it.
 
 ## Files that matter
 
@@ -75,7 +75,7 @@ On 2026-11-09 the suite was **139 passed, 0 failed** at `651f478`. Node 18, 20, 
 | `index.html` | Pages entry, CSP, reserved layout, script hashes |
 | `routes-v13.js` | Chart, coach, report UI (bundled) |
 | `styles-v13.css` | Theme and chart swatches |
-| `h2c-shell.js` | Toolbar, workflow hub, sanitizer, chart-color enforcement |
+| `h2c-shell.js` | Toolbar, workflow hub, sanitizer, chart-color enforcement. The hub does not move React's step list. |
 | `h2c-help.js` | Help drawer, developer credit, Feedback link |
 | `help-kb.js` / `help-diagrams.js` | Knowledge text and original diagrams |
 | `h2c-videos.js` | Seven YouTube episodes. Players load from `youtube-nocookie.com` only after a click. Sync Official Durations reads the player length. |

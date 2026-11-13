@@ -12,7 +12,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Branch | `main`, even with `origin/main` |
 | HEAD | `b1afdd3` — **baseline**. Later commits are changes on top of this tree unless a newer baseline is recorded here. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Tests | `node --test` → 139 passed, 0 failed (11 suites, about 4s) at `651f478` |
+| Tests | `node --test` → 140 passed, 0 failed (11 suites, about 4s). Last full run after the coach fix. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-13 | coach | Header RCA Coach opens the coach section. The step list stays a child of `main`, so React no longer throws `insertBefore`. Shell cache is `v=23`. Tests 140/140. |
 | 2026-11-08 | `c8a8d94` | Synchronized clone to `origin/main` (`c8a8d94`). Verified full test suite (139/139 PASS across 11 suites). Confirmed HARD RULE: PROGRESS.md updated on every task so we do not get lost; README.md maintained as standard standing context. |
 | 2026-11-09 | `b1afdd3` | **Baseline.** This tree is the latest accepted state: docs rule, live duration sync, Episode 6 `Q4-Bu2qUaaE`. Do not roll back past it. |
 | 2026-11-09 | `755af2c` | Hard rule recorded: update PROGRESS.md after every task and README.md when the product description changes. |
@@ -45,7 +46,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
 - Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v24` and `apollo-rca-runtime-v1`.
-- Cache bust: shell `v=22`, help and videos `v=24`, local bridge `v=21`. Bump the query of a file when that file changes.
+- Cache bust: shell `v=23`, help and videos `v=24`, local bridge `v=21`. Bump the query of a file when that file changes.
 - Episode lengths last read from the player: 55:50, 20:22, 07:57, 06:59, 08:19, 07:20, 07:10. Episode 6 id is `Q4-Bu2qUaaE`.
 
 ## Do not

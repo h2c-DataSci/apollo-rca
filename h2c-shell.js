@@ -934,14 +934,17 @@ function updateStepsHub() {
   const existingOl = document.querySelector('ol.grid-cols-2, ol.sm\\:grid-cols-7');
   let hub = document.querySelector('.h2c-workflow-hub');
 
+  // The step list is a React child of <main>. Moving it into the hub makes the
+  // next coach mount call insertBefore on a node that is no longer a child.
+  if (existingOl && hub && hub.contains(existingOl)) hub.after(existingOl);
+
   if (!hub && existingOl && existingOl.parentNode) {
     hub = document.createElement('div');
     hub.className = 'no-print h2c-workflow-hub';
-    existingOl.parentNode.insertBefore(hub, existingOl);
-    hub.append(existingOl);
-    existingOl.hidden = true;
+    existingOl.before(hub);
   }
 
+  if (existingOl) existingOl.hidden = true;
   if (!hub) return;
 
   const st = getAppState();
@@ -1210,8 +1213,6 @@ function placeOfficialCoach() {
 function focusOfficialCoach() {
   placeOfficialCoach();
   const coach = document.querySelector('section[aria-label="RCA coach"]');
-  const headerBtn = [...document.querySelectorAll('header button')].find((b) => /RCA Coach/i.test(b.textContent));
-  if (headerBtn) headerBtn.className = 'inline-flex h-11 items-center gap-2 rounded-md border px-3 text-sm border-ink bg-ink text-on-solid shadow-sm';
   if (!coach) return;
   coach.scrollIntoView({ behavior: 'smooth', block: 'start' });
   coach.classList.add('h2c-coach-focus');
@@ -1222,9 +1223,12 @@ function ensureLocalBridgeUI() {
   const coachSection = document.querySelector('section[aria-label="RCA coach"]');
   if (!coachSection) return;
 
-  let bridge = coachSection.querySelector('.h2c-local-bridge-card');
-  if (!bridge) {
-    const cfg = getBridgeConfig();
+  let bridge = document.querySelector('.h2c-local-bridge-card');
+  if (bridge) {
+    if (coachSection.contains(bridge) || bridge.previousElementSibling !== coachSection) coachSection.after(bridge);
+    return;
+  }
+  const cfg = getBridgeConfig();
     bridge = document.createElement('div');
     bridge.className = 'no-print h2c-local-bridge-card';
     bridge.style.cssText = 'margin-top: 12px; margin-bottom: 12px; background: #fff; border: 1px solid #e7ded0; border-left: 4px solid #c9a227; border-radius: 8px; padding: 12px 14px; font-family: system-ui, sans-serif;';
@@ -1260,9 +1264,8 @@ function ensureLocalBridgeUI() {
       <div class="h2c-bridge-feedback" style="margin-top: 8px; font-size: 11.5px; line-height: 1.4; display: none;"></div>
     `);
 
-    // Insert right after the top description paragraph or before the action buttons
-    const target = coachSection.querySelector('.flex.flex-wrap.gap-2') || coachSection.firstChild;
-    coachSection.insertBefore(bridge, target);
+    // Keep the card beside the coach, not inside it. React owns the section's children.
+    coachSection.after(bridge);
 
     const testBtn = bridge.querySelector('.h2c-bridge-test-btn');
     const endpointInput = bridge.querySelector('.h2c-bridge-endpoint');
@@ -1330,7 +1333,6 @@ function ensureLocalBridgeUI() {
         testBtn.textContent = '⚡ Test Connection';
       }
     };
-  }
 }
 
 function ensureBrowserAiButton() {
@@ -1453,8 +1455,7 @@ document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('button');
   if (!b) return;
   if (b.closest('header') && /RCA Coach/i.test(b.textContent)) {
-    e.preventDefault();
-    focusOfficialCoach();
+    setTimeout(focusOfficialCoach, 80);
     return;
   }
 }, true);

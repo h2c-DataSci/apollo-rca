@@ -11,7 +11,7 @@ const SHELL = [
   './index-v13.js',
   './routes-v13.js',
   './rolldown-runtime-v11.js',
-  './h2c-shell.js?v=22',
+  './h2c-shell.js?v=23',
   './h2c-help.js?v=24',
   './help-kb.js?v=22',
   './help-diagrams.js?v=22',

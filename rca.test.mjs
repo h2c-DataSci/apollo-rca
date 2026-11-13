@@ -119,6 +119,13 @@ test('service worker keeps only this app caches and fails a broken shell install
   assert.match(sw, /RUNTIME_MAX_AGE_MS = 7 \* 24 \* 60 \* 60 \* 1000/);
   assert.match(sw, /RUNTIME_MAX_BYTES = 1500000/);
 });
+test('workflow hub does not reparent the React step list', () => {
+  const shell = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
+  assert.ok(!shell.includes('hub.append(existingOl)'), 'moving the step list breaks coach insertBefore');
+  assert.match(shell, /existingOl\.before\(hub\)/);
+  assert.match(shell, /hub\.contains\(existingOl\)/);
+  assert.match(shell, /coachSection\.after\(bridge\)/);
+});
 test('shell sanitizer drops nested forbidden tags and normalized javascript URLs', () => {
   const shell = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
   const start = shell.indexOf('function normalizedUrl');
