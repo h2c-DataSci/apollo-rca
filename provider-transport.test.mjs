@@ -153,15 +153,12 @@ test('free Groq accepts every model from the console limits list', () => {
   assert.deepEqual(groq.models, [
     'openai/gpt-oss-20b',
     'openai/gpt-oss-120b',
-    'qwen/qwen3.8-27b',
-    'allam-2-7b',
-    'openai/gpt-oss-safeguard-20b',
-    'meta-llama/llama-prompt-guard-2-22m',
-    'meta-llama/llama-prompt-guard-2-86m'
+    'qwen/qwen3.8-27b'
   ]);
   for (const model of groq.models) {
     assert.equal(validateCloudConfig({ mode: 'free', preset: 'groq', endpoint: groq.endpoint, model, cloudConsent: true }), groq.endpoint);
   }
+  assert.throws(() => validateCloudConfig({ mode: 'free', preset: 'groq', endpoint: groq.endpoint, model: 'meta-llama/llama-prompt-guard-2-22m', cloudConsent: true }), /listed free/);
 });
 
 test('free Google AI lists the five text models and does not switch on quota', async () => {
