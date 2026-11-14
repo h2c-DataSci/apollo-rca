@@ -10,7 +10,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `a367cbf` — cloud models no longer hit local Ollama. |
+| HEAD | `a0bc7a9` — one RCA Coach panel. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
 | Tests | `node --test` → 173 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | this commit | One RCA Coach. The connection controls are the top of that panel, not a second coach. The React coach section stays in place. Shell cache is v31. |
+| 2026-11-14 | `a0bc7a9` | One RCA Coach. The connection controls are the top of that panel, not a second coach. The React coach section stays in place. Shell cache is v31. |
 | 2026-11-14 | `a367cbf` | A Groq (or other cloud) selection no longer falls through to local Ollama. The connection card and the longer reviews share one configuration, so `qwen/qwen3.8-27b` is not checked as `qwen3:2b` on port 11434. |
 | 2026-11-14 | `2d65a99` | Removed unused `styles-v11.css` and its identical copy `styles-CjEoaxHy.css`. The live page still uses `styles-v13.css`. Kept `browser-dCISOrnY.js` (report ZIP), `rolldown-runtime-v11.js`, and `es-DawnZXYc.js` because the current bundle loads them. Added the MIT `LICENSE`. Deleted the merged `housekeeping/sri-stale-legacy` branch. Dependabot pull requests were left open. |
 | 2026-11-14 | `1bac0d6` | Groq free-cloud choices now include every chat model from the console limits list: gpt-oss-20b, gpt-oss-120b, qwen/qwen3.8-27b, allam-2-7b, gpt-oss-safeguard-20b, and both Llama Prompt Guard models. The default remains gpt-oss-20b. Reasoning settings stay on the two gpt-oss chat models. Shell cache is v29. |
