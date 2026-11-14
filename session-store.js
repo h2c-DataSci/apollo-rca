@@ -11,7 +11,8 @@ export const sessionStore = {
   }
 };
 
-// No legacy content is read, imported or deleted until a caller explicitly asks.
+// Older browser storage is offered as a recovery download, then removed.
+// The saved API-key record is never copied into that download.
 export const LEGACY_KEYS = Object.freeze([
   'realitychart-intake-v1', 'realitychart-hypotheses-v1',
   'realitychart-raw-notes-v1', 'h2c-coach-notes-v1',
@@ -27,6 +28,17 @@ export function listLegacyData(provided) {
     try { const value = storage?.getItem(key); if (value != null) result[key] = value; } catch {}
   }
   return result;
+}
+export function legacyRecoveryPlan(legacy) {
+  const data = {};
+  let hadSecret = false;
+  let present = false;
+  for (const [key, value] of Object.entries(legacy || {})) {
+    present = true;
+    if (key === 'h2c-local-ai-bridge-v1') { hadSecret = true; continue; }
+    data[key] = value;
+  }
+  return { offer: Object.keys(data).length > 0, data, hadSecret, clear: present };
 }
 export function removeLegacyData(provided) {
   const storage = legacyStorage(provided);
