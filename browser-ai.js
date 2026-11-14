@@ -1,5 +1,5 @@
 import { MODEL_CONFIG } from './ai-config.js';
-import { RECOMMENDED_LOCAL_MODELS } from './local-ai-bridge.js?v=22';
+import { RECOMMENDED_LOCAL_MODELS } from './local-ai-bridge.js?v=23';
 
 export function openBrowserAiDialog() {
   let dialog = document.getElementById('h2c-browser-ai-dialog');

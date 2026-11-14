@@ -248,6 +248,189 @@ function visibleAnswer(payload) {
   return text;
 }
 
+function createVisibleSink(onChunk) {
+  let pending = '';
+  let hidden = false;
+  let out = '';
+  const emit = (piece) => {
+    if (!piece) return;
+    out += piece;
+    if (onChunk) onChunk(piece);
+  };
+  return {
+    push(piece) {
+      pending += String(piece || '');
+      while (pending) {
+        if (hidden) {
+          const end = pending.search(/<\/think>/i);
+          if (end < 0) {
+            pending = pending.slice(-8);
+            return;
+          }
+          pending = pending.slice(end).replace(/^<\/think>/i, '');
+          hidden = false;
+          continue;
+        }
+        const start = pending.search(/<think\b/i);
+        if (start < 0) {
+          const hold = pending.match(/<$|<t$|<th$|<thi$|<thin$|<think$/i);
+          const cut = hold ? hold[0].length : 0;
+          emit(pending.slice(0, pending.length - cut));
+          pending = pending.slice(pending.length - cut);
+          return;
+        }
+        emit(pending.slice(0, start));
+        pending = pending.slice(start);
+        const open = pending.match(/^<think\b[^>]*>/i);
+        if (!open) return;
+        pending = pending.slice(open[0].length);
+        hidden = true;
+      }
+    },
+    finish() {
+      if (!hidden && pending) emit(pending);
+      pending = '';
+      return out.trim();
+    }
+  };
+}
+
+function chunkText(obj) {
+  const message = obj && obj.message || {};
+  const choice = obj && obj.choices && obj.choices[0] || {};
+  const delta = choice.delta || {};
+  if (typeof delta.content === 'string') return delta.content;
+  if (typeof message.content === 'string') return message.content;
+  if (typeof obj.response === 'string') return obj.response;
+  if (choice.message && typeof choice.message.content === 'string') return choice.message.content;
+  return '';
+}
+
+export function collectStreamedAnswer(raw, onChunk) {
+  const text = String(raw ?? '');
+  const sink = createVisibleSink(onChunk);
+  const lines = text.split(/\r?\n/);
+  let mode = '';
+  let error = '';
+  const apply = (obj) => {
+    if (obj && obj.error) error = String(typeof obj.error === 'string' ? obj.error : (obj.error.message || obj.error)).slice(0, 300);
+    const piece = chunkText(obj);
+    if (piece) sink.push(piece);
+  };
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (!mode) mode = trimmed.startsWith('data:') ? 'sse' : 'ndjson';
+    if (mode === 'sse') {
+      if (!trimmed.startsWith('data:')) continue;
+      const payload = trimmed.slice(5).trim();
+      if (!payload || payload === '[DONE]') continue;
+      try { apply(JSON.parse(payload)); } catch { mode = 'json'; break; }
+      continue;
+    }
+    try { apply(JSON.parse(trimmed)); }
+    catch { mode = 'json'; break; }
+  }
+  if (mode === 'json' || !mode) {
+    let obj;
+    try { obj = JSON.parse(text); }
+    catch { throw new Error('The model response could not be read.'); }
+    const answer = visibleAnswer(obj);
+    if (onChunk) onChunk(answer);
+    return answer;
+  }
+  const answer = sink.finish();
+  if (!answer) {
+    if (error) throw new Error(error);
+    throw new Error('The model returned only internal reasoning. Nothing was applied.');
+  }
+  return answer;
+}
+
+let activeGeneration = null;
+
+export function abortActiveGeneration() {
+  if (activeGeneration) activeGeneration.reason = 'cancel';
+  activeGeneration?.ctrl.abort();
+}
+
+function beginGeneration(ms) {
+  const ctrl = new AbortController();
+  const generation = { ctrl, reason: '' };
+  activeGeneration = generation;
+  const timer = setTimeout(() => {
+    generation.reason = 'timeout';
+    ctrl.abort();
+  }, ms);
+  return {
+    signal: ctrl.signal,
+    finish() {
+      clearTimeout(timer);
+      if (activeGeneration === generation) activeGeneration = null;
+    },
+    failure(err, label) {
+      if (err && err.name === 'AbortError') {
+        if (generation.reason === 'cancel') throw new Error('Generation cancelled. Nothing was changed.');
+        throw new Error(`${label} generation timed out after ${Math.round(ms / 1000)}s. Nothing was changed.`);
+      }
+    }
+  };
+}
+
+async function answerFromResponse(res, onChunk) {
+  const reader = res.body && typeof res.body.getReader === 'function' ? res.body.getReader() : null;
+  if (!reader) return collectStreamedAnswer(await res.text(), onChunk);
+  const decoder = new TextDecoder();
+  const sink = createVisibleSink(onChunk);
+  let raw = '';
+  let buf = '';
+  let mode = '';
+  let error = '';
+  let streamed = false;
+  const apply = (obj) => {
+    if (obj && obj.error) error = String(typeof obj.error === 'string' ? obj.error : (obj.error.message || obj.error)).slice(0, 300);
+    const piece = chunkText(obj);
+    if (piece) sink.push(piece);
+  };
+  const take = (line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (!mode) mode = trimmed.startsWith('data:') ? 'sse' : 'ndjson';
+    if (mode === 'json') return;
+    if (mode === 'sse') {
+      if (!trimmed.startsWith('data:')) return;
+      const payload = trimmed.slice(5).trim();
+      if (!payload || payload === '[DONE]') return;
+      try { apply(JSON.parse(payload)); streamed = true; } catch { mode = 'json'; }
+      return;
+    }
+    try { apply(JSON.parse(trimmed)); streamed = true; }
+    catch { mode = 'json'; }
+  };
+  try {
+    while (true) {
+      const step = await reader.read();
+      const chunk = decoder.decode(step.value || new Uint8Array(), { stream: !step.done });
+      raw += chunk;
+      buf += chunk;
+      const lines = buf.split(/\n/);
+      buf = lines.pop() || '';
+      for (const line of lines) take(line);
+      if (step.done) break;
+    }
+  } finally {
+    reader.releaseLock?.();
+  }
+  if (buf) take(buf);
+  if (mode === 'json' || !streamed) return collectStreamedAnswer(raw, onChunk);
+  const answer = sink.finish();
+  if (!answer) {
+    if (error) throw new Error(error);
+    throw new Error('The model returned only internal reasoning. Nothing was applied.');
+  }
+  return answer;
+}
+
 export async function executeLocalChat(messages, options = {}) {
   const cfg = { ...getBridgeConfig(), ...options };
   if (cfg.provider === 'openai') return openAiChat(cfg, messages);
@@ -257,39 +440,46 @@ export async function executeLocalChat(messages, options = {}) {
 async function ollamaChat(cfg, messages) {
   const url = localDaemonUrl(cfg.endpoint);
   const ms = timeoutMs(cfg, 25000);
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), ms);
+  const generation = beginGeneration(ms);
   let res;
   try {
     res = await fetch(`${url}/api/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/x-ndjson' },
       body: JSON.stringify({
         model: cfg.model,
         messages: messages.map((m) => ({ role: m.role || 'user', content: String(m.content || '') })),
-        stream: false,
+        stream: true,
         think: false,
         options: { temperature: cfg.temperature ?? 0.2, num_predict: cfg.numPredict ?? 384 }
       }),
-      signal: ctrl.signal
+      signal: generation.signal
     });
   } catch (err) {
-    clearTimeout(timer);
-    if (err && err.name === 'AbortError') throw new Error(`Local model generation timed out after ${Math.round(ms / 1000)}s. Nothing was changed.`);
+    generation.finish();
+    try { generation.failure(err, 'Local model'); } catch (e) { throw e; }
     throw new Error(unreachableMessage(url, 'ollama'));
   }
-  clearTimeout(timer);
-  if (res.ok) return visibleAnswer(await res.json());
-  const detail = await errorText(res);
-  if (missingModel(detail)) throw new Error(`Model "${cfg.model}" is not installed at ${url}. Nothing was downloaded.`);
-  if (res.status !== 404) throw new Error(`Ollama returned HTTP ${res.status}. ${detail}`);
-  return sameHostOpenAi(url, cfg, messages);
+  if (!res.ok) {
+    generation.finish();
+    const detail = await errorText(res);
+    if (missingModel(detail)) throw new Error(`Model "${cfg.model}" is not installed at ${url}. Nothing was downloaded.`);
+    if (res.status !== 404) throw new Error(`Ollama returned HTTP ${res.status}. ${detail}`);
+    return sameHostOpenAi(url, cfg, messages);
+  }
+  try {
+    return await answerFromResponse(res, cfg.onChunk);
+  } catch (err) {
+    try { generation.failure(err, 'Local model'); } catch (e) { throw e; }
+    throw err;
+  } finally {
+    generation.finish();
+  }
 }
 
 async function sameHostOpenAi(url, cfg, messages) {
   const ms = timeoutMs(cfg, 25000);
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), ms);
+  const generation = beginGeneration(ms);
   try {
     const res = await fetch(`${url}/v1/chat/completions`, {
       method: 'POST',
@@ -297,22 +487,23 @@ async function sameHostOpenAi(url, cfg, messages) {
       body: JSON.stringify({
         model: cfg.model,
         messages: messages.map((m) => ({ role: m.role || 'user', content: String(m.content || '') })),
+        stream: true,
         temperature: cfg.temperature ?? 0.2,
         max_tokens: cfg.numPredict ?? 384
       }),
-      signal: ctrl.signal
+      signal: generation.signal
     });
-    clearTimeout(timer);
     if (!res.ok) {
       const detail = await errorText(res);
       if (missingModel(detail)) throw new Error(`Model "${cfg.model}" is not installed at ${url}. Nothing was downloaded.`);
       throw new Error(`Local server returned HTTP ${res.status}. ${detail}`);
     }
-    return visibleAnswer(await res.json());
+    return await answerFromResponse(res, cfg.onChunk);
   } catch (err) {
-    clearTimeout(timer);
-    if (err && err.name === 'AbortError') throw new Error(`Local model generation timed out after ${Math.round(ms / 1000)}s. Nothing was changed.`);
+    try { generation.failure(err, 'Local model'); } catch (e) { throw e; }
     throw err;
+  } finally {
+    generation.finish();
   }
 }
 
@@ -320,8 +511,7 @@ async function openAiChat(cfg, messages) {
   const url = apiEndpoint(cfg.endpoint);
   if (!isLoopback(url) && !String(cfg.apiKey || '').trim()) throw new Error('Add your API key. This app does not include one.');
   const ms = timeoutMs(cfg, 25000);
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), ms);
+  const generation = beginGeneration(ms);
   const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
   if (cfg.apiKey) headers.Authorization = `Bearer ${cfg.apiKey}`;
   try {
@@ -331,24 +521,25 @@ async function openAiChat(cfg, messages) {
       body: JSON.stringify({
         model: cfg.model,
         messages: messages.map((m) => ({ role: m.role || 'user', content: String(m.content || '') })),
+        stream: true,
         temperature: cfg.temperature ?? 0.2,
         max_tokens: cfg.numPredict ?? 384
       }),
-      signal: ctrl.signal
+      signal: generation.signal
     });
-    clearTimeout(timer);
     if (!res.ok) {
       const detail = await errorText(res);
       if (res.status === 401 || res.status === 403) throw new Error('The API rejected the key. Nothing was sent to another provider.');
       if (missingModel(detail)) throw new Error(`Model "${cfg.model}" is not available at that API. Nothing was downloaded.`);
       throw new Error(`The API returned HTTP ${res.status}. ${detail}`);
     }
-    return visibleAnswer(await res.json());
+    return await answerFromResponse(res, cfg.onChunk);
   } catch (err) {
-    clearTimeout(timer);
-    if (err && err.name === 'AbortError') throw new Error(`API generation timed out after ${Math.round(ms / 1000)}s. Nothing was changed.`);
+    try { generation.failure(err, 'API'); } catch (e) { throw e; }
     if (err instanceof TypeError) throw new Error(unreachableMessage(url, 'openai'));
     throw err;
+  } finally {
+    generation.finish();
   }
 }
 
@@ -371,10 +562,21 @@ export async function prepareConfiguredModel() {
 export async function generateWithConfiguredModel(promptText) {
   const cfg = getBridgeConfig();
   if (cfg.provider === 'browser' || cfg.enabled === false) throw new Error('External AI is off.');
+  let shown = 0;
   return executeLocalChat([
     { role: 'system', content: 'You are an RCA Coach for Apollo-style analysis. Reply with one JSON object only. Do not include a thinking trace.' },
     { role: 'user', content: String(promptText || '') }
-  ], cfg);
+  ], {
+    ...cfg,
+    onChunk(piece) {
+      shown += piece.length;
+      const el = typeof document !== 'undefined' ? document.querySelector('.h2c-bridge-feedback') : null;
+      if (!el) return;
+      el.style.display = 'block';
+      el.style.color = '#065f46';
+      el.textContent = `Receiving answer (${shown} characters). Reasoning is not shown.`;
+    }
+  });
 }
 
 export function installExternalCoach() {
@@ -384,6 +586,7 @@ export function installExternalCoach() {
   };
   globalThis.h2cExternalReady = () => prepareConfiguredModel();
   globalThis.h2cExternalGenerate = (prompt) => generateWithConfiguredModel(prompt);
+  globalThis.h2cExternalAbort = () => abortActiveGeneration();
 }
 
 installExternalCoach();

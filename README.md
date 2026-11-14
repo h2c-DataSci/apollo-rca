@@ -103,6 +103,8 @@ To use another model you already have, type its tag. To use your own API, choose
 
 Startup: leave `OLLAMA_MODELS` as it is, start the Ollama you already installed, open RCA Coach, test the connection, then **Enable assistant**.
 
+Ollama is called with `stream: true`. The reply is newline-delimited JSON. `message.thinking` and `<think>` tags are discarded as they arrive. The coach still waits for the full JSON answer before it offers anything to accept. Cancel aborts the stream.
+
 ## Training videos
 
 Official series on [@h2c_Learnings](https://www.youtube.com/@h2c_Learnings). Open them from the floating **7 Videos** button. Help opens from the floating **? Help** button. The toolbar copies of both were removed. Lengths below are the player durations checked on 2026-11-09. Sync Official Durations refreshes them from YouTube.

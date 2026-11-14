@@ -9,7 +9,8 @@ import {
   testLocalDaemonConnection,
   executeLocalChat,
   pickInstalledQwen,
-  stripModelThinking
+  stripModelThinking,
+  collectStreamedAnswer
 } from './local-ai-bridge.js';
 
 test('local-ai-bridge: refuses a non-local endpoint before any request', async () => {
@@ -192,6 +193,7 @@ test('local-ai-bridge: Apollo example strips thinking and keeps the JSON', async
     assert.equal(reply, '{"summary":"Oil Released","proposedText":"Oil Released"}');
     assert.equal(body.model, 'qwen3:2b');
     assert.equal(body.think, false);
+    assert.equal(body.stream, true);
     assert.match(body.messages[1].content, /Oil Released/);
     assert.ok(!reply.includes('do not show'));
   } finally {
@@ -218,4 +220,40 @@ test('bring-your-own API requires a key and does not call another host', async (
     server.close();
   }
 });
+
+test('Ollama NDJSON stream keeps the answer and drops thinking as chunks arrive', async () => {
+  const pieces = [];
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'application/x-ndjson' });
+    res.write(JSON.stringify({ message: { role: 'assistant', thinking: 'hidden chain', content: '' }, done: false }) + '\n');
+    res.write(JSON.stringify({ message: { role: 'assistant', content: '<think>nope</think>{"summary":' }, done: false }) + '\n');
+    setTimeout(() => {
+      res.end(JSON.stringify({ message: { role: 'assistant', content: '"Oil Released"}' }, done: true, done_reason: 'stop' }) + '\n');
+    }, 40);
+  });
+  await new Promise((r) => server.listen(18894, '127.0.0.1', r));
+  try {
+    const pending = executeLocalChat([{ role: 'user', content: 'Review: Oil Released' }], {
+      endpoint: 'http://127.0.0.1:18894', model: 'qwen3:2b', provider: 'ollama', onChunk: (piece) => pieces.push(piece)
+    });
+    await new Promise((r) => setTimeout(r, 15));
+    assert.match(pieces.join(''), /summary/);
+    assert.equal(pieces.join('').includes('hidden'), false);
+    assert.equal(pieces.join('').includes('nope'), false);
+    assert.equal(await pending, '{"summary":"Oil Released"}');
+  } finally {
+    server.close();
+  }
+});
+
+test('collectStreamedAnswer reads OpenAI SSE and ignores the done marker', () => {
+  const raw = [
+    'data: {"choices":[{"delta":{"reasoning_content":"secret","content":""}}]}',
+    'data: {"choices":[{"delta":{"content":"{\\"summary\\":\\"Oil Released\\"}"}}]}',
+    'data: [DONE]',
+    ''
+  ].join('\n');
+  assert.equal(collectStreamedAnswer(raw), '{"summary":"Oil Released"}');
+});
+
 

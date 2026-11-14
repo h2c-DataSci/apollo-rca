@@ -82,7 +82,7 @@ test('cache quota failures do not replace a successful network response', async 
 
 test('offline fetch falls back to the shell cache without a rejected lifetime promise', async () => {
   const h = harness();
-  await h.cacheFor('apollo-rca-shell-v25').put(BASE + 'asset.js', new Response('offline copy'));
+  await h.cacheFor('apollo-rca-shell-v26').put(BASE + 'asset.js', new Response('offline copy'));
   const e = h.event(new Request(BASE + 'asset.js'));
   h.listeners.get('fetch')(e.value);
   assert.equal(await (await e.response()).text(), 'offline copy');
@@ -148,11 +148,11 @@ test('failed essential precache prevents skipWaiting', async () => {
 
 test('activation only deletes this app old caches', async () => {
   const h = harness();
-  for (const name of ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'heat-index-shell-v2', 'model-cache']) h.cacheFor(name);
+  for (const name of ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25', 'heat-index-shell-v2', 'model-cache']) h.cacheFor(name);
   const e = h.event();
   h.listeners.get('activate')(e.value);
   await Promise.all(e.waits);
-  assert.deepEqual(h.deleted, ['apollo-rca-shell-v23', 'apollo-rca-shell-v24']);
+  assert.deepEqual(h.deleted, ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25']);
 });
 
 test('non-GET and cross-origin requests remain untouched', () => {

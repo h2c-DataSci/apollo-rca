@@ -12,7 +12,7 @@ function escapeHtml(str) {
 // interactive lively 7-step Apollo RCA workflow hub, real-time color-coded validation,
 // and local AI daemon bridge for low-resource hardware.
 
-import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=22';
+import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=23';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
@@ -1353,7 +1353,7 @@ function ensureBrowserAiButton() {
   btn.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    import('./browser-ai.js?v=23').then((mod) => mod.openBrowserAiDialog()).catch(() => {});
+    import('./browser-ai.js?v=24').then((mod) => mod.openBrowserAiDialog()).catch(() => {});
   });
   anchor.insertAdjacentElement('afterend', btn);
 }
