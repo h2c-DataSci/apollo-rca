@@ -10,7 +10,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `95c2206` — solution matrix is included in reviews. |
+| HEAD | `fd4b826` — full report audit added. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
 | Tests | `node --test` → 175 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | this commit | Added Audit full report. One connected-model pass checks problem definition, executive summary, the cause chart, the solution matrix, the corrective-action log, and the action items. It does not edit the report. Shell cache is v33. |
+| 2026-11-14 | `fd4b826` | Added Audit full report. One connected-model pass checks problem definition, executive summary, the cause chart, the solution matrix, the corrective-action log, and the action items. It does not edit the report. Shell cache is v33. |
 | 2026-11-14 | `95c2206` | Screen solutions now reads the filled Solution challenge matrix from the report, so a completed matrix is not described as having no proposed actions. |
 | 2026-11-14 | `a0bc7a9` | One RCA Coach. The connection controls are the top of that panel, not a second coach. The React coach section stays in place. |
 | 2026-11-14 | `a367cbf` | A Groq (or other cloud) selection no longer falls through to local Ollama. The connection card and the longer reviews share one configuration, so `qwen/qwen3.8-27b` is not checked as `qwen3:2b` on port 11434. |
