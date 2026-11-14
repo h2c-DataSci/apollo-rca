@@ -4,11 +4,23 @@
 
 Work in `D:\ApolloRCA_webapp`, the clone of https://github.com/h2c-DataSci/apollo-rca. Read README.md for product context and PROGRESS.md for the latest handoff. Preserve Standard Mode, investigator approval of AI suggestions, local-only Ollama, and the existing privacy rules.
 
+## Chart color standard
+
+The app's current chart colors are official. Every chart shows this five-color legend:
+
+- Primary effect: black `#111827` with white text
+- Action cause: red `#dc2626`, drawn as a rectangle
+- Condition cause: green `#16a34a`
+- STOP (stopping reason): red `#d32f2f` with white text, drawn as an octagon labeled STOP, with the reason under the node
+- Unknown `?`: yellow `#fbc02d` with black text and the label Need More Info
+
+Action rectangles and STOP octagons are both red; tell them apart by shape and the STOP label. Do not paint STOP or `?` grey.
+
 ## Using RCA Coach
 
 1. Open the one RCA Coach panel. The connection controls are at the top of that panel.
-2. Choose Local AI, Free cloud, or Paid cloud. Start with Free cloud if you are authorized to share the case with that provider.
-3. For cloud AI, choose a provider and model. Open Get your key in a new tab, create your personal provider key, and paste it in the masked field. No Cloudflare account or shared key is used. Never send your key in chat or a report.
+2. Choose Local AI, Free cloud, or Paid cloud. For the free path, choose Free cloud, then Groq (or OpenRouter) if you are authorized to share the case with that provider.
+3. For cloud AI, choose a provider and model. Open Get your key in a new tab, create your personal provider key, and paste it in the masked field in the browser. The key stays in this tab's memory only. No Cloudflare account or shared key is used. Never send your key in chat or a report.
 4. Read the notice and authorize this destination. Test connection checks the key and lists models without running inference. For paid APIs, test first to discover model IDs, then choose one. Other APIs must support OpenAI-compatible chat and browser CORS.
 5. In the existing workbench choose Enable AI Assistant, then Enable assistant. Run a task, review its findings, and accept only evidence-supported suggestions. Deterministic BLOCK remains binding.
 6. Download your report/ZIP or print before leaving. Case data and keys do not survive reload. Your browser controls the save location. Disconnect & clear key removes the active credential.

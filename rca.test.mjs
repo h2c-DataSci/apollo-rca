@@ -106,6 +106,14 @@ test('chart colors: STOP is red with white text, unknown is yellow with black te
   assert.match(shell, /'#fbc02d'/);
   assert.match(shell, /'#ffffff'/);
   assert.match(shell, /'#000000'/);
+  const kb = readFileSync(new URL('./help-kb.js', import.meta.url), 'utf8');
+  assert.match(kb, /id:'colors'[\s\S]*?#d32f2f/);
+  assert.match(kb, /id:'colors'[\s\S]*?#fbc02d/);
+  assert.match(kb, /red octagon #d32f2f with white text that says STOP/);
+  assert.doesNotMatch(kb, /grey|gray/i);
+  const guide = readFileSync(new URL('./USER_GUIDE.md', import.meta.url), 'utf8');
+  assert.match(guide, /Free cloud \(Groq or OpenRouter\)/);
+  assert.match(guide, /paste your own key in the masked field in the browser/);
 });
 test('service worker keeps only this app caches and fails a broken shell install', () => {
   const sw = readFileSync(new URL('./sw.js', import.meta.url), 'utf8');

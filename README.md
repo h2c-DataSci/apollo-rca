@@ -33,7 +33,7 @@ Seven steps: Define, Causes, RealityChart, Evidence, Test, Solutions, Track.
 
 - Up to three primary effects.
 - Each causal set is an action plus at least one condition.
-- Chart colors: primary effect black `#111827` with white text, action `#dc2626`, condition `#16a34a`, STOP `#d32f2f` with white text, unknown `?` `#fbc02d` with black text.
+- Chart colors (shown in the on-chart legend): primary effect black `#111827` with white text, action `#dc2626` (rectangle), condition `#16a34a`, STOP `#d32f2f` with white text (octagon labeled STOP, reason under the node), unknown `?` `#fbc02d` with black text and the label Need More Info. Action rectangles and STOP octagons are both red; tell them apart by shape and the STOP label.
 - Evidence tiers: Sensed, Inferred, Intuited, Emotional. Missing evidence shows `?`.
 - Reports export as PDF, and as ZIP when one file would damage figures.
 - One-click New analysis, with confirm and undo.
@@ -88,6 +88,7 @@ The current test count and HEAD are recorded in [PROGRESS.md](PROGRESS.md). Node
 | `h2c-shell.js` | Toolbar, workflow hub, sanitizer, chart-color enforcement. The hub does not move React's step list. |
 | `h2c-help.js` | Help drawer, developer credit, Feedback link |
 | `help-kb.js` / `help-diagrams.js` | Knowledge text and original diagrams |
+| `CHANGELOG.md` | Short record of published changes |
 | `h2c-videos.js` | Seven YouTube episodes. Players load from `youtube-nocookie.com` only after a click. Sync Official Durations reads the player length. |
 | `browser-ai.js` | In-browser ONNX loader |
 | `session-store.js` / `provider-presets.js` | Memory-only case storage and public provider connection presets. |
