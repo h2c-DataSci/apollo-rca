@@ -16,7 +16,7 @@ import { PROVIDER_PRESETS } from './provider-presets.js';
 import { sessionStore, listLegacyData, removeLegacyData, legacyRecoveryPlan } from './session-store.js';
 
 import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=25';
-import { DEEPER_TASKS, runDeeperReview, briefForReview } from './coach-deeper.js?v=4';
+import { DEEPER_TASKS, runDeeperReview, briefForReview, presentFinding } from './coach-deeper.js?v=5';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
@@ -397,11 +397,23 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
   box-shadow: 0 4px 18px rgba(4, 61, 46, 0.08), 0 1px 3px rgba(0,0,0,0.04) !important;
 }
 .h2c-official-coach.h2c-coach-focus { outline: 3px solid #c9a227; outline-offset: 3px; }
-.h2c-official-coach > div:first-child h2,
 .h2c-official-coach h2 {
   font: 700 15px/1.3 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   color: #14261c !important;
 }
+.h2c-review { display: grid; gap: 10px; margin-top: 4px; }
+.h2c-review h3 { margin: 0; font: 700 14px/1.3 system-ui, sans-serif; color: #043d2e; }
+.h2c-review-summary, .h2c-review-next, .h2c-review-note { margin: 0; }
+.h2c-review-summary, .h2c-review-next { padding: 8px 10px; background: #fff; border-left: 4px solid #c9a227; border-radius: 4px; }
+.h2c-review-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.h2c-review-list > li { margin: 0; padding: 8px 10px; background: #fff; border: 1px solid #e7ded0; border-radius: 6px; }
+.h2c-review-kind { display: inline-block; margin: 0 8px 4px 0; padding: 1px 7px; border-radius: 999px; background: #043d2e; color: #f1d16b; font-size: 11px; font-weight: 700; letter-spacing: .02em; text-transform: capitalize; }
+.h2c-review-list h4 { display: inline; margin: 0; font-size: 13px; }
+.h2c-review-list ul { margin: 6px 0 0; padding-left: 1.15rem; }
+.h2c-review-list li li { margin: 3px 0; }
+.h2c-review-label { font-weight: 700; color: #043d2e; }
+.h2c-review-ids { margin: 6px 0 0; font-size: 12px; color: #3d4a42; }
+.h2c-review-note { font-size: 12px; color: #5c6e80; }
 .h2c-official-coach .h2c-local-bridge-card {
   margin-top: 12px !important;
   background: #fff !important;
@@ -1224,6 +1236,69 @@ function focusOfficialCoach() {
   setTimeout(() => coach.classList.remove('h2c-coach-focus'), 1600);
 }
 
+function addReviewPoint(list, point) {
+  const item = document.createElement('li');
+  if (point.label) {
+    const label = document.createElement('span');
+    label.className = 'h2c-review-label';
+    label.textContent = point.label + ':';
+    item.append(label, document.createTextNode(' ' + point.text));
+  } else item.textContent = point.text;
+  list.append(item);
+}
+
+function renderReview(review, root) {
+  root.replaceChildren();
+  root.classList.add('h2c-review');
+  const heading = document.createElement('h3');
+  heading.textContent = 'Review';
+  const summary = document.createElement('p');
+  summary.className = 'h2c-review-summary';
+  summary.textContent = review.summary;
+  root.append(heading, summary);
+  if (review.findings.length) {
+    const list = document.createElement('ol');
+    list.className = 'h2c-review-list';
+    for (const finding of review.findings) {
+      const item = document.createElement('li');
+      const kind = document.createElement('span');
+      kind.className = 'h2c-review-kind';
+      kind.textContent = finding.kind || 'note';
+      item.append(kind);
+      const presented = presentFinding(finding.text);
+      if (presented.title) {
+        const title = document.createElement('h4');
+        title.textContent = presented.title;
+        item.append(title);
+      }
+      const points = document.createElement('ul');
+      for (const point of presented.points) addReviewPoint(points, point);
+      if (points.childNodes.length) item.append(points);
+      if (finding.evidenceIds.length) {
+        const ids = document.createElement('p');
+        ids.className = 'h2c-review-ids';
+        ids.textContent = 'Evidence: ' + finding.evidenceIds.join(', ');
+        item.append(ids);
+      }
+      list.append(item);
+    }
+    root.append(list);
+  }
+  if (review.nextStep) {
+    const next = document.createElement('p');
+    next.className = 'h2c-review-next';
+    const label = document.createElement('span');
+    label.className = 'h2c-review-label';
+    label.textContent = 'Next:';
+    next.append(label, document.createTextNode(' ' + review.nextStep));
+    root.append(next);
+  }
+  const caution = document.createElement('p');
+  caution.className = 'h2c-review-note';
+  caution.textContent = 'This is not a finding. Check the evidence before you accept anything.';
+  root.append(caution);
+}
+
 function ensureLocalBridgeUI() {
   const coachSection = document.querySelector('section[aria-label="RCA coach"]');
   if (!coachSection) return;
@@ -1275,24 +1350,7 @@ function ensureLocalBridgeUI() {
       deeperOut.textContent = 'Reviewing. Reasoning is not shown.';
       try {
         const review = await runDeeperReview(task.id, briefForReview(task.id));
-        deeperOut.replaceChildren();
-        const summary = document.createElement('p');
-        summary.textContent = review.summary;
-        deeperOut.append(summary);
-        for (const finding of review.findings) {
-          const line = document.createElement('p');
-          const ids = finding.evidenceIds.length ? ` (${finding.evidenceIds.join(', ')})` : '';
-          line.textContent = `${finding.kind}: ${finding.text}${ids}`;
-          deeperOut.append(line);
-        }
-        if (review.nextStep) {
-          const next = document.createElement('p');
-          next.textContent = `Next: ${review.nextStep}`;
-          deeperOut.append(next);
-        }
-        const caution = document.createElement('p');
-        caution.textContent = 'This is not a finding. Check the evidence before you accept anything.';
-        deeperOut.append(caution);
+        renderReview(review, deeperOut);
       } catch (error) {
         deeperOut.textContent = error && error.message ? error.message : 'The review failed. Nothing was changed.';
       } finally {

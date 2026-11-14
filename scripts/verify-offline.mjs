@@ -8,8 +8,8 @@ try {
  await page.goto('http://127.0.0.1:8080/apollo-rca/');
  await page.locator('.h2c-session-notice').waitFor();
  const cachesFound=await page.evaluate(async()=>{await navigator.serviceWorker.ready;return await caches.keys();});
- assert.ok(cachesFound.includes('apollo-rca-shell-v33'));
- const cachedModules=await page.evaluate(async()=>{const cache=await caches.open('apollo-rca-shell-v33');return (await cache.keys()).map(r=>new URL(r.url).pathname);});
+ assert.ok(cachesFound.includes('apollo-rca-shell-v34'));
+ const cachedModules=await page.evaluate(async()=>{const cache=await caches.open('apollo-rca-shell-v34');return (await cache.keys()).map(r=>new URL(r.url).pathname);});
  assert.ok(cachedModules.includes('/apollo-rca/session-store.js'));
  assert.ok(cachedModules.includes('/apollo-rca/provider-presets.js'));
  await context.setOffline(true);

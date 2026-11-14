@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { caseBrief, parseDeeper, runDeeperReview, readSolutionMatrix, currentCaseBrief, readReportText, briefForReview } from './coach-deeper.js';
+import { caseBrief, parseDeeper, runDeeperReview, readSolutionMatrix, currentCaseBrief, readReportText, briefForReview, presentFinding } from './coach-deeper.js';
 import { sessionStore } from './session-store.js';
 
 test('case brief drops images and stays bounded', () => {
@@ -94,6 +94,16 @@ test('full report audit includes every numbered section and entered actions', as
   assert.equal(review.findings.length, 5);
   assert.match(review.findings[2].text, /Solution challenge matrix/);
   sessionStore.removeItem('realitychart-intake-v1');
+});
+
+test('a dense audit finding becomes a title and labeled points', () => {
+  const shown = presentFinding('1. Problem definition – Holds: includes PE-1 and PE-2 details. Missing: evidence references are empty. No contradiction with causal rules.');
+  assert.equal(shown.title, '1. Problem definition');
+  assert.deepEqual(shown.points.map((point) => point.label), ['Holds', 'Missing', 'No contradiction']);
+  assert.match(shown.points[1].text, /evidence references/);
+  const sentences = presentFinding('The action only retrains people. It does not change a condition.');
+  assert.equal(sentences.points.length, 2);
+  assert.equal(sentences.points[0].label, '');
 });
 
 

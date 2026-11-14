@@ -55,6 +55,41 @@ export function solutionMatrixText(rows) {
   }).join('\n');
 }
 
+const REVIEW_LABELS = [
+  ['Holds', /^holds\b[:\s–—-]*/i],
+  ['Missing', /^missing\b[:\s–—-]*/i],
+  ['No contradiction', /^no contradiction\b[:\s.–—-]*/i],
+  ['Contradiction', /^contradiction\b[:\s–—-]*/i],
+  ['Next', /^next\b[:\s–—-]*/i]
+];
+
+export function presentFinding(text) {
+  const raw = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!raw) return { title: '', points: [] };
+  let title = '';
+  let body = raw;
+  const titled = raw.match(/^((?:\d+\.\s*)?[^–—.]{3,90}?)\s+[–—]\s+(.+)$/);
+  if (titled) { title = titled[1].trim(); body = titled[2].trim(); }
+  const chunks = body.split(/(?=\b(?:Holds|Missing|No contradiction|Next)\b)|(?<!\bNo )(?=\bContradiction\b)/i).map((part) => part.trim()).filter(Boolean);
+  const points = [];
+  for (const chunk of chunks) {
+    const hit = REVIEW_LABELS.find(([, pattern]) => pattern.test(chunk));
+    if (!hit) {
+      const plain = chunk.replace(/[.;]\s*$/, '').trim();
+      if (plain) points.push({ label: '', text: plain });
+      continue;
+    }
+    let rest = chunk.replace(hit[1], '').replace(/[.;]\s*$/, '').trim();
+    if (hit[0] === 'No contradiction' && (!rest || /^with causal rules$/i.test(rest))) rest = 'None found.';
+    if (rest) points.push({ label: hit[0], text: rest });
+  }
+  if (!title && points.length <= 1) {
+    const sentences = raw.split(/(?<=[.!?])\s+(?=[A-Z0-9“"])/).map((part) => part.trim()).filter((part) => part.length > 1);
+    if (sentences.length > 1) return { title: '', points: sentences.map((line) => ({ label: '', text: line })) };
+  }
+  return { title, points: points.length ? points : [{ label: '', text: raw }] };
+}
+
 export function currentCaseBrief(doc = globalThis.document) {
   const intake = caseBrief(sessionStore.getItem('realitychart-intake-v1') || '{}', 8000);
   const matrix = solutionMatrixText(readSolutionMatrix(doc));
