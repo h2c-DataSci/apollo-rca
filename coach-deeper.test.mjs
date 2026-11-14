@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { caseBrief, parseDeeper, runDeeperReview, readSolutionMatrix, currentCaseBrief } from './coach-deeper.js';
+import { caseBrief, parseDeeper, runDeeperReview, readSolutionMatrix, currentCaseBrief, readReportText, briefForReview } from './coach-deeper.js';
 import { sessionStore } from './session-store.js';
 
 test('case brief drops images and stays bounded', () => {
@@ -56,4 +56,44 @@ test('screen solutions receives the filled solution challenge matrix', () => {
   assert.match(brief, /Seal Failed/);
   sessionStore.removeItem('realitychart-intake-v1');
 });
+
+test('full report audit includes every numbered section and entered actions', async () => {
+  sessionStore.setItem('realitychart-intake-v1', JSON.stringify({ effects: [{ what: 'Seal Failed' }] }));
+  const section = (title, text, fields = []) => ({
+    querySelector: (sel) => /h2|h3|h1/.test(sel) ? { textContent: title } : null,
+    querySelectorAll: (sel) => sel === 'textarea, input' ? fields : [],
+    textContent: `${title}\n${text}`
+  });
+  const sections = [
+    section('1. Problem definition', 'Seal leaked at startup'),
+    section('2. Executive summary', 'Leak followed vibration'),
+    section('3. Solution challenge matrix', 'CA-01', [{ type: 'textarea', value: 'Fit a cooled seal', closest: () => null }]),
+    section('4. Corrective actions tracking log', 'CA-01 owner Pat'),
+    section('5. Action items — points of ignorance', 'Need the seal teardown')
+  ];
+  const article = { querySelectorAll: (sel) => sel === 'header, section' ? sections : [], contains: () => false };
+  const doc = { querySelector: (sel) => sel === 'article.print-sheet' ? article : null, getElementById: (id) => id === 'realitychart' ? { textContent: 'Seal Failed STOP' } : null };
+  const text = readReportText(doc);
+  for (const title of ['1. Problem definition', '2. Executive summary', '3. Solution challenge matrix', '4. Corrective actions tracking log', '5. Action items']) {
+    assert.match(text, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+  assert.match(text, /Fit a cooled seal/);
+  assert.match(text, /Cause chart/);
+  const brief = briefForReview('audit', doc);
+  assert.match(brief, /Formal report/);
+  assert.match(brief, /Seal Failed/);
+  let sent = '';
+  const review = await runDeeperReview('audit', brief, async (messages, cfg) => {
+    sent = messages[1].content;
+    assert.ok(cfg.numPredict >= 768);
+    const findings = ['1. Problem definition', '2. Executive summary', '3. Solution challenge matrix', '4. Corrective actions tracking log', '5. Action items'].map((part) => ({ kind: 'section', text: `${part} was checked.`, evidenceIds: [] }));
+    return JSON.stringify({ summary: 'All five report parts were checked.', findings, nextStep: 'Confirm the seal teardown evidence.' });
+  });
+  assert.match(sent, /Audit every numbered part/);
+  assert.match(sent, /Fit a cooled seal/);
+  assert.equal(review.findings.length, 5);
+  assert.match(review.findings[2].text, /Solution challenge matrix/);
+  sessionStore.removeItem('realitychart-intake-v1');
+});
+
 

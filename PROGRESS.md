@@ -12,7 +12,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Branch | `main`, even with `origin/main` |
 | HEAD | `95c2206` — solution matrix is included in reviews. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Tests | `node --test` → 174 passed, 0 failed. |
+| Tests | `node --test` → 175 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -21,7 +21,8 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | `95c2206` | Screen solutions now reads the filled Solution challenge matrix from the report, so a completed matrix is not described as having no proposed actions. Shell cache is v32. |
+| 2026-11-14 | this commit | Added Audit full report. One connected-model pass checks problem definition, executive summary, the cause chart, the solution matrix, the corrective-action log, and the action items. It does not edit the report. Shell cache is v33. |
+| 2026-11-14 | `95c2206` | Screen solutions now reads the filled Solution challenge matrix from the report, so a completed matrix is not described as having no proposed actions. |
 | 2026-11-14 | `a0bc7a9` | One RCA Coach. The connection controls are the top of that panel, not a second coach. The React coach section stays in place. |
 | 2026-11-14 | `a367cbf` | A Groq (or other cloud) selection no longer falls through to local Ollama. The connection card and the longer reviews share one configuration, so `qwen/qwen3.8-27b` is not checked as `qwen3:2b` on port 11434. |
 | 2026-11-14 | `2d65a99` | Removed unused `styles-v11.css` and its identical copy `styles-CjEoaxHy.css`. The live page still uses `styles-v13.css`. Kept `browser-dCISOrnY.js` (report ZIP), `rolldown-runtime-v11.js`, and `es-DawnZXYc.js` because the current bundle loads them. Added the MIT `LICENSE`. Deleted the merged `housekeeping/sri-stale-legacy` branch. Dependabot pull requests were left open. |
@@ -63,8 +64,8 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Help knowledge base stays. No copyrighted book images.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
-- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v32` and `apollo-rca-runtime-v2`.
-- Cache bust: shell `v=32`, help `v=27`, videos `v=25`, local bridge `v=25`, browser AI `v=24`, deeper reviews `v=3`. Bump the query of a file when that file changes.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v33` and `apollo-rca-runtime-v2`.
+- Cache bust: shell `v=33`, help `v=27`, videos `v=25`, local bridge `v=25`, browser AI `v=24`, deeper reviews `v=4`. Bump the query of a file when that file changes.
 - Episode lengths last read from the player: 55:50, 20:22, 07:57, 06:59, 08:19, 07:20, 07:10. Episode 6 id is `Q4-Bu2qUaaE`.
 
 ## Do not

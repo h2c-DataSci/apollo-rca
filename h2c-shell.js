@@ -16,7 +16,7 @@ import { PROVIDER_PRESETS } from './provider-presets.js';
 import { sessionStore, listLegacyData, removeLegacyData, legacyRecoveryPlan } from './session-store.js';
 
 import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=25';
-import { DEEPER_TASKS, runDeeperReview, currentCaseBrief } from './coach-deeper.js?v=3';
+import { DEEPER_TASKS, runDeeperReview, briefForReview } from './coach-deeper.js?v=4';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
@@ -1258,7 +1258,7 @@ function ensureLocalBridgeUI() {
   deeper.style.marginTop = '12px';
   const deeperNote = document.createElement('p');
   deeperNote.style.margin = '0 0 8px';
-  deeperNote.textContent = 'Longer reviews use the connected model once. A free or paid cloud model can read the whole case in one pass. Nothing is written into the chart.';
+  deeperNote.textContent = 'Longer reviews use the connected model once. Audit full report checks every section of the formal report. Nothing is written into the chart.';
   const deeperRow = document.createElement('div');
   deeperRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
   const deeperOut = document.createElement('div');
@@ -1274,7 +1274,7 @@ function ensureLocalBridgeUI() {
       deeperRow.querySelectorAll('button').forEach((item) => { item.disabled = true; });
       deeperOut.textContent = 'Reviewing. Reasoning is not shown.';
       try {
-        const review = await runDeeperReview(task.id, currentCaseBrief());
+        const review = await runDeeperReview(task.id, briefForReview(task.id));
         deeperOut.replaceChildren();
         const summary = document.createElement('p');
         summary.textContent = review.summary;
