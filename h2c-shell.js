@@ -1482,7 +1482,7 @@ function ensureBrowserAiButton() {
   btn.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    import('./browser-ai.js?v=24').then((mod) => mod.openBrowserAiDialog()).catch(() => {});
+    import('./browser-ai.js?v=25').then((mod) => mod.openBrowserAiDialog()).catch(() => {});
   });
   anchor.insertAdjacentElement('afterend', btn);
 }
