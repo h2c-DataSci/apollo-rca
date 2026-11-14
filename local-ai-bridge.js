@@ -188,7 +188,7 @@ async function testOllama(endpoint) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 4000);
   try {
-    const res = await fetch(`${url}/api/tags`, { method: 'GET', headers: { Accept: 'application/json' }, signal: ctrl.signal });
+    const res = await fetch(`${url}/api/tags`, { method: 'GET', headers: { Accept: 'application/json' }, signal: ctrl.signal, redirect: 'error' });
     if (!res.ok) {
       const detail = await errorText(res);
       return offline(url, `Ollama returned HTTP ${res.status}. ${detail}`);
@@ -481,7 +481,8 @@ async function ollamaChat(cfg, messages) {
         think: false,
         options: { temperature: cfg.temperature ?? 0.2, num_predict: cfg.numPredict ?? 384 }
       }),
-      signal: generation.signal
+      signal: generation.signal,
+      redirect: 'error'
     });
   } catch (err) {
     generation.finish();
@@ -519,7 +520,8 @@ async function sameHostOpenAi(url, cfg, messages) {
         temperature: cfg.temperature ?? 0.2,
         max_tokens: cfg.numPredict ?? 384
       }),
-      signal: generation.signal
+      signal: generation.signal,
+      redirect: 'error'
     });
     if (!res.ok) {
       const detail = await errorText(res);

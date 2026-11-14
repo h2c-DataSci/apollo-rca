@@ -20,6 +20,26 @@ test('local-ai-bridge: refuses a non-local endpoint before any request', async (
   await assert.rejects(() => executeLocalChat([{ role: 'user', content: 'case text' }], { endpoint: 'https://example.com' }));
 });
 
+test('ollama fetches refuse redirects', async () => {
+  const original = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push(init);
+    const body = String(url).includes('/api/tags')
+      ? JSON.stringify({ models: [{ name: 'qwen3:2b' }] })
+      : JSON.stringify({ message: { content: 'Cause is unknown.' }, done: true });
+    return new Response(body, { status: 200 });
+  };
+  try {
+    const status = await testLocalDaemonConnection('http://127.0.0.1:11434');
+    assert.equal(status.online, true);
+    const answer = await executeLocalChat([{ role: 'user', content: 'synthetic' }], { provider: 'ollama', endpoint: 'http://127.0.0.1:11434', model: 'qwen3:2b' });
+    assert.match(answer, /unknown/);
+  } finally { globalThis.fetch = original; }
+  assert.equal(calls.length, 2);
+  for (const init of calls) assert.equal(init.redirect, 'error');
+});
+
 test('local-ai-bridge: default config and recommended models are well-formed', () => {
   assert.equal(DEFAULT_BRIDGE_CONFIG.endpoint, 'http://127.0.0.1:11434');
   assert.equal(DEFAULT_BRIDGE_CONFIG.model, 'qwen3:2b');
