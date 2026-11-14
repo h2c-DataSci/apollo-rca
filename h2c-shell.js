@@ -375,6 +375,19 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
 }
 
 /* 7-Step Interactive Workflow Hub */
+.h2c-local-bridge-card {
+  margin: 0 0 0 0 !important;
+  background: linear-gradient(180deg, #fffdfa 0%, #fbf7ee 100%) !important;
+  border: 2px solid #c9a227 !important;
+  border-bottom: 0 !important;
+  border-radius: 12px 12px 0 0 !important;
+  box-shadow: none !important;
+}
+.h2c-local-bridge-card + .h2c-official-coach {
+  margin-top: 0 !important;
+  border-top: 0 !important;
+  border-radius: 0 0 12px 12px !important;
+}
 .h2c-official-coach {
   margin: 0 0 1.5rem 0 !important;
   border: 2px solid #c9a227 !important;
@@ -1221,7 +1234,7 @@ function ensureLocalBridgeUI() {
   bridge.className = 'no-print h2c-local-bridge-card';
   bridge.style.cssText = 'margin:12px 0;background:#fffdf8;border:1px solid #e7ded0;border-left:4px solid #c9a227;border-radius:8px;padding:14px;font:13px/1.5 system-ui;color:#1a202c';
   setSafeHtml(bridge, `
-    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>Connect your RCA Coach</strong><span class="h2c-bridge-status-pill" role="status">Not connected</span></div>
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>Connection</strong><span class="h2c-bridge-status-pill" role="status">Not connected</span></div>
     <p style="margin:6px 0 12px">Choose how AI helps. Your investigation stays under your control; suggestions need your review.</p>
     <div class="h2c-ai-controls" style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
       <label>1. AI path<br><select class="h2c-ai-mode"><option value="local">Local AI — on this device</option><option value="free">Free cloud — your own key</option><option value="paid">Paid cloud — your own key</option></select></label>

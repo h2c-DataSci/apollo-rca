@@ -42,7 +42,7 @@ Seven steps: Define, Causes, RealityChart, Evidence, Test, Solutions, Track.
 
 ## AI
 
-AI is optional. Open **RCA Coach**, then use **Connect your RCA Coach** above the workbench:
+AI is optional. There is one **RCA Coach** panel. Connect a model at the top of that panel:
 
 | Path | Setup |
 |---|---|
