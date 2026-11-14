@@ -105,7 +105,7 @@ There is no `local-bridge.js` or `ai-coach.js`. Those names in older notes are w
 
 Local mode enforces loopback. The website cannot start Ollama, install models, inspect folders or change OLLAMA_MODELS. On this Windows computer keep Ollama runtime on C: and its existing models at D:\Ollama\models. A read-only check found installed `qwen3.5:4b` and `qwen3.5:2b`; no model was run or downloaded. No local companion has been installed.
 
-Implementation verification: 164 automated tests passed, plus synthetic mocked inference in isolated Edge, real credential-free browser model-list connectivity, a sample report download, and a real service-worker offline reload. Authenticated live inference and published-site validation remain pending; no API keys, paid inference or Cloudflare account were used. Changes are local and not published.
+Implementation verification: 164 automated tests passed, plus synthetic mocked inference in isolated Edge, real credential-free browser model-list connectivity, a sample report download, and a real service-worker offline reload. Authenticated live inference and published-site validation remain pending; no API keys, paid inference or Cloudflare account were used. Publication to origin/main was authorized on 2026-11-14; the branch-managed Pages deployment publishes the site after push.
 
 ## Training videos
 
@@ -145,7 +145,7 @@ Local checkout: `D:\ApolloRCA_webapp`, tracking `origin/main`. Use `node --test`
 
 ## Three-path RCA Coach implementation
 
-The design and remaining limitations are in [docs/AI_COACH_PLAN.md](docs/AI_COACH_PLAN.md). Local AI, free BYOK cloud, and paid BYOK cloud are implemented in the local working tree. The seven-step workflow and report formats remain. Automatic local startup still requires an optional separately installed companion and is not implemented by the website.
+The design and remaining limitations are in [docs/AI_COACH_PLAN.md](docs/AI_COACH_PLAN.md). Local AI, free BYOK cloud, and paid BYOK cloud are implemented in the repository. The seven-step workflow and report formats remain. Automatic local startup still requires an optional separately installed companion and is not implemented by the website.
 
 Hard usage rule: no runtime resets, credit purchases, paid upgrades or additional spend; test inference with mocks and checkpoint before resource limits. No automatic paid fallback. README.md and PROGRESS.md must be updated for every task. Disclaimers supplement controls; do not promise absolute zero retention across external services.
 

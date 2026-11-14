@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-14 | this commit | User authorized publication to GitHub. Prepared push of 459973d and this documentation update to origin/main; Pages is branch-managed. Prior checks: 164 tests and browser/offline/export acceptance passed. CI/Pages outcome is verified after push and reported in chat. No Cloudflare or paid inference involved. |
 | 2026-11-14 | this commit | Committed the three-path RCA Coach implementation, session-only privacy, provider adapters, browser verification tools and EGM documentation. Formatting check passed; credential scan found only synthetic test keys. Prior validation: 164 tests passed plus browser/offline/report checks. Local commit only; no push or publication. |
 | 2026-11-14 | uncommitted | Implemented Local / Free BYOK / Paid BYOK Coach with provider/model dropdowns, key links, consent and recovery guidance. Session-only case/keys, explicit legacy export/delete, streamed-error rejection, reasoning adapters, actual-model audit labels and PDF disclaimer. Added dependency-free npm run serve preview with correct /apollo-rca/ paths; offline assets revalidate on install and stale runtime cache is retired. Two implementation agents; no resets or inference charges. 164 tests pass; Edge mocked full analysis, case reset/undo, reload, responsive controls and ZIP download verified. Real SW install plus offline reload/Coach controls passed with shell v27/runtime v2; preview running at http://127.0.0.1:8080/apollo-rca/. Credential-free browser CORS reached Groq/OpenRouter/OpenAI; Ollama tags found qwen3.5:4b and qwen3.5:2b. No real model invoked, no Cloudflare connection or deployment. |
 | 2026-11-14 | uncommitted | User selected visitor BYOK for all cloud AI. Removed proposed shared Cloudflare backend/account requirement from current plan and README. Owner uses the same provider-key flow as visitors; no Cloudflare connection authorized. Documentation only. |
@@ -68,7 +69,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 ## Known gaps
 
-- Three-path AI changes are local and unpublished. Real authenticated inference is not tested; all analysis tests used mocks, and real connectivity checks used invalid/no credentials without model execution.
+- Publication requested on 2026-11-14; follow origin/main CI and branch-managed Pages deployment for publication status. Real authenticated inference is not tested; all analysis tests used mocks, and real connectivity checks used invalid/no credentials without model execution.
 - Automatic Ollama startup and folder inspection require an optional companion; no companion is installed. Local origin/permission behavior must still be checked on the published HTTPS site.
 - Cases/keys now live in tab memory; download before close/reload. Legacy recovery is archival export plus explicit deletion, not automatic import.
 
