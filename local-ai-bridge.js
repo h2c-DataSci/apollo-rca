@@ -2,11 +2,14 @@
 // A user-supplied HTTPS API is used only when that provider is selected.
 // There is no silent fallback to a cloud model.
 
-const BRIDGE_STORAGE_KEY = 'h2c-local-ai-bridge-v1';
+import { PROVIDER_PRESETS } from './provider-presets.js';
 
 export const DEFAULT_BRIDGE_CONFIG = {
   enabled: true,
   provider: 'ollama',
+  mode: 'local',
+  preset: '',
+  cloudConsent: false,
   endpoint: 'http://127.0.0.1:11434',
   model: 'qwen3:2b',
   apiKey: '',
@@ -46,29 +49,33 @@ export const RECOMMENDED_LOCAL_MODELS = [
   }
 ];
 
-function storage() {
-  try { return globalThis.localStorage || null; } catch { return null; }
-}
+let sessionConfig = { ...DEFAULT_BRIDGE_CONFIG };
 
-export function getBridgeConfig() {
-  try {
-    const raw = storage()?.getItem(BRIDGE_STORAGE_KEY);
-    if (!raw) return { ...DEFAULT_BRIDGE_CONFIG };
-    const parsed = JSON.parse(raw);
-    return { ...DEFAULT_BRIDGE_CONFIG, ...parsed, apiKey: typeof parsed.apiKey === 'string' ? parsed.apiKey : '' };
-  } catch {
-    return { ...DEFAULT_BRIDGE_CONFIG };
-  }
-}
+export function getBridgeConfig() { return { ...sessionConfig }; }
 
 export function saveBridgeConfig(cfg) {
-  try {
-    const updated = { ...getBridgeConfig(), ...cfg };
-    storage()?.setItem(BRIDGE_STORAGE_KEY, JSON.stringify(updated));
-    return updated;
-  } catch {
-    return { ...DEFAULT_BRIDGE_CONFIG, ...cfg };
+  const destinationChanged = ['endpoint', 'provider', 'preset', 'mode'].some((key) => key in cfg && cfg[key] !== sessionConfig[key]);
+  sessionConfig = { ...sessionConfig, ...(destinationChanged ? { apiKey: '', cloudConsent: false } : {}), ...cfg };
+  return getBridgeConfig();
+}
+
+function configuredOptions(options) {
+  const saved = getBridgeConfig();
+  const destinationChanged = ['endpoint', 'provider', 'preset', 'mode'].some((key) => key in options && options[key] !== saved[key]);
+  return { ...saved, ...(destinationChanged ? { apiKey: '', cloudConsent: false, ...(options.provider === 'openai' ? { numPredict: 1536 } : {}) } : {}), ...options };
+}
+
+export function clearBridgeSession() { abortActiveGeneration(); sessionConfig = { ...DEFAULT_BRIDGE_CONFIG }; }
+
+export function validateCloudConfig(cfg, requireConsent = true) {
+  const url = apiEndpoint(cfg.endpoint);
+  if (!isLoopback(url) && requireConsent && cfg.cloudConsent !== true) throw new Error('Confirm cloud processing before sending investigation information.');
+  if (cfg.mode === 'free') {
+    const preset = PROVIDER_PRESETS.find((item) => item.id === cfg.preset && item.free);
+    if (!preset || url !== preset.endpoint || !preset.models.includes(cfg.model)) throw new Error('Free cloud mode requires a listed free provider and model. No paid fallback was used.');
   }
+  if (requireConsent && !String(cfg.model || '').trim()) throw new Error('Choose a model first.');
+  return url;
 }
 
 export function isLoopback(endpoint) {
@@ -101,7 +108,7 @@ export function apiEndpoint(endpoint) {
   } catch {
     throw new Error('API address must be a full URL, such as https://api.example.com/v1');
   }
-  if (parsed.username || parsed.password) throw new Error('Put the API key in the key field, not in the URL.');
+  if (parsed.username || parsed.password || parsed.search || parsed.hash) throw new Error('API address must not contain credentials, query parameters or fragments. Put the API key in the key field.');
   const loopback = isLoopback(parsed.origin);
   if (!loopback && parsed.protocol !== 'https:') {
     throw new Error('A remote API must use https. Only 127.0.0.1 or localhost may use http.');
@@ -142,22 +149,16 @@ function offline(endpoint, error) {
 
 function timeoutMs(cfg, fallback) {
   const value = Number(cfg && cfg.timeoutMs);
-  return Number.isFinite(value) && value >= 1000 ? value : fallback;
+  return Number.isFinite(value) && value >= 1000 ? Math.min(value, 120000) : fallback;
 }
 
+// Inspect only for a known recovery category; never echo provider bodies that
+// may contain investigation text, credentials or internal diagnostic details.
 async function errorText(res) {
   try {
     const body = await res.text();
-    try {
-      const parsed = JSON.parse(body);
-      const nested = parsed && parsed.error;
-      return String((nested && (nested.message || nested)) || parsed.message || body || res.status).slice(0, 300);
-    } catch {
-      return String(body || res.status).slice(0, 300);
-    }
-  } catch {
-    return String(res.status);
-  }
+    return missingModel(body) ? 'Model not found.' : 'The request was rejected by the server.';
+  } catch { return 'The server response could not be read.'; }
 }
 
 function missingModel(message) {
@@ -166,7 +167,7 @@ function missingModel(message) {
 
 function unreachableMessage(endpoint, provider) {
   const where = provider === 'openai' ? 'API' : 'Ollama';
-  return `${where} is not reachable at ${endpoint}. Start it on this computer, or correct the address. This app will not switch to a cloud model.`;
+  return provider === 'openai' ? `API connection failed. Check the address, internet connection and browser access (CORS). No other provider was called.` : `${where} is not reachable at ${endpoint}. Start Ollama on this computer, then retry. Browser local-network permission or Ollama origin settings may be required. No cloud fallback was used.`;
 }
 
 export async function testLocalDaemonConnection(endpoint = 'http://127.0.0.1:11434') {
@@ -174,7 +175,7 @@ export async function testLocalDaemonConnection(endpoint = 'http://127.0.0.1:114
 }
 
 export async function testConfiguredConnection(options = {}) {
-  const cfg = { ...getBridgeConfig(), ...options };
+  const cfg = configuredOptions(options);
   if (cfg.provider === 'browser') return offline(cfg.endpoint, 'Browser ONNX is selected. No daemon call was made.');
   if (cfg.provider === 'openai') return testOpenAi(cfg);
   return testOllama(cfg.endpoint);
@@ -188,24 +189,24 @@ async function testOllama(endpoint) {
   const timer = setTimeout(() => ctrl.abort(), 4000);
   try {
     const res = await fetch(`${url}/api/tags`, { method: 'GET', headers: { Accept: 'application/json' }, signal: ctrl.signal });
-    clearTimeout(timer);
     if (!res.ok) {
       const detail = await errorText(res);
       return offline(url, `Ollama returned HTTP ${res.status}. ${detail}`);
     }
     const data = await res.json();
     const models = modelNames(data.models, (m) => m && (m.name || m.model));
+    clearTimeout(timer);
     return { online: true, type: 'ollama', endpoint: url, models, message: `Connected to Ollama on ${url} (${models.length} model(s) installed).` };
   } catch (err) {
     clearTimeout(timer);
     const timedOut = err && err.name === 'AbortError';
     return offline(url, timedOut ? 'Connection timed out' : unreachableMessage(url, 'ollama'));
-  }
+  } finally { clearTimeout(timer); }
 }
 
 async function testOpenAi(cfg) {
   let url;
-  try { url = apiEndpoint(cfg.endpoint); }
+  try { url = validateCloudConfig(cfg, false); }
   catch (error) { return offline(cfg.endpoint, error.message); }
   if (!isLoopback(url) && !String(cfg.apiKey || '').trim()) {
     return offline(url, 'Add your API key. This app does not include one.');
@@ -215,32 +216,41 @@ async function testOpenAi(cfg) {
   try {
     const headers = { Accept: 'application/json' };
     if (cfg.apiKey) headers.Authorization = `Bearer ${cfg.apiKey}`;
-    const res = await fetch(modelsUrl(url), { method: 'GET', headers, signal: ctrl.signal });
-    clearTimeout(timer);
+    const res = await fetch(modelsUrl(url), { method: 'GET', headers, signal: ctrl.signal, redirect: 'error', cache: 'no-store' });
     if (!res.ok) {
       const detail = await errorText(res);
+      if (res.status === 429) return offline(url, 'Provider quota or rate limit reached. Try later or choose Local AI. No paid fallback was used.');
       if (res.status === 401 || res.status === 403) return offline(url, `The API rejected the key (HTTP ${res.status}).`);
       return offline(url, `The API returned HTTP ${res.status}. ${detail}`);
     }
     const data = await res.json();
     const models = modelNames(data.data || data.models, (m) => m && (m.id || m.name));
+    clearTimeout(timer);
     return { online: true, type: 'openai', endpoint: url, models, message: `Connected to the API at ${url}.` };
   } catch (err) {
     clearTimeout(timer);
     return offline(url, err && err.name === 'AbortError' ? 'Connection timed out' : unreachableMessage(url, 'openai'));
-  }
+  } finally { clearTimeout(timer); }
 }
 
-function modelsUrl(endpoint) {
-  return /\/models$/.test(endpoint) ? endpoint : endpoint.endsWith('/v1') ? `${endpoint}/models` : `${endpoint}/v1/models`;
+export function modelsUrl(endpoint) {
+  const base = endpoint.replace(/\/(?:chat\/completions|models)$/, '');
+  return `${base}${new URL(base).pathname === '/' ? '/v1' : ''}/models`;
 }
 
-function chatUrl(endpoint) {
-  if (/\/chat\/completions$/.test(endpoint)) return endpoint;
-  return endpoint.endsWith('/v1') ? `${endpoint}/chat/completions` : `${endpoint}/v1/chat/completions`;
+export function chatUrl(endpoint) {
+  const base = endpoint.replace(/\/(?:chat\/completions|models)$/, '');
+  return `${base}${new URL(base).pathname === '/' ? '/v1' : ''}/chat/completions`;
+}
+
+function responseFailure(obj) {
+  if (obj?.error) return 'The provider reported a generation error. Nothing was applied.';
+  const reason = obj?.choices?.[0]?.finish_reason || obj?.done_reason;
+  return reason && reason !== 'stop' ? `The model did not finish normally (${String(reason).slice(0, 40)}). Nothing was applied.` : '';
 }
 
 function visibleAnswer(payload) {
+  const failure = responseFailure(payload); if (failure) throw new Error(failure);
   const message = payload && payload.message || {};
   const choice = payload && payload.choices && payload.choices[0] && payload.choices[0].message || {};
   const text = stripModelThinking(message.content || choice.content || payload.response || '');
@@ -312,19 +322,24 @@ export function collectStreamedAnswer(raw, onChunk) {
   const lines = text.split(/\r?\n/);
   let mode = '';
   let error = '';
+  let requiresEnd = false;
+  let ended = false;
   const apply = (obj) => {
-    if (obj && obj.error) error = String(typeof obj.error === 'string' ? obj.error : (obj.error.message || obj.error)).slice(0, 300);
+    error = responseFailure(obj) || error;
+    if (obj?.done === false || obj?.choices?.[0]?.delta) requiresEnd = true;
+    if (obj?.done === true || obj?.choices?.[0]?.finish_reason === 'stop') ended = true;
     const piece = chunkText(obj);
     if (piece) sink.push(piece);
   };
   for (const line of lines) {
     const trimmed = line.trim();
-    if (!trimmed) continue;
+    if (!trimmed || trimmed.startsWith(':') || /^(event|id|retry):/.test(trimmed)) continue;
     if (!mode) mode = trimmed.startsWith('data:') ? 'sse' : 'ndjson';
     if (mode === 'sse') {
       if (!trimmed.startsWith('data:')) continue;
       const payload = trimmed.slice(5).trim();
-      if (!payload || payload === '[DONE]') continue;
+      if (payload === '[DONE]') { ended = true; continue; }
+      if (!payload) continue;
       try { apply(JSON.parse(payload)); } catch { mode = 'json'; break; }
       continue;
     }
@@ -339,6 +354,8 @@ export function collectStreamedAnswer(raw, onChunk) {
     if (onChunk) onChunk(answer);
     return answer;
   }
+  if (error) throw new Error(error);
+  if (requiresEnd && !ended) throw new Error('The model stream ended early. Nothing was applied.');
   const answer = sink.finish();
   if (!answer) {
     if (error) throw new Error(error);
@@ -355,6 +372,7 @@ export function abortActiveGeneration() {
 }
 
 function beginGeneration(ms) {
+  if (activeGeneration) throw new Error('A generation is already running. Cancel it or wait for completion.');
   const ctrl = new AbortController();
   const generation = { ctrl, reason: '' };
   activeGeneration = generation;
@@ -386,21 +404,26 @@ async function answerFromResponse(res, onChunk) {
   let buf = '';
   let mode = '';
   let error = '';
+  let requiresEnd = false;
+  let ended = false;
   let streamed = false;
   const apply = (obj) => {
-    if (obj && obj.error) error = String(typeof obj.error === 'string' ? obj.error : (obj.error.message || obj.error)).slice(0, 300);
+    error = responseFailure(obj) || error;
+    if (obj?.done === false || obj?.choices?.[0]?.delta) requiresEnd = true;
+    if (obj?.done === true || obj?.choices?.[0]?.finish_reason === 'stop') ended = true;
     const piece = chunkText(obj);
     if (piece) sink.push(piece);
   };
   const take = (line) => {
     const trimmed = line.trim();
-    if (!trimmed) return;
+    if (!trimmed || trimmed.startsWith(':') || /^(event|id|retry):/.test(trimmed)) return;
     if (!mode) mode = trimmed.startsWith('data:') ? 'sse' : 'ndjson';
     if (mode === 'json') return;
     if (mode === 'sse') {
       if (!trimmed.startsWith('data:')) return;
       const payload = trimmed.slice(5).trim();
-      if (!payload || payload === '[DONE]') return;
+      if (payload === '[DONE]') { ended = true; return; }
+      if (!payload) return;
       try { apply(JSON.parse(payload)); streamed = true; } catch { mode = 'json'; }
       return;
     }
@@ -423,6 +446,8 @@ async function answerFromResponse(res, onChunk) {
   }
   if (buf) take(buf);
   if (mode === 'json' || !streamed) return collectStreamedAnswer(raw, onChunk);
+  if (error) throw new Error(error);
+  if (requiresEnd && !ended) throw new Error('The model stream ended early. Nothing was applied.');
   const answer = sink.finish();
   if (!answer) {
     if (error) throw new Error(error);
@@ -432,13 +457,16 @@ async function answerFromResponse(res, onChunk) {
 }
 
 export async function executeLocalChat(messages, options = {}) {
-  const cfg = { ...getBridgeConfig(), ...options };
+  const cfg = configuredOptions(options);
+  if (cfg.enabled === false || cfg.provider === 'browser') throw new Error('External AI is off.');
+  if (!Array.isArray(messages) || JSON.stringify(messages).length > 64000) throw new Error('The AI request is too large. Select a smaller task or shorten the context.');
   if (cfg.provider === 'openai') return openAiChat(cfg, messages);
   return ollamaChat(cfg, messages);
 }
 
 async function ollamaChat(cfg, messages) {
   const url = localDaemonUrl(cfg.endpoint);
+  if (/(?:^|[-:])cloud(?:$|[-:])/i.test(cfg.model)) throw new Error('Cloud-backed Ollama models are not allowed in Local AI mode.');
   const ms = timeoutMs(cfg, 25000);
   const generation = beginGeneration(ms);
   let res;
@@ -507,8 +535,24 @@ async function sameHostOpenAi(url, cfg, messages) {
   }
 }
 
+function cloudRequestBody(cfg, messages, url) {
+  const body = {
+    model: cfg.model,
+    messages: messages.map((m) => ({ role: m.role || 'user', content: String(m.content || '') })),
+    stream: true
+  };
+  const limit = cfg.numPredict ?? 1536;
+  if (cfg.preset === 'groq' && url === 'https://api.groq.com/openai/v1') {
+    return { ...body, max_completion_tokens: limit, reasoning_effort: 'low', include_reasoning: false, response_format: { type: 'json_object' } };
+  }
+  if (url === 'https://api.openai.com/v1' && /^(?:o[134](?:-|$)|gpt-[56])/.test(cfg.model)) {
+    return { ...body, max_completion_tokens: limit };
+  }
+  return { ...body, temperature: cfg.temperature ?? 0.2, max_tokens: limit };
+}
+
 async function openAiChat(cfg, messages) {
-  const url = apiEndpoint(cfg.endpoint);
+  const url = validateCloudConfig(cfg);
   if (!isLoopback(url) && !String(cfg.apiKey || '').trim()) throw new Error('Add your API key. This app does not include one.');
   const ms = timeoutMs(cfg, 25000);
   const generation = beginGeneration(ms);
@@ -518,17 +562,14 @@ async function openAiChat(cfg, messages) {
     const res = await fetch(chatUrl(url), {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        model: cfg.model,
-        messages: messages.map((m) => ({ role: m.role || 'user', content: String(m.content || '') })),
-        stream: true,
-        temperature: cfg.temperature ?? 0.2,
-        max_tokens: cfg.numPredict ?? 384
-      }),
+      redirect: 'error',
+      cache: 'no-store',
+      body: JSON.stringify(cloudRequestBody(cfg, messages, url)),
       signal: generation.signal
     });
     if (!res.ok) {
       const detail = await errorText(res);
+      if (res.status === 429) throw new Error('Provider quota or rate limit reached. Try later or choose Local AI. No paid fallback was used.');
       if (res.status === 401 || res.status === 403) throw new Error('The API rejected the key. Nothing was sent to another provider.');
       if (missingModel(detail)) throw new Error(`Model "${cfg.model}" is not available at that API. Nothing was downloaded.`);
       throw new Error(`The API returned HTTP ${res.status}. ${detail}`);
@@ -580,6 +621,7 @@ export async function generateWithConfiguredModel(promptText) {
 }
 
 export function installExternalCoach() {
+  globalThis.h2cExternalModelInfo = () => { const cfg = getBridgeConfig(); return { model: cfg.model, provider: cfg.provider === 'openai' ? cfg.preset : cfg.provider }; };
   globalThis.h2cUseExternalAi = () => {
     const cfg = getBridgeConfig();
     return cfg.enabled !== false && cfg.provider !== 'browser';

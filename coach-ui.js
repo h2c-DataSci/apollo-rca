@@ -1,3 +1,4 @@
+import { sessionStore, SESSION_CHANGED } from './session-store.js';
 // Layer C + UI: contextual RCA Coach. Overlay only; never mutates app data without an explicit Accept.
 import { MODEL_CONFIG, AI_VERSION } from './ai-config.js';
 import { AIService, TASK_NAMES } from './ai-service.js';
@@ -15,12 +16,12 @@ let lastField = null, undoStack = [], target = '';
 // ---------- helpers
 function setNative(el, v) { const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype; Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, v); el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }
 function fieldLabel(el) { const box = el.closest('div'); const l = box && box.parentElement && box.parentElement.querySelector('label, p, span'); return (el.getAttribute('aria-label') || (l && l.textContent) || el.placeholder || '').trim(); }
-function appState() { try { return JSON.parse(localStorage.getItem(APP_KEY) || '{}'); } catch { return {}; } }
+function appState() { try { return JSON.parse(sessionStore.getItem(APP_KEY) || '{}'); } catch { return {}; } }
 function flatten(o, p = '', out = []) { if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) flatten(v, p ? p + '.' + k : k, out); else if (typeof o === 'string' && o.trim()) out.push(`${p}: ${o.trim()}`); return out; }
 const contextText = () => flatten(appState()).join('\n');
 const evidenceList = () => flatten(appState()).filter((l) => /evidence|timeline|events?|note/i.test(l)).map((l) => l.replace(/^[^:]*:\s*/, ''));
-const notes = () => { try { return JSON.parse(localStorage.getItem(NOTES_KEY) || '[]'); } catch { return []; } };
-const saveNotes = (n) => localStorage.setItem(NOTES_KEY, JSON.stringify(n.slice(-200)));
+const notes = () => { try { return JSON.parse(sessionStore.getItem(NOTES_KEY) || '[]'); } catch { return []; } };
+const saveNotes = (n) => sessionStore.setItem(NOTES_KEY, JSON.stringify(n.slice(-200)));
 
 // ---------- UI shell
 const css = $('style', { text: `
@@ -174,22 +175,24 @@ drawer.querySelector('#h2cc-cancel').onclick = () => svc.cancel();
 const BACKUP_KEY = 'h2c-last-cleared-v1', TOAST_KEY = 'h2c-cleared-toast';
 function clearCase(msg) {
   if (!confirm(msg)) return;
-  try { localStorage.setItem(BACKUP_KEY, JSON.stringify({ app: localStorage.getItem(APP_KEY), notes: localStorage.getItem(NOTES_KEY), at: Date.now() })); sessionStorage.setItem(TOAST_KEY, '1'); } catch {}
-  localStorage.removeItem(APP_KEY); localStorage.removeItem(NOTES_KEY); location.reload();
+  try { sessionStore.setItem(BACKUP_KEY, JSON.stringify({ app: sessionStore.getItem(APP_KEY), notes: sessionStore.getItem(NOTES_KEY), at: Date.now() })); sessionStore.setItem(TOAST_KEY, '1'); } catch {}
+  sessionStore.removeItem(APP_KEY); sessionStore.removeItem(NOTES_KEY); sessionStore.notify();
 }
-function undoClear() { try { const b = JSON.parse(localStorage.getItem(BACKUP_KEY) || 'null'); if (!b) return; if (b.app != null) localStorage.setItem(APP_KEY, b.app); if (b.notes != null) localStorage.setItem(NOTES_KEY, b.notes); localStorage.removeItem(BACKUP_KEY); } catch {} location.reload(); }
+function undoClear() { try { const b = JSON.parse(sessionStore.getItem(BACKUP_KEY) || 'null'); if (!b) return; if (b.app != null) sessionStore.setItem(APP_KEY, b.app); if (b.notes != null) sessionStore.setItem(NOTES_KEY, b.notes); sessionStore.removeItem(BACKUP_KEY); } catch {} sessionStore.notify(); }
 drawer.querySelector('#h2cc-reset').onclick = () => clearCase('Delete ALL locally stored investigation data and AI notes in this browser? You can undo right after.');
 const newBtn = $('button', { type: 'button', id: 'h2c-new', class: 'h2c-new', 'aria-label': 'New analysis: clear the current analysis and start a new one', text: '＋ New analysis' });
 newBtn.onclick = () => clearCase('Clear analysis and start new?\n\nThe current case is removed from this browser. You can undo right after. Use Export case first if you want a file copy.');
 const mountNew = () => { const m = document.querySelector('.h2c-mast'); if (m && !m.contains(newBtn)) { const r = m.querySelector('.r'); m.insertBefore(newBtn, r || null); } };
 mountNew(); new MutationObserver(mountNew).observe(document.documentElement, { childList: true, subtree: true });
-if (sessionStorage.getItem(TOAST_KEY)) { sessionStorage.removeItem(TOAST_KEY); const t = $('div', { class: 'h2cc-toast', role: 'status' }, $('span', { text: 'Analysis cleared. Starting fresh.' }), $('button', { type: 'button', class: 'b', text: 'Undo', onclick: 'void 0' })); t.querySelector('button').onclick = undoClear; root.append(t); setTimeout(() => t.remove(), 20000); }
+function showClearedToast() { if (sessionStore.getItem(TOAST_KEY)) { sessionStore.removeItem(TOAST_KEY); const t = $('div', { class: 'h2cc-toast', role: 'status' }, $('span', { text: 'Analysis cleared. Starting fresh.' }), $('button', { type: 'button', class: 'b', text: 'Undo', onclick: 'void 0' })); t.querySelector('button').onclick = undoClear; root.append(t); setTimeout(() => t.remove(), 20000); } }
+window.addEventListener(SESSION_CHANGED, showClearedToast);
+showClearedToast();
 const openDrawer = (o) => { drawer.classList.toggle('open', o); if (o) drawer.querySelector('.h2cc-head button').focus(); else pill.focus(); };
 pill.onclick = () => openDrawer(!drawer.classList.contains('open'));
 drawer.setAttribute('role', 'dialog'); drawer.setAttribute('aria-modal', 'false');
 drawer.querySelector('#h2cc-export').onclick = () => { const blob = new Blob([JSON.stringify(exportCase(appState(), notes()), null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'h2c-rca-case.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
 drawer.querySelector('#h2cc-import').onclick = () => drawer.querySelector('#h2cc-file').click();
-drawer.querySelector('#h2cc-file').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; const r = validateImport(await f.text()); if (!r.ok) { addResult(card('rule', 'Import rejected', $('div', { class: 'err', text: r.error + ' Nothing was changed.' }))); return; } if (!confirm('Replace the current investigation with the imported case?')) return; localStorage.setItem(APP_KEY, JSON.stringify(r.state)); saveNotes(r.notes); location.reload(); };
+drawer.querySelector('#h2cc-file').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; const r = validateImport(await f.text()); if (!r.ok) { addResult(card('rule', 'Import rejected', $('div', { class: 'err', text: r.error + ' Nothing was changed.' }))); return; } if (!confirm('Replace the current investigation with the imported case?')) return; sessionStore.setItem(APP_KEY, JSON.stringify(r.state)); saveNotes(r.notes); sessionStore.notify(); };
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer.classList.contains('open')) openDrawer(false); });
 
 // contextual chip next to the focused app field

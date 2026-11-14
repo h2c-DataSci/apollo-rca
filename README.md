@@ -42,13 +42,23 @@ Seven steps: Define, Causes, RealityChart, Evidence, Test, Solutions, Track.
 
 ## AI
 
-AI is optional. It never writes the case until the investigator accepts. A BLOCK from the rules cannot be accepted.
+AI is optional. Open **RCA Coach**, then use **Connect your RCA Coach** above the workbench:
 
-| Mode | Where it runs | Notes |
-|---|---|---|
-| Standard | Browser only | No model. Full chart and report. |
-| Local daemon | `http://127.0.0.1:11434` only | Ollama or an OpenAI-compatible local server. Loopback is enforced. |
-| Browser AI | ONNX `onnx-community/Qwen2.5-0.5B-Instruct` | The only model that runs inside the browser. The popup explains why other models stay on a local server. |
+| Path | Setup |
+|---|---|
+| Local AI | Start Ollama, leave the loopback address or enter your loopback server URL, then Test connection. Select an installed model. No folder path is needed. |
+| Free cloud | Choose Groq or OpenRouter and a listed free model. Follow Get your key, paste your own key, authorize processing, and Test connection. Your own account's limits apply. |
+| Paid cloud | Choose OpenAI or Other OpenAI-compatible API. Enter your key, test to discover models, select a model and authorize processing. Custom APIs require their HTTPS base URL and compatible browser access. |
+
+Then choose **Enable AI Assistant**, confirm **Enable assistant**, and run a Coach task. AI suggestions require investigator review; deterministic BLOCK decisions remain enforced. Existing Browser AI remains available separately as an optional on-device model download.
+
+No Cloudflare account, shared API key, hosted AI proxy or application-owned inference backend is used. Cloud requests go directly to the provider you choose. Free mode restricts provider/model IDs and never falls back to paid models. A free model label does not verify your account's billing settings; use provider spending controls. Provider access, model availability, retention and terms can change. Groq users should review their account's Zero Data Retention controls; OpenRouter may route to different underlying free providers.
+
+**Cases and keys now stay in tab memory. Reloading, closing the tab or a crash loses unsaved work. Download reports before leaving.** Existing older browser-saved data is not automatically loaded or deleted: the session notice offers a recovery download (excluding the old API-key configuration) and explicit deletion. Other browser preferences and app assets may still be cached. No app-controlled persistent investigation storage is used; browser/OS behavior and external provider retention cannot be universally guaranteed.
+
+Download report uses the existing PDF/ZIP flow. ZIP packages include the PDF, full-size chart SVG/PNG, action CSV and project JSON. Print remains available. Browser settings determine the folder prompt; enable Ask where to save if desired. Downloaded files may remain in backups or synced folders.
+
+Privacy, accuracy, costs, local setup limitations and saving-work notices appear in the connection panel. Reports contain an AI accuracy disclaimer. See [INSTRUCTION.md](INSTRUCTION.md) for detailed steps.
 
 Rules live in `rca-principles.js`, `rca-rules.js`, and `rca-integrity.js` (P01â€“P15).
 
@@ -57,16 +67,16 @@ Rules live in `rca-principles.js`, `rca-rules.js`, and `rca-integrity.js` (P01â€
 ```bash
 git clone https://github.com/h2c-DataSci/apollo-rca.git
 cd apollo-rca
-python3 -m http.server 8080
+npm run serve
 ```
 
-Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/). The live Pages site adds the `/apollo-rca/` prefix; asset URLs in `index.html` already use that prefix, so local viewing of images and modules is most faithful behind a `/apollo-rca/` path (or the published site).
+Open [http://127.0.0.1:8080/apollo-rca/](http://127.0.0.1:8080/apollo-rca/). The preview server maps the published `/apollo-rca/` path correctly, binds only to this computer, and requires no Python or package installation. Choose another port with `node scripts/serve.mjs 8081`.
 
 ```bash
 node --test
 ```
 
-On 2026-11-13 the suite was **140 passed, 0 failed**. Node 18, 20, and 22 are the CI matrix (Ubuntu and Windows). The accepted baseline remains `b1afdd3`; later commits are fixes on top of it.
+The pre-change baseline was **147 passed, 0 failed**. Current implementation validation is recorded in PROGRESS.md. Node 18, 20, and 22 are the CI matrix (Ubuntu and Windows). The accepted baseline remains `b1afdd3`; later commits are fixes on top of it.
 
 ## Files that matter
 
@@ -80,30 +90,22 @@ On 2026-11-13 the suite was **140 passed, 0 failed**. Node 18, 20, and 22 are th
 | `help-kb.js` / `help-diagrams.js` | Knowledge text and original diagrams |
 | `h2c-videos.js` | Seven YouTube episodes. Players load from `youtube-nocookie.com` only after a click. Sync Official Durations reads the player length. |
 | `browser-ai.js` | In-browser ONNX loader |
+| `session-store.js` / `provider-presets.js` | Memory-only case storage and public provider connection presets. |
 | `local-ai-bridge.js` | Ollama on `127.0.0.1:11434`, or a user-supplied HTTPS API. No cloud fallback. |
 | `sw.js` | App-shell cache. Install fails if a shell file is missing. Runtime cache is capped. |
 | `rca.test.mjs` and `test/` | Node test runner. No package install required. |
 
 There is no `local-bridge.js` or `ai-coach.js`. Those names in older notes are wrong.
 
-## AI provider
+## AI transport and privacy
 
-This is a static page. It has no server of its own, so the browser calls the model. There is no cloud API key in the repo.
+`provider-presets.js` contains public connection metadata only. `local-ai-bridge.js` holds configuration in memory, enforces consent and free-provider restrictions, aborts streams and rejects partial failed output. Model-list tests make no inference calls. Groq reasoning requests use a bounded completion budget, low reasoning effort and JSON output; other providers use their supported payloads.
 
-| Setting | Value |
-|---|---|
-| Provider | `ollama` (default), `openai` for your own API, or `browser` for the ONNX model |
-| Ollama address | `http://127.0.0.1:11434` |
-| Default model tag | `qwen3:2b` |
-| Stored in | `localStorage` key `h2c-local-ai-bridge-v1` |
+`session-store.js` holds case data, hypotheses, notes and clear/undo backups in memory. The active bundled editor and shell share this store. Shell and Help wait for the editor's first React commit before modifying the page. Service worker shell v27 reloads assets on install and runtime cache v2 retires stale runtime entries; credential-bearing requests and cross-origin inference are excluded from caching.
 
-`qwen3:2b` is the usual Ollama tag for Qwen3 2B. This build machine could not see a running Ollama, so that tag was not confirmed against `D:\Ollama\models`. On your computer, **Test connection** reads `/api/tags` and selects the installed Qwen3 2B tag when one is listed. It does not download or move models.
+Local mode enforces loopback. The website cannot start Ollama, install models, inspect folders or change OLLAMA_MODELS. On this Windows computer keep Ollama runtime on C: and its existing models at D:\Ollama\models. A read-only check found installed `qwen3.5:4b` and `qwen3.5:2b`; no model was run or downloaded. No local companion has been installed.
 
-To use another model you already have, type its tag. To use your own API, choose **My API key**, set the HTTPS base URL and the key. The key is sent only to that address. Ollama itself stays on localhost.
-
-Startup: leave `OLLAMA_MODELS` as it is, start the Ollama you already installed, open RCA Coach, test the connection, then **Enable assistant**.
-
-Ollama is called with `stream: true`. The reply is newline-delimited JSON. `message.thinking` and `<think>` tags are discarded as they arrive. The coach still waits for the full JSON answer before it offers anything to accept. Cancel aborts the stream.
+Implementation verification: 164 automated tests passed, plus synthetic mocked inference in isolated Edge, real credential-free browser model-list connectivity, a sample report download, and a real service-worker offline reload. Authenticated live inference and published-site validation remain pending; no API keys, paid inference or Cloudflare account were used. Changes are local and not published.
 
 ## Training videos
 
@@ -132,3 +134,19 @@ Official series on [@h2c_Learnings](https://www.youtube.com/@h2c_Learnings). Ope
 ## License
 
 Source is intended as MIT. A `LICENSE` file is not in the tree yet. Methodology and trademarks remain with Dean L. Gano and Apollonian Publications, LLC.
+
+## Developer tooling: Elephant-Goldfish Model
+
+Google's [Elephant-Goldfish Model](https://github.com/google/elephant-goldfish-model) (EGM) helps develop specifications with project context and review them with fresh agents. The complete EGM plugin was installed through the supported Codex CLI on 2026-11-14; its manifest reports version 0.1.1. It is developer tooling, separate from the website and its local AI models.
+
+Read [INSTRUCTION.md](INSTRUCTION.md) for installation commands, the seven EGM skills, review requirements, and application commands. Start a fresh Codex session and select an EGM skill from the skill picker. Desktop skill discovery and a full Goldfish review still need verification in that fresh session.
+
+Local checkout: `D:\ApolloRCA_webapp`, tracking `origin/main`. Use `node --test` to run the application tests. Keep this README as product context and PROGRESS.md as the task handoff.
+
+## Three-path RCA Coach implementation
+
+The design and remaining limitations are in [docs/AI_COACH_PLAN.md](docs/AI_COACH_PLAN.md). Local AI, free BYOK cloud, and paid BYOK cloud are implemented in the local working tree. The seven-step workflow and report formats remain. Automatic local startup still requires an optional separately installed companion and is not implemented by the website.
+
+Hard usage rule: no runtime resets, credit purchases, paid upgrades or additional spend; test inference with mocks and checkpoint before resource limits. No automatic paid fallback. README.md and PROGRESS.md must be updated for every task. Disclaimers supplement controls; do not promise absolute zero retention across external services.
+
+Git workflow: a local commit records the reviewed implementation; it does not publish to GitHub Pages. Push or publication is a separate action.

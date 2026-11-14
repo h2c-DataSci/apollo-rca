@@ -84,7 +84,7 @@ function whenHydrated(run) {
   const start = Date.now();
   const tick = () => {
     const tsr = globalThis.$_TSR;
-    if (tsr && !tsr.hydrated && Date.now() - start < 4000) {
+    if (!globalThis.h2cAppHydrated) {
       setTimeout(tick, 40);
       return;
     }

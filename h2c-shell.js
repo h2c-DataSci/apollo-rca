@@ -12,7 +12,10 @@ function escapeHtml(str) {
 // interactive lively 7-step Apollo RCA workflow hub, real-time color-coded validation,
 // and local AI daemon bridge for low-resource hardware.
 
-import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=23';
+import { PROVIDER_PRESETS } from './provider-presets.js';
+import { sessionStore, listLegacyData, removeLegacyData } from './session-store.js';
+
+import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=24';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
@@ -74,6 +77,7 @@ let updating = false;
 // Injected CSS for the 7-step Workflow Hub and Real-Time Color Coded Validation
 const css = document.createElement('style');
 css.textContent = `
+main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-width:0}#realitychart{min-width:0;max-width:100%}#realitychart table{display:block;max-width:100%;overflow-x:auto}
 .h2c-new-prominent{background:linear-gradient(180deg,#f6dd7a,#c9a227)!important;color:#043d2e!important;border:2px solid #8c6a1a!important;font-weight:700!important}
 .h2c-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:10000;background:#043d2e;color:#f1d16b;border:2px solid #c9a227;border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;font:600 14px system-ui;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 .h2c-toast button{background:#f1d16b;color:#043d2e;border:0;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer}.h2c-toast button:focus-visible{outline:3px solid #fff}
@@ -1209,136 +1213,111 @@ function focusOfficialCoach() {
 function ensureLocalBridgeUI() {
   const coachSection = document.querySelector('section[aria-label="RCA coach"]');
   if (!coachSection) return;
-
   let bridge = document.querySelector('.h2c-local-bridge-card');
-  if (bridge && bridge.dataset.v !== '2') {
-    bridge.remove();
-    bridge = null;
-  }
-  if (bridge) {
-    if (coachSection.contains(bridge) || bridge.previousElementSibling !== coachSection) coachSection.after(bridge);
-    return;
-  }
+  if (bridge) { if (bridge.nextElementSibling !== coachSection) coachSection.before(bridge); return; }
   const cfg = getBridgeConfig();
   bridge = document.createElement('div');
-  bridge.dataset.v = '2';
   bridge.className = 'no-print h2c-local-bridge-card';
-  bridge.style.cssText = 'margin-top: 12px; margin-bottom: 12px; background: #fff; border: 1px solid #e7ded0; border-left: 4px solid #c9a227; border-radius: 8px; padding: 12px 14px; font-family: system-ui, sans-serif;';
+  bridge.style.cssText = 'margin:12px 0;background:#fffdf8;border:1px solid #e7ded0;border-left:4px solid #c9a227;border-radius:8px;padding:14px;font:13px/1.5 system-ui;color:#1a202c';
   setSafeHtml(bridge, `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-      <strong style="font-size: 13.5px; color: #1a202c;">AI provider</strong>
-      <span class="h2c-bridge-status-pill" style="font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #f3f4f6; color: #4b5563;">Not checked</span>
-    </div>
-    <p style="font-size: 12px; color: #4a5568; margin: 0 0 10px 0; line-height: 1.45;">
-      Ollama on this computer is the default. The usual tag for Qwen3 2B is qwen3:2b. Test Connection uses the tag that is actually installed. Your API key, if you add one, stays in this browser and is sent only to the address you type.
-    </p>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-      <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">Provider
-        <select class="h2c-bridge-provider" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
-          <option value="ollama" ${cfg.provider === 'ollama' ? 'selected' : ''}>Ollama on this computer</option>
-          <option value="openai" ${cfg.provider === 'openai' ? 'selected' : ''}>My API key</option>
-          <option value="browser" ${cfg.provider === 'browser' ? 'selected' : ''}>Browser model</option>
-        </select>
-      </label>
-      <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">Address
-        <input type="text" class="h2c-bridge-endpoint" value="${escapeHtml(cfg.endpoint)}" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 220px;" />
-      </label>
-      <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">Model
-        <input type="text" class="h2c-bridge-model" list="h2c-bridge-models" value="${escapeHtml(cfg.model)}" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 160px;" />
-      </label>
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>Connect your RCA Coach</strong><span class="h2c-bridge-status-pill" role="status">Not connected</span></div>
+    <p style="margin:6px 0 12px">Choose how AI helps. Your investigation stays under your control; suggestions need your review.</p>
+    <div class="h2c-ai-controls" style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
+      <label>1. AI path<br><select class="h2c-ai-mode"><option value="local">Local AI — on this device</option><option value="free">Free cloud — your own key</option><option value="paid">Paid cloud — your own key</option></select></label>
+      <label class="h2c-ai-preset-label">2. Provider<br><select class="h2c-ai-preset"></select></label>
+      <label>Model<br><select class="h2c-ai-model-choice" aria-label="Choose model"></select><input class="h2c-bridge-model" list="h2c-bridge-models" autocomplete="off" spellcheck="false" aria-label="Model ID" placeholder="Enter model ID"></label>
       <datalist id="h2c-bridge-models"></datalist>
-      <label class="h2c-bridge-key-label" style="font-size: 12px; font-weight: 600; color: #2d3748; display: ${cfg.provider === 'openai' ? 'flex' : 'none'}; align-items: center; gap: 6px;">API key
-        <input type="password" class="h2c-bridge-key" autocomplete="off" value="${escapeHtml(cfg.apiKey || '')}" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 160px;" />
-      </label>
-      <button type="button" class="h2c-bridge-test-btn" style="font-size: 12px; font-weight: 700; background: #043d2e; color: #f1d16b; border: 1px solid #c9a227; padding: 5px 12px; border-radius: 5px; cursor: pointer;">Test connection</button>
+      <label class="h2c-bridge-key-label">3. Your API key<br><input type="password" class="h2c-bridge-key" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="Paste key for this session"></label>
     </div>
-    <div class="h2c-bridge-feedback" style="margin-top: 8px; font-size: 11.5px; line-height: 1.4; display: none;"></div>
+    <p class="h2c-ai-steps" style="margin:10px 0"></p>
+    <details class="h2c-ai-advanced"><summary>Connection settings</summary><label>Server / API base URL<br><input class="h2c-bridge-endpoint" type="url" spellcheck="false" style="max-width:100%;width:360px"></label><p class="h2c-ai-local-help">Default: http://127.0.0.1:11434. Test connection lists installed models. No model folder is needed. If Ollama is stopped, start the installed app or run <code>ollama serve</code>, then retry. <a href="https://ollama.com/download" target="_blank" rel="noopener noreferrer">Install Ollama</a>. A website cannot start programs or inspect folders. Browser local-network permission or Ollama origin settings may be needed; do not disable browser security.</p></details>
+    <label class="h2c-ai-consent" style="display:block;margin:10px 0"><input type="checkbox" class="h2c-ai-allow"> I authorize sending selected investigation context to this provider. I have checked its privacy and billing settings.</label>
+    <p class="h2c-ai-risk" style="font-size:12px;margin:8px 0"></p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="h2c-bridge-test-btn">Test connection</button><button type="button" class="h2c-ai-forget">Disconnect &amp; clear key</button></div>
+    <div class="h2c-bridge-feedback" role="status" aria-live="polite" style="margin-top:8px"></div>
+    <details style="margin-top:10px;font-size:12px"><summary>Privacy, accuracy &amp; saving your work</summary><p>Cloud providers process the context you send under their own policies. Absolute confidentiality, zero retention across every system, uninterrupted availability and correct AI advice cannot be guaranteed. Verify evidence and causal logic; AI is not a verified finding or a replacement for qualified judgment. Use Local AI or Standard Mode for information you cannot share.</p><p>Cases and keys are kept in this tab's memory. Reloading or closing it loses unsaved work. Download your report or ZIP package before leaving. Your browser controls the download folder; enable “Ask where to save” for a folder prompt. Downloaded copies may remain in device backups or synced folders. Local runtimes may keep their own logs.</p><p>No shared API key, proxy or Cloudflare account is used. Some tasks may make a second AI validation call and consume additional provider quota. Cancellation may not stop work already processed by a provider.</p></details>
   `);
-  coachSection.after(bridge);
-
-  const testBtn = bridge.querySelector('.h2c-bridge-test-btn');
-  const endpointInput = bridge.querySelector('.h2c-bridge-endpoint');
-  const modelInput = bridge.querySelector('.h2c-bridge-model');
-  const providerInput = bridge.querySelector('.h2c-bridge-provider');
-  const keyInput = bridge.querySelector('.h2c-bridge-key');
-  const keyLabel = bridge.querySelector('.h2c-bridge-key-label');
-  const list = bridge.querySelector('#h2c-bridge-models');
-  const pill = bridge.querySelector('.h2c-bridge-status-pill');
-  const feedback = bridge.querySelector('.h2c-bridge-feedback');
-
-  const saveChanges = () => saveBridgeConfig({
-    provider: providerInput.value,
-    endpoint: endpointInput.value.trim(),
-    model: modelInput.value.trim(),
-    apiKey: keyInput.value,
-    enabled: providerInput.value !== 'browser'
-  });
-  providerInput.addEventListener('change', () => {
-    keyLabel.style.display = providerInput.value === 'openai' ? 'flex' : 'none';
-    saveChanges();
-  });
-  endpointInput.addEventListener('change', saveChanges);
-  modelInput.addEventListener('change', saveChanges);
-  keyInput.addEventListener('change', saveChanges);
-
-  testBtn.onclick = async () => {
-    testBtn.disabled = true;
-    testBtn.textContent = 'Testing...';
-    pill.textContent = 'Checking...';
-    feedback.style.display = 'block';
-    feedback.replaceChildren();
-    feedback.style.color = '#4b5563';
-    feedback.textContent = 'Checking ' + endpointInput.value + '...';
-    saveChanges();
-    try {
-      const res = await testConfiguredConnection({
-        provider: providerInput.value,
-        endpoint: endpointInput.value.trim(),
-        model: modelInput.value.trim(),
-        apiKey: keyInput.value
-      });
-      feedback.replaceChildren();
-      if (res.online) {
-        const picked = providerInput.value === 'ollama' ? pickInstalledQwen(res.models) : '';
-        if (picked && (modelInput.value.trim() === 'qwen3:2b' || modelInput.value.trim() === 'gemma2:2b' || !res.models.includes(modelInput.value.trim()))) {
-          modelInput.value = picked;
-          saveBridgeConfig({ model: picked });
-        }
-        list.replaceChildren();
-        for (const name of res.models || []) {
-          const option = document.createElement('option');
-          option.value = name;
-          list.append(option);
-        }
-        pill.textContent = 'Connected';
-        pill.style.background = '#d1fae5';
-        pill.style.color = '#065f46';
-        feedback.style.color = '#065f46';
-        const title = document.createElement('strong');
-        title.textContent = 'Connected. ';
-        feedback.append(title, document.createTextNode(String(res.message || '')));
-        if (res.models && res.models.length) feedback.append(document.createTextNode(' Installed: ' + res.models.join(', ')));
-        if (modelInput.value && res.models && res.models.length && !res.models.includes(modelInput.value)) {
-          feedback.append(document.createElement('br'), document.createTextNode('The typed model is not in that list. Choose one of the installed tags. Nothing was downloaded.'));
-        }
-      } else {
-        pill.textContent = 'Not connected';
-        pill.style.background = '#fee2e2';
-        pill.style.color = '#991b1b';
-        feedback.style.color = '#b91c1c';
-        feedback.textContent = String(res.error || res.message || 'Connection failed.');
-      }
-    } catch (error) {
-      pill.textContent = 'Not connected';
-      pill.style.background = '#fee2e2';
-      pill.style.color = '#991b1b';
-      feedback.style.color = '#b91c1c';
-      feedback.textContent = error && error.message ? error.message : 'Connection check failed.';
-    } finally {
-      testBtn.disabled = false;
-      testBtn.textContent = 'Test connection';
-    }
+  coachSection.before(bridge);
+  for (const el of bridge.querySelectorAll('input:not([type="checkbox"]), select, button')) el.style.cssText += ';min-height:38px;border:1px solid #cbd5e1;border-radius:5px;padding:6px 9px;max-width:100%;background:#fff;color:#1a202c';
+  const $ = (q) => bridge.querySelector(q);
+  const mode = $('.h2c-ai-mode'), preset = $('.h2c-ai-preset'), model = $('.h2c-bridge-model');
+  const choice = $('.h2c-ai-model-choice');
+  const key = $('.h2c-bridge-key'), endpoint = $('.h2c-bridge-endpoint'), consent = $('.h2c-ai-allow');
+  const feedback = $('.h2c-bridge-feedback'), pill = $('.h2c-bridge-status-pill'), test = $('.h2c-bridge-test-btn');
+  let revision = 0;
+  const presets = () => Array.isArray(PROVIDER_PRESETS) ? PROVIDER_PRESETS : Object.values(PROVIDER_PRESETS);
+  const currentPreset = () => presets().find((p) => p.id === preset.value);
+  const resetStatus = () => { revision++; pill.textContent = 'Not connected'; feedback.textContent = ''; globalThis.h2cExternalAbort?.(); };
+  const save = () => {
+    const local = mode.value === 'local';
+    saveBridgeConfig({ provider: local ? 'ollama' : 'openai', mode: mode.value, preset: local ? '' : preset.value, endpoint: endpoint.value.trim(), model: model.value.trim(), apiKey: local ? '' : key.value.trim(), cloudConsent: !local && consent.checked, numPredict: local ? 384 : 1536, timeoutMs: local ? 90000 : 60000, enabled: true });
   };
+  const models = (values) => {
+    const list = $('#h2c-bridge-models'); list.replaceChildren(); choice.replaceChildren();
+    for (const value of values) { const name = typeof value === 'string' ? value : value.id; const o = document.createElement('option'); o.value = name; list.append(o); const c = document.createElement('option'); c.value = name; c.textContent = name; choice.append(c); }
+    choice.hidden = !values.length; model.hidden = values.length > 0 && preset.value !== 'custom';
+    if (values.length && [...choice.options].some((o) => o.value === model.value)) choice.value = model.value;
+  };
+  const applyPreset = (restore = false) => {
+    const local = mode.value === 'local', p = currentPreset();
+    key.value = restore ? cfg.apiKey || '' : ''; consent.checked = restore && cfg.cloudConsent === true;
+    $('.h2c-ai-preset-label').hidden = local; $('.h2c-bridge-key-label').hidden = local; $('.h2c-ai-consent').hidden = local;
+    $('.h2c-ai-local-help').hidden = !local;
+    endpoint.value = local ? (restore && cfg.provider === 'ollama' ? cfg.endpoint : 'http://127.0.0.1:11434') : p?.endpoint || '';
+    endpoint.readOnly = !local && preset.value !== 'custom';
+    model.value = restore ? cfg.model : local ? 'qwen3:2b' : (p?.models?.[0]?.id || p?.models?.[0] || '');
+    models(local ? [] : p?.models || []);
+    choice.value = model.value;
+    const steps = $('.h2c-ai-steps'); steps.replaceChildren();
+    if (local) steps.textContent = 'Start Ollama, then Test connection to find your installed models. Use Enable assistant in the Coach when connected.';
+    else {
+      steps.append(document.createTextNode('Create a key with your provider, paste it above, review the notice, then Test connection. '));
+      if (p?.keyUrl) { const link = document.createElement('a'); link.href = p.keyUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Get your key ↗'; steps.append(link); }
+      if (p?.privacyUrl) { const link = document.createElement('a'); link.href = p.privacyUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = ' · Privacy policy ↗'; steps.append(link); }
+    }
+    $('.h2c-ai-risk').textContent = local ? 'Local mode stays on loopback. A folder path does not start or import a model.' : mode.value === 'free' ? 'Free models use your provider account and its quota. Confirm billing is disabled or capped. Availability and provider retention settings can change. No automatic paid fallback. OpenRouter may route to different underlying free providers.' : 'Your provider may charge you. The app cannot guarantee the final cost or verify account billing settings. Only use a provider you trust.';
+    resetStatus(); save();
+  };
+  const applyMode = (restore = false) => {
+    preset.replaceChildren();
+    for (const p of presets().filter((p) => mode.value === 'free' ? p.free : !p.free)) { const o = document.createElement('option'); o.value = p.id; o.textContent = p.label; preset.append(o); }
+    if (restore && [...preset.options].some((o) => o.value === cfg.preset)) preset.value = cfg.preset;
+    applyPreset(restore);
+  };
+  mode.value = cfg.mode || (cfg.provider === 'openai' ? 'paid' : 'local');
+  mode.addEventListener('change', () => applyMode()); preset.addEventListener('change', () => applyPreset());
+  choice.addEventListener('change', () => { model.value = choice.value; resetStatus(); save(); });
+  endpoint.addEventListener('input', () => { key.value = ''; consent.checked = false; resetStatus(); save(); });
+  for (const el of [model, key, consent]) el.addEventListener('input', () => { resetStatus(); save(); });
+  $('.h2c-ai-forget').onclick = () => { key.value = ''; consent.checked = false; saveBridgeConfig({ enabled: false, apiKey: '', cloudConsent: false }); resetStatus(); feedback.textContent = 'Disconnected. Key cleared from this session. Standard Mode still works.'; };
+  test.onclick = async () => {
+    save(); const ticket = ++revision;
+    if (mode.value !== 'local' && (!key.value.trim() || !consent.checked)) { feedback.textContent = 'Paste your key and authorize this provider first. No request was sent.'; return; }
+    test.disabled = true; test.textContent = 'Checking…'; pill.textContent = 'Checking…';
+    try {
+      const status = await testConfiguredConnection(getBridgeConfig());
+      if (ticket !== revision || !bridge.isConnected) return;
+      pill.textContent = status.online ? 'Connected' : 'Not connected';
+      feedback.textContent = status.message || status.error || 'Connection failed.';
+      if (status.online) {
+        const names = status.models || [];
+        if (mode.value === 'local') {
+          models(names);
+          if (names.length && !names.includes(model.value)) model.value = pickInstalledQwen(names) || names[0];
+          choice.value = model.value;
+          feedback.textContent += names.length ? ' Choose an installed model, then Enable assistant in the Coach.' : ' No installed models found. Install a model in Ollama before enabling the assistant.';
+        }
+        if (mode.value === 'paid') {
+          models(names);
+          if (!model.value.trim() && names.length) { const blank = document.createElement('option'); blank.value = ''; blank.textContent = 'Choose a model'; choice.prepend(blank); choice.value = ''; }
+          if (!model.value.trim() && names.length) feedback.textContent += ' Choose a model from the Model field before enabling the assistant.';
+        }
+        save();
+      } else feedback.textContent += ' Check the key, address and browser permissions. If the provider blocks browser access, choose another provider; no proxy is used.';
+    } catch { if (ticket === revision) { pill.textContent = 'Not connected'; feedback.textContent = 'Connection failed. Check your provider settings and browser access.'; } }
+    finally { test.disabled = false; test.textContent = 'Test connection'; }
+  };
+  applyMode(true);
 }
 
 function ensureBrowserAiButton() {
@@ -1388,7 +1367,7 @@ function whenHydrated(run) {
   const start = Date.now();
   const tick = () => {
     const tsr = globalThis.$_TSR;
-    if (tsr && !tsr.hydrated && Date.now() - start < 4000) {
+    if (!globalThis.h2cAppHydrated) {
       setTimeout(tick, 40);
       return;
     }
@@ -1440,9 +1419,34 @@ function initShell() {
   }
 }
 
+function ensureSessionNotice() {
+  if (document.querySelector('.h2c-session-notice')) return;
+  const main = document.querySelector('main'); if (!main) return;
+  const note = document.createElement('aside'); note.className = 'h2c-session-notice no-print';
+  note.style.cssText = 'margin:12px 0;padding:10px 12px;border:1px solid #e7ded0;border-radius:6px;font:12px/1.5 system-ui;background:#fffdf8';
+  note.textContent = 'Private session: work stays in this tab. Download your report before closing or reloading. ';
+  const legacy = listLegacyData();
+  if (Object.keys(legacy).length) {
+    note.append(document.createTextNode('Older saved data exists on this device; it has not been loaded or sent to AI. '));
+    const exportBtn = document.createElement('button'); exportBtn.type = 'button'; exportBtn.textContent = 'Download older saved data';
+    exportBtn.onclick = () => {
+      const data = Object.fromEntries(Object.entries(listLegacyData()).filter(([k]) => k !== 'h2c-local-ai-bridge-v1'));
+      const url = URL.createObjectURL(new Blob([JSON.stringify({ format: 'h2c-legacy-recovery-v1', data }, null, 2)], { type: 'application/json' }));
+      const a = document.createElement('a'); a.href = url; a.download = 'apollo-rca-older-saved-data.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+    const clearBtn = document.createElement('button'); clearBtn.type = 'button'; clearBtn.textContent = 'Delete older saved data & keys';
+    clearBtn.onclick = () => { if (!confirm('Delete older Apollo RCA data and saved API keys from this browser? Download a recovery copy first if needed. This cannot be undone.')) return; const failed = removeLegacyData(); if (failed.length) { alert('Some older data could not be removed. Check browser storage permissions.'); return; } note.remove(); ensureSessionNotice(); };
+    for (const b of [exportBtn, clearBtn]) { b.style.cssText = 'margin:4px;padding:5px;border:1px solid #cbd5e1;border-radius:4px'; note.append(b); }
+  }
+  main.querySelector('header')?.after(note);
+}
+window.addEventListener('beforeunload', (event) => {
+  if (KEYS.some((k) => sessionStore.getItem(k))) { event.preventDefault(); event.returnValue = ''; }
+});
 function bootShell() {
   installExternalCoach();
   initShell();
+  ensureSessionNotice();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register(new URL('./sw.js', import.meta.url)).catch(() => {});
   }
@@ -1454,7 +1458,7 @@ else window.addEventListener('load', startShell, { once: true });
 function toast() {
   const t = document.createElement('div'); t.className = 'h2c-toast'; t.setAttribute('role', 'status');
   const s = document.createElement('span'); s.textContent = 'Analysis cleared. Starting fresh.'; const u = document.createElement('button'); u.type = 'button'; u.textContent = 'Undo';
-  u.onclick = () => { try { const b = JSON.parse(localStorage.getItem(BACKUP) || 'null'); if (b && b.data) for (const [k, v] of Object.entries(b.data)) if (v != null) localStorage.setItem(k, v); localStorage.removeItem(BACKUP); } catch {} location.reload(); };
+  u.onclick = () => { try { const b = JSON.parse(sessionStore.getItem(BACKUP) || 'null'); if (b && b.data) for (const [k, v] of Object.entries(b.data)) if (v != null) sessionStore.setItem(k, v); sessionStore.removeItem(BACKUP); } catch {} sessionStore.notify(); };
   t.append(s, u); document.body.append(t); setTimeout(() => t.remove(), 20000);
 }
 
@@ -1472,6 +1476,6 @@ document.addEventListener('click', (e) => {
   if (proceed) { proceed = false; return; }
   e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
   if (!confirm('Clear analysis and start new?\n\nThe current case is removed from this browser. You can undo right after.')) return;
-  try { localStorage.setItem(BACKUP, JSON.stringify({ data: Object.fromEntries(KEYS.map((k) => [k, localStorage.getItem(k)])), at: Date.now() })); } catch {}
+  try { sessionStore.setItem(BACKUP, JSON.stringify({ data: Object.fromEntries(KEYS.map((k) => [k, sessionStore.getItem(k)])), at: Date.now() })); } catch {}
   proceed = true; b.click(); setTimeout(toast, 150);
 }, true);

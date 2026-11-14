@@ -27,7 +27,7 @@ function harness({ fetchImpl = async () => { throw new Error('offline fixture');
   const context = vm.createContext({
     URL, Request, Response, Headers, Uint8Array, Set, Date,
     self: {
-      location: { origin: new URL(BASE).origin },
+      location: { origin: new URL(BASE).origin, href: new URL('sw.js', BASE).href },
       addEventListener: (name, fn) => listeners.set(name, fn),
       skipWaiting: async () => { skipCalls += 1; },
       clients: { claim: async () => {} },
@@ -69,7 +69,7 @@ test('fetch registers cache lifetime synchronously and serves the page before a 
   assert.equal(done, false);
   gate.resolve();
   await completion;
-  assert.equal(await (await h.cacheFor('apollo-rca-runtime-v1').match(e.value.request)).text(), 'page');
+  assert.equal(await (await h.cacheFor('apollo-rca-runtime-v2').match(e.value.request)).text(), 'page');
 });
 
 test('cache quota failures do not replace a successful network response', async () => {
@@ -82,7 +82,7 @@ test('cache quota failures do not replace a successful network response', async 
 
 test('offline fetch falls back to the shell cache without a rejected lifetime promise', async () => {
   const h = harness();
-  await h.cacheFor('apollo-rca-shell-v26').put(BASE + 'asset.js', new Response('offline copy'));
+  await h.cacheFor('apollo-rca-shell-v27').put(BASE + 'asset.js', new Response('offline copy'));
   const e = h.event(new Request(BASE + 'asset.js'));
   h.listeners.get('fetch')(e.value);
   assert.equal(await (await e.response()).text(), 'offline copy');
@@ -128,7 +128,7 @@ test('oversized declared length skips reading and cancels only the supplied cach
 
 test('runtime trimming preserves the count bound and expires old entries', async () => {
   const h = harness();
-  const cache = h.cacheFor('apollo-rca-runtime-v1');
+  const cache = h.cacheFor('apollo-rca-runtime-v2');
   for (let i = 0; i < 42; i += 1) {
     await cache.put(BASE + i, new Response('x', { headers: { 'x-apollo-cached-at': String(Date.now()) } }));
   }
@@ -148,17 +148,28 @@ test('failed essential precache prevents skipWaiting', async () => {
 
 test('activation only deletes this app old caches', async () => {
   const h = harness();
-  for (const name of ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25', 'heat-index-shell-v2', 'model-cache']) h.cacheFor(name);
+  for (const name of ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25', 'apollo-rca-runtime-v1', 'heat-index-shell-v2', 'model-cache']) h.cacheFor(name);
   const e = h.event();
   h.listeners.get('activate')(e.value);
   await Promise.all(e.waits);
-  assert.deepEqual(h.deleted, ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25']);
+  assert.deepEqual(h.deleted, ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25', 'apollo-rca-runtime-v1']);
 });
 
-test('non-GET and cross-origin requests remain untouched', () => {
+test('non-GET, credential-bearing and cross-origin requests remain untouched', () => {
   const h = harness();
-  for (const request of [new Request(BASE, { method: 'POST' }), new Request('https://other.invalid/')]) {
+  for (const request of [new Request(BASE, { method: 'POST' }), new Request(BASE, {headers: {authorization:'Bearer synthetic'}}), new Request('https://other.invalid/')]) {
     const e = h.event(request); h.listeners.get('fetch')(e.value);
     assert.equal(e.waits.length, 0); assert.equal(e.response(), undefined);
   }
+});
+
+
+test('new shell installation revalidates same-name assets instead of reusing the HTTP cache', async () => {
+  const requests = [];
+  const h = harness({ addHook: async request => requests.push(request) });
+  const e = h.event(); h.listeners.get('install')(e.value); await Promise.all(e.waits);
+  assert.ok(requests.length > 0);
+  assert.ok(requests.every(request => request.cache === 'reload'));
+  assert.ok(requests.some(request => request.url === BASE + 'session-store.js'));
+  assert.equal(h.skipCalls(), 1);
 });

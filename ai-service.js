@@ -94,7 +94,7 @@ export class AIService {
   }
   provenance(task, reviews) {
     const worst = reviews.reduce((a, r) => (r.review.decision === 'BLOCK' ? 'BLOCK' : a === 'BLOCK' ? a : r.review.decision === 'WARN' ? 'WARN' : a), 'PASS');
-    return { task, modelId: MODEL_CONFIG.id, promptTemplate: VERSIONS.coachSystem, reviewerTemplate: VERSIONS.integrityReviewer, principleSet: VERSIONS.principleSet, schemas: VERSIONS.schemas, reviewerDecision: worst, principleIds: [...new Set(reviews.flatMap((r) => r.review.principleIds))] };
+    return { task, modelId: this.t.modelId || MODEL_CONFIG.id, promptTemplate: VERSIONS.coachSystem, reviewerTemplate: VERSIONS.integrityReviewer, principleSet: VERSIONS.principleSet, schemas: VERSIONS.schemas, reviewerDecision: worst, principleIds: [...new Set(reviews.flatMap((r) => r.review.principleIds))] };
   }
   cancel() { this.t.cancel && this.t.cancel(); }
   async disable() { try { await this.t.unload(); } catch {} this.set('disabled', { progress: 0, error: '' }); }

@@ -1,5 +1,5 @@
-const CACHE = 'apollo-rca-shell-v26';
-const RUNTIME = 'apollo-rca-runtime-v1';
+const CACHE = 'apollo-rca-shell-v27';
+const RUNTIME = 'apollo-rca-runtime-v2';
 const OWN_PREFIX = 'apollo-rca-';
 const RUNTIME_MAX_ENTRIES = 40;
 const RUNTIME_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -11,13 +11,15 @@ const SHELL = [
   './index-v13.js',
   './routes-v13.js',
   './rolldown-runtime-v11.js',
-  './h2c-shell.js?v=27',
-  './h2c-help.js?v=26',
+  './h2c-shell.js?v=28',
+  './h2c-help.js?v=27',
   './help-kb.js?v=22',
   './help-diagrams.js?v=22',
   './h2c-videos.js?v=25',
-  './local-ai-bridge.js?v=23',
+  './local-ai-bridge.js?v=24',
   './ai-config.js',
+  './provider-presets.js',
+  './session-store.js',
   './browser-ai.js?v=24',
   './favicon.svg',
   './h2c-logo.jpg',
@@ -28,7 +30,7 @@ const SHELL = [
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
-    await Promise.all(SHELL.map((url) => cache.add(url)));
+    await Promise.all(SHELL.map((url) => cache.add(new Request(new URL(url, self.location.href), { cache: 'reload' }))));
     await self.skipWaiting();
   })());
 });
@@ -122,7 +124,7 @@ async function matchCached(request) {
 
 self.addEventListener('fetch', (event) => {
   const request = event.request;
-  if (request.method !== 'GET') return;
+  if (request.method !== 'GET' || request.headers.has('authorization')) return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
   const network = fetch(request);
