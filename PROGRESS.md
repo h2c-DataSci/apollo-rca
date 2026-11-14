@@ -10,7 +10,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `eb028af` — Groq list is the three chat models. |
+| HEAD | `2ef7aae` — housekeeping check recorded. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
 | Tests | `node --test` → 177 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | this commit | Housekeeping. Only `main` exists. No unused bundle was removed; `404.html` stays because Pages uses it. The handoff now separates shell query `v=35` from service-worker cache `v36`, and notes Google free-tier retention. Tests remain 177. |
+| 2026-11-14 | `2ef7aae` | Housekeeping. Only `main` exists. No unused bundle was removed; `404.html` stays because Pages uses it. The handoff now separates shell query `v=35` from service-worker cache `v36`, and notes Google free-tier retention. Tests remain 177. |
 | 2026-11-14 | `eb028af` | Groq free-cloud list now keeps only the three chat models useful for RCA: gpt-oss-20b, gpt-oss-120b, and qwen/qwen3.8-27b. Removed Allam, the safeguard model, and both Prompt Guard classifiers. Shell cache is v36. |
 | 2026-11-14 | `a5b5b48` | Free cloud can use a Google AI key. The selector lists gemini-3.8-flash, gemini-3.5-flash-lite, gemini-3.1-flash-lite, gemma-4-31b-it, and gemma-4-26b-a4b-it. Calls use generateContent. A quota error does not switch models. |
 | 2026-11-14 | `56b6dc3` | Housekeeping. Only `main` is present. The live bundles are still loaded, so none were deleted. Stale notes that said the site was unpublished and the suite was 164 tests now point at this file. |
