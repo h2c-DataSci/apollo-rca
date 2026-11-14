@@ -10,9 +10,9 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `7563be0` — docs after merge `0133a0a` (PR #5). |
+| HEAD | `f4de6ba` — Groq model list is on main. This cleanup follows it. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Tests | `node --test` → 172 passed, 0 failed, after the Groq model list. |
+| Tests | `node --test` → 172 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -21,16 +21,17 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-14 | this commit | Removed unused `styles-v11.css` and its identical copy `styles-CjEoaxHy.css`. The live page still uses `styles-v13.css`. Kept `browser-dCISOrnY.js` (report ZIP), `rolldown-runtime-v11.js`, and `es-DawnZXYc.js` because the current bundle loads them. Added the MIT `LICENSE`. Deleted the merged `housekeeping/sri-stale-legacy` branch. Dependabot pull requests were left open. |
 | 2026-11-14 | `1bac0d6` | Groq free-cloud choices now include every chat model from the console limits list: gpt-oss-20b, gpt-oss-120b, qwen/qwen3.8-27b, allam-2-7b, gpt-oss-safeguard-20b, and both Llama Prompt Guard models. The default remains gpt-oss-20b. Reasoning settings stay on the two gpt-oss chat models. Shell cache is v29. |
 | 2026-11-14 | `7563be0` | Recorded publication of merge `0133a0a` (PR #5). Pinned Transformers.js is integrity-checked before import. Unused v11/v12 bundles and coach-ui.js removed. Offline check expects shell cache v28. Legacy localStorage is cleared after the recovery download is offered, and the saved API key is not kept. Ollama fetches use redirect error. Tests were 171/171. |
 | 2026-11-14 | `9d3672b` | Added three one-pass reviews on the connection card: whole chart, next interview, and solution screen. They use the connected model, including free or paid cloud, and do not edit the case. |
-| 2026-11-14 | this commit | User authorized publication to GitHub. Prepared push of 459973d and this documentation update to origin/main; Pages is branch-managed. Prior checks: 164 tests and browser/offline/export acceptance passed. CI/Pages outcome is verified after push and reported in chat. No Cloudflare or paid inference involved. |
-| 2026-11-14 | this commit | Committed the three-path RCA Coach implementation, session-only privacy, provider adapters, browser verification tools and EGM documentation. Formatting check passed; credential scan found only synthetic test keys. Prior validation: 164 tests passed plus browser/offline/report checks. Local commit only; no push or publication. |
-| 2026-11-14 | uncommitted | Implemented Local / Free BYOK / Paid BYOK Coach with provider/model dropdowns, key links, consent and recovery guidance. Session-only case/keys, explicit legacy export/delete, streamed-error rejection, reasoning adapters, actual-model audit labels and PDF disclaimer. Added dependency-free npm run serve preview with correct /apollo-rca/ paths; offline assets revalidate on install and stale runtime cache is retired. Two implementation agents; no resets or inference charges. 164 tests pass; Edge mocked full analysis, case reset/undo, reload, responsive controls and ZIP download verified. Real SW install plus offline reload/Coach controls passed with shell v27/runtime v2; preview running at http://127.0.0.1:8080/apollo-rca/. Credential-free browser CORS reached Groq/OpenRouter/OpenAI; Ollama tags found qwen3.5:4b and qwen3.5:2b. No real model invoked, no Cloudflare connection or deployment. |
-| 2026-11-14 | uncommitted | User selected visitor BYOK for all cloud AI. Removed proposed shared Cloudflare backend/account requirement from current plan and README. Owner uses the same provider-key flow as visitors; no Cloudflare connection authorized. Documentation only. |
-| 2026-11-14 | uncommitted | Added residual-risk disclaimer copy and UI placement requirements to AI_COACH_PLAN.md; clarified owner deployment account versus visitor accounts. README updated. Documentation only; no deployment, inference or paid service changes. |
-| 2026-11-14 | uncommitted | Planned three-path RCA Coach in docs/AI_COACH_PLAN.md with two focused read-only agents. Recorded no-spend/no-reset usage rule, memory-only privacy migration, bounded free backend, guided local setup and optional companion. Updated README. No app implementation, inference calls or deployment performed. |
-| 2026-11-14 | uncommitted | Installed complete EGM 0.1.1 with Codex CLI. Added INSTRUCTION.md and README tooling context. Fresh-session discovery and EGM workflow execution remain unverified. No application code changed. |
+| 2026-11-14 | `495dad7` | User authorized publication to GitHub. Prepared push of 459973d and this documentation update to origin/main; Pages is branch-managed. Prior checks: 164 tests and browser/offline/export acceptance passed. CI/Pages outcome is verified after push and reported in chat. No Cloudflare or paid inference involved. |
+| 2026-11-14 | `459973d` | Committed the three-path RCA Coach implementation, session-only privacy, provider adapters, browser verification tools and EGM documentation. Formatting check passed; credential scan found only synthetic test keys. Prior validation: 164 tests passed plus browser/offline/report checks. |
+| 2026-11-14 | note | Implemented Local / Free BYOK / Paid BYOK Coach with provider/model dropdowns, key links, consent and recovery guidance. Session-only case/keys, explicit legacy export/delete, streamed-error rejection, reasoning adapters, actual-model audit labels and PDF disclaimer. Added dependency-free npm run serve preview with correct /apollo-rca/ paths; offline assets revalidate on install and stale runtime cache is retired. Two implementation agents; no resets or inference charges. 164 tests pass; Edge mocked full analysis, case reset/undo, reload, responsive controls and ZIP download verified. Real SW install plus offline reload/Coach controls passed with shell v27/runtime v2; preview running at http://127.0.0.1:8080/apollo-rca/. Credential-free browser CORS reached Groq/OpenRouter/OpenAI; Ollama tags found qwen3.5:4b and qwen3.5:2b. No real model invoked, no Cloudflare connection or deployment. |
+| 2026-11-14 | note | User selected visitor BYOK for all cloud AI. Removed proposed shared Cloudflare backend/account requirement from current plan and README. Owner uses the same provider-key flow as visitors; no Cloudflare connection authorized. Documentation only. |
+| 2026-11-14 | note | Added residual-risk disclaimer copy and UI placement requirements to AI_COACH_PLAN.md; clarified owner deployment account versus visitor accounts. README updated. Documentation only; no deployment, inference or paid service changes. |
+| 2026-11-14 | note | Planned three-path RCA Coach in docs/AI_COACH_PLAN.md with two focused read-only agents. Recorded no-spend/no-reset usage rule, memory-only privacy migration, bounded free backend, guided local setup and optional companion. Updated README. No app implementation, inference calls or deployment performed. |
+| 2026-11-14 | note | Installed complete EGM 0.1.1 with Codex CLI. Added INSTRUCTION.md and README tooling context. Fresh-session discovery and EGM workflow execution remain unverified. No application code changed. |
 | 2026-11-14 | `0643a08` | Ollama chat now uses NDJSON streaming. Thinking chunks are dropped. Cancel aborts the request. |
 | 2026-11-14 | `751af7d` | RCA Coach can use local Ollama. Default tag `qwen3:2b` at `http://127.0.0.1:11434`. Test connection selects an installed Qwen3 2B tag. Users can also set their own model tag or HTTPS API key. No cloud fallback and no model download. |
 | 2026-11-13 | `25e69f7` | Removed the toolbar `? Help` button. The floating `? Help` button is the only Help control. |
@@ -75,8 +76,6 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Publication requested on 2026-11-14; follow origin/main CI and branch-managed Pages deployment for publication status. Real authenticated inference is not tested; all analysis tests used mocks, and real connectivity checks used invalid/no credentials without model execution.
 - Automatic Ollama startup and folder inspection require an optional companion; no companion is installed. Local origin/permission behavior must still be checked on the published HTTPS site.
 - Cases/keys now live in tab memory; download before close/reload. Legacy recovery is archival export plus explicit deletion, not automatic import.
-
-- No `LICENSE` file, though the UI says MIT.
 - `index.html` asset URLs use the `/apollo-rca/` prefix, so a server at the repo root is not path-identical to Pages.
 - An old `h2c-rca-shell-*` cache is not deleted, because it lacks the `apollo-rca-` prefix.
 

@@ -76,7 +76,7 @@ Open [http://127.0.0.1:8080/apollo-rca/](http://127.0.0.1:8080/apollo-rca/). The
 node --test
 ```
 
-The pre-change baseline was **147 passed, 0 failed**. Current implementation validation is recorded in PROGRESS.md. Node 18, 20, and 22 are the CI matrix (Ubuntu and Windows). The accepted baseline remains `b1afdd3`; later commits are fixes on top of it.
+The current test count and HEAD are recorded in [PROGRESS.md](PROGRESS.md). Node 18, 20, and 22 are the CI matrix (Ubuntu and Windows).
 
 ## Files that matter
 
@@ -101,7 +101,7 @@ There is no `local-bridge.js` or `ai-coach.js`. Those names in older notes are w
 
 The existing short coach buttons stay. On the connection card, three longer reviews use the same connected model once: review the whole chart, plan the next interview, and screen solutions. A free or paid cloud model can cover the whole case in that one pass. The result is advice only. It is not written into the chart, and a failed or partial answer changes nothing. `local-ai-bridge.js` holds configuration in memory, enforces consent and free-provider restrictions, aborts streams and rejects partial failed output. Model-list tests make no inference calls. Groq reasoning requests use a bounded completion budget, low reasoning effort and JSON output; other providers use their supported payloads.
 
-`session-store.js` holds case data, hypotheses, notes and clear/undo backups in memory. The active bundled editor and shell share this store. Shell and Help wait for the editor's first React commit before modifying the page. Service worker shell v27 reloads assets on install and runtime cache v2 retires stale runtime entries; credential-bearing requests and cross-origin inference are excluded from caching.
+`session-store.js` holds case data, hypotheses, notes and clear/undo backups in memory. The active bundled editor and shell share this store. Shell and Help wait for the editor's first React commit before modifying the page. The current service-worker shell reloads assets on install and runtime cache v2 retires stale runtime entries; credential-bearing requests and cross-origin inference are excluded from caching.
 
 Local mode enforces loopback. The website cannot start Ollama, install models, inspect folders or change OLLAMA_MODELS. On this Windows computer keep Ollama runtime on C: and its existing models at D:\Ollama\models. A read-only check found installed `qwen3.5:4b` and `qwen3.5:2b`; no model was run or downloaded. No local companion has been installed.
 
@@ -133,7 +133,7 @@ Official series on [@h2c_Learnings](https://www.youtube.com/@h2c_Learnings). Ope
 
 ## License
 
-Source is intended as MIT. A `LICENSE` file is not in the tree yet. Methodology and trademarks remain with Dean L. Gano and Apollonian Publications, LLC.
+Source is MIT. See [LICENSE](LICENSE). Methodology and trademarks remain with Dean L. Gano and Apollonian Publications, LLC.
 
 ## Developer tooling: Elephant-Goldfish Model
 
