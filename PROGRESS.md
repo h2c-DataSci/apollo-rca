@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | ai | RCA Coach can use local Ollama. Default tag `qwen3:2b` at `http://127.0.0.1:11434`. Test connection selects an installed Qwen3 2B tag. Users can also set their own model tag or HTTPS API key. No cloud fallback and no model download. |
+| 2026-11-14 | `751af7d` | RCA Coach can use local Ollama. Default tag `qwen3:2b` at `http://127.0.0.1:11434`. Test connection selects an installed Qwen3 2B tag. Users can also set their own model tag or HTTPS API key. No cloud fallback and no model download. |
 | 2026-11-13 | `25e69f7` | Removed the toolbar `? Help` button. The floating `? Help` button is the only Help control. |
 | 2026-11-13 | `186479a` | Removed the redundant toolbar `7 Videos (Training)` button and the step-card `Video Tutorial` buttons. The floating `7 Videos` button remains. |
 | 2026-11-13 | `fd654b4` | Header RCA Coach opens the coach section. The step list stays a child of `main`, so React no longer throws `insertBefore`. Shell cache is `v=23`. Tests 140/140. |
