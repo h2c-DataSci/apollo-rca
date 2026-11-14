@@ -32,7 +32,12 @@ The interactive 7-Step Workflow Navigator at the top tracks your investigation p
 
 ### Step 3: Reality Tree Chart
 - Visualizes causes running from left (Primary Effect) to right (Preceding Causes).
-- Black nodes = Primary Effect, Red nodes = Action Causes, Green nodes = Condition Causes.
+- Every chart includes a five-color legend:
+  - Black `#111827` with white text = Primary Effect.
+  - Red `#dc2626` rectangle = Action cause (momentary trigger).
+  - Green `#16a34a` = Condition cause (pre-existing state).
+  - Red `#d32f2f` octagon with white text labeled **STOP**, and the stopping reason under the node = stopping reason. This is a different shape from a red action rectangle.
+  - Yellow `#fbc02d` rounded box with a black `?` and the label *Need More Info* = unknown ending.
 - Export as high-resolution PNG, vector SVG, or structured JSON.
 
 ### Step 4: Evidence Register
@@ -95,16 +100,31 @@ Click the floating `▶ 7 Videos` button to access the official video curriculum
 
 ## 4. AI provider
 
-The coach can use a model you already have. It does not download one for you.
+AI is optional. Standard Mode works with AI off. There is one **RCA Coach** panel. Connect a model at the top of that panel.
+
+### Free cloud (Groq or OpenRouter)
 
 1. Click **RCA Coach**.
-2. In **AI provider**, leave **Ollama on this computer** selected. The address is `http://127.0.0.1:11434`. The model field starts as `qwen3:2b`, which is the usual Ollama tag for Qwen3 2B.
-3. Start the Ollama app you already installed. Do not move the model folder. If `OLLAMA_MODELS` already points at `D:\Ollama\models`, leave it.
-4. Click **Test connection**. The card lists the tags Ollama reports. If one of them is a Qwen3 2B tag, the model field changes to that exact tag.
-5. Click **Enable assistant**. The case stays put until you accept a suggestion.
-6. To use a different model you already run, type its tag. To use your own hosted API, choose **My API key**, enter the HTTPS address and the key. The key stays in this browser. A failed call does not switch to another provider.
+2. Choose **Free cloud**, then **Groq** (or OpenRouter) and a listed free model.
+3. Follow **Get your key**, then paste your own key in the masked field in the browser. The key stays in this tab's memory only. Reloading or closing the tab clears it. Never send the key in chat or a report.
+4. Read the notice and authorize this destination. Click **Test connection** to check the key and list models without running inference.
+5. Choose **Enable AI Assistant**, then **Enable assistant**. Run a task, review its findings, and accept only evidence-supported suggestions.
 
-Browser model remains available if you choose that provider instead. Standard Mode still works with AI off.
+Free means the provider's current model offer, not guaranteed availability or billing verification. Your own account's limits apply. There is no automatic paid fallback or provider switch. No Cloudflare account or shared key is used.
+
+### Local AI (Ollama on this computer)
+
+1. Click **RCA Coach** and choose **Local AI**. Leave **Ollama on this computer** selected. The address is `http://127.0.0.1:11434`. The model field starts as `qwen3:2b`, which is the usual Ollama tag for Qwen3 2B.
+2. Start the Ollama app you already installed. Do not move the model folder. If `OLLAMA_MODELS` already points at `D:\Ollama\models`, leave it.
+3. Click **Test connection**. The card lists the tags Ollama reports. If one of them is a Qwen3 2B tag, the model field changes to that exact tag.
+4. Click **Enable assistant**. The case stays put until you accept a suggestion.
+5. To use a different model you already run, type its tag.
+
+### Paid cloud
+
+Choose OpenAI or another OpenAI-compatible API. Enter the HTTPS address if needed and paste your key in the masked field. Test connection first to discover model IDs, then Enable assistant. The key stays in this tab's memory only. A failed call does not switch to another provider.
+
+Browser model remains available if you choose that provider instead.
 
 ---
 
