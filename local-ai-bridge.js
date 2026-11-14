@@ -49,13 +49,20 @@ export const RECOMMENDED_LOCAL_MODELS = [
   }
 ];
 
-let sessionConfig = { ...DEFAULT_BRIDGE_CONFIG };
+const sharedConfig = Symbol.for('h2c.bridge.config');
+const sharedGeneration = Symbol.for('h2c.bridge.generation');
 
-export function getBridgeConfig() { return { ...sessionConfig }; }
+function readConfig() {
+  if (!globalThis[sharedConfig]) globalThis[sharedConfig] = { ...DEFAULT_BRIDGE_CONFIG };
+  return globalThis[sharedConfig];
+}
+
+export function getBridgeConfig() { return { ...readConfig() }; }
 
 export function saveBridgeConfig(cfg) {
-  const destinationChanged = ['endpoint', 'provider', 'preset', 'mode'].some((key) => key in cfg && cfg[key] !== sessionConfig[key]);
-  sessionConfig = { ...sessionConfig, ...(destinationChanged ? { apiKey: '', cloudConsent: false } : {}), ...cfg };
+  const current = readConfig();
+  const destinationChanged = ['endpoint', 'provider', 'preset', 'mode'].some((key) => key in cfg && cfg[key] !== current[key]);
+  globalThis[sharedConfig] = { ...current, ...(destinationChanged ? { apiKey: '', cloudConsent: false } : {}), ...cfg };
   return getBridgeConfig();
 }
 
@@ -65,7 +72,7 @@ function configuredOptions(options) {
   return { ...saved, ...(destinationChanged ? { apiKey: '', cloudConsent: false, ...(options.provider === 'openai' ? { numPredict: 1536 } : {}) } : {}), ...options };
 }
 
-export function clearBridgeSession() { abortActiveGeneration(); sessionConfig = { ...DEFAULT_BRIDGE_CONFIG }; }
+export function clearBridgeSession() { abortActiveGeneration(); globalThis[sharedConfig] = { ...DEFAULT_BRIDGE_CONFIG }; }
 
 export function validateCloudConfig(cfg, requireConsent = true) {
   const url = apiEndpoint(cfg.endpoint);
@@ -364,18 +371,17 @@ export function collectStreamedAnswer(raw, onChunk) {
   return answer;
 }
 
-let activeGeneration = null;
-
 export function abortActiveGeneration() {
-  if (activeGeneration) activeGeneration.reason = 'cancel';
-  activeGeneration?.ctrl.abort();
+  const active = globalThis[sharedGeneration];
+  if (active) active.reason = 'cancel';
+  active?.ctrl.abort();
 }
 
 function beginGeneration(ms) {
-  if (activeGeneration) throw new Error('A generation is already running. Cancel it or wait for completion.');
+  if (globalThis[sharedGeneration]) throw new Error('A generation is already running. Cancel it or wait for completion.');
   const ctrl = new AbortController();
   const generation = { ctrl, reason: '' };
-  activeGeneration = generation;
+  globalThis[sharedGeneration] = generation;
   const timer = setTimeout(() => {
     generation.reason = 'timeout';
     ctrl.abort();
@@ -384,7 +390,7 @@ function beginGeneration(ms) {
     signal: ctrl.signal,
     finish() {
       clearTimeout(timer);
-      if (activeGeneration === generation) activeGeneration = null;
+      if (globalThis[sharedGeneration] === generation) globalThis[sharedGeneration] = null;
     },
     failure(err, label) {
       if (err && err.name === 'AbortError') {

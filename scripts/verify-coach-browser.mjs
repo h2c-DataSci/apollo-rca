@@ -105,7 +105,7 @@ try {
   await page.screenshot({path:resolve(output,'coach-mobile.png'),fullPage:false});
   page.once('dialog', dialog => dialog.accept());
   await page.reload();
-  const reset = await page.evaluate(async () => { const {getBridgeConfig} = await import('/apollo-rca/local-ai-bridge.js?v=24'); return getBridgeConfig().apiKey; });
+  const reset = await page.evaluate(async () => { const {getBridgeConfig} = await import('/apollo-rca/local-ai-bridge.js?v=25'); return getBridgeConfig().apiKey; });
   assert.equal(reset,'');
   assert.equal(await page.evaluate(() => Object.keys(localStorage).length), 0);
   assert.deepEqual(errors,[]);

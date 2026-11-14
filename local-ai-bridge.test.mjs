@@ -6,6 +6,7 @@ import {
   RECOMMENDED_LOCAL_MODELS,
   getBridgeConfig,
   saveBridgeConfig,
+  clearBridgeSession,
   testLocalDaemonConnection,
   executeLocalChat,
   pickInstalledQwen,
@@ -274,6 +275,28 @@ test('collectStreamedAnswer reads OpenAI SSE and ignores the done marker', () =>
     ''
   ].join('\n');
   assert.equal(collectStreamedAnswer(raw), '{"summary":"Oil Released"}');
+});
+
+test('a second copy of the bridge keeps the cloud model and does not call Ollama', async () => {
+  clearBridgeSession();
+  saveBridgeConfig({ provider: 'openai', mode: 'free', preset: 'groq', endpoint: 'https://api.groq.com/openai/v1', model: 'qwen/qwen3.8-27b', apiKey: 'temp', cloudConsent: true, enabled: true });
+  const copy = await import('./local-ai-bridge.js?copy=1');
+  assert.equal(copy.getBridgeConfig().model, 'qwen/qwen3.8-27b');
+  assert.equal(copy.getBridgeConfig().provider, 'openai');
+  const urls = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    urls.push(String(url));
+    return new Response(JSON.stringify({ choices: [{ message: { content: '{"summary":"synthetic"}' }, finish_reason: 'stop' }] }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  try {
+    await copy.executeLocalChat([{ role: 'user', content: 'synthetic' }]);
+    assert.equal(urls.some((url) => url.includes('11434')), false);
+    assert.equal(urls[0], 'https://api.groq.com/openai/v1/chat/completions');
+  } finally {
+    globalThis.fetch = original;
+    clearBridgeSession();
+  }
 });
 
 

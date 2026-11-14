@@ -15,8 +15,8 @@ function escapeHtml(str) {
 import { PROVIDER_PRESETS } from './provider-presets.js';
 import { sessionStore, listLegacyData, removeLegacyData, legacyRecoveryPlan } from './session-store.js';
 
-import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=24';
-import { DEEPER_TASKS, runDeeperReview, currentCaseBrief } from './coach-deeper.js?v=1';
+import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=25';
+import { DEEPER_TASKS, runDeeperReview, currentCaseBrief } from './coach-deeper.js?v=2';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
