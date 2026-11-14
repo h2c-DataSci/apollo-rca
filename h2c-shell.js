@@ -15,8 +15,8 @@ function escapeHtml(str) {
 import { PROVIDER_PRESETS } from './provider-presets.js';
 import { sessionStore, listLegacyData, removeLegacyData, legacyRecoveryPlan } from './session-store.js';
 
-import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=26';
-import { DEEPER_TASKS, runDeeperReview, briefForReview, presentFinding } from './coach-deeper.js?v=6';
+import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=27';
+import { DEEPER_TASKS, runDeeperReview, briefForReview, presentFinding } from './coach-deeper.js?v=7';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
@@ -1380,7 +1380,7 @@ function ensureLocalBridgeUI() {
   };
   const models = (values) => {
     const list = $('#h2c-bridge-models'); list.replaceChildren(); choice.replaceChildren();
-    for (const value of values) { const name = typeof value === 'string' ? value : value.id; const o = document.createElement('option'); o.value = name; list.append(o); const c = document.createElement('option'); c.value = name; c.textContent = name; choice.append(c); }
+    for (const value of values) { const name = typeof value === 'string' ? value : value.id; const label = typeof value === 'string' ? value : (value.label || value.id); const o = document.createElement('option'); o.value = name; list.append(o); const c = document.createElement('option'); c.value = name; c.textContent = label; choice.append(c); }
     choice.hidden = !values.length; model.hidden = values.length > 0 && preset.value !== 'custom';
     if (values.length && [...choice.options].some((o) => o.value === model.value)) choice.value = model.value;
   };
@@ -1424,6 +1424,7 @@ function ensureLocalBridgeUI() {
       steps.append(document.createTextNode('Create a key with your provider, paste it above, review the notice, then Test connection. '));
       if (p?.keyUrl) steps.append(externalLink(p.keyUrl, 'Get your key ↗'));
       if (p?.privacyUrl) steps.append(externalLink(p.privacyUrl, ' · Privacy policy ↗'));
+      if (p?.setup) { const note = document.createElement('p'); note.className = 'h2c-key-note'; note.textContent = p.setup; steps.append(note); }
     }
     $('.h2c-ai-risk').textContent = local ? 'Local mode stays on loopback. A folder path does not start or import a model.' : mode.value === 'free' ? 'Free models use your provider account and its quota. Confirm billing is disabled or capped. Availability and provider retention settings can change. No automatic paid fallback. OpenRouter may route to different underlying free providers.' : 'Your provider may charge you. The app cannot guarantee the final cost or verify account billing settings. Only use a provider you trust.';
     resetStatus(); save();
@@ -1482,7 +1483,7 @@ function ensureBrowserAiButton() {
   btn.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    import('./browser-ai.js?v=25').then((mod) => mod.openBrowserAiDialog()).catch(() => {});
+    import('./browser-ai.js?v=26').then((mod) => mod.openBrowserAiDialog()).catch(() => {});
   });
   anchor.insertAdjacentElement('afterend', btn);
 }

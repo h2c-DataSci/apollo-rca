@@ -48,7 +48,7 @@ AI is optional. There is one **RCA Coach** panel. Connect a model at the top of 
 |---|---|
 | Local AI | Start Ollama, leave the loopback address or enter your loopback server URL, then Test connection. Select an installed model. No folder path is needed. |
 | Free cloud | Choose Groq, Google AI, or OpenRouter and a listed free model. The panel links each provider's key page and shows the setup steps. Groq offers `openai/gpt-oss-20b` (the default), `openai/gpt-oss-120b`, and `qwen/qwen3.8-27b`. Classifier models are not listed. Google AI offers `gemini-3.8-flash` (the default for that provider), `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`, `gemma-4-31b-it`, and `gemma-4-26b-a4b-it`. A quota error does not switch models. Paste your own key, authorize processing, and Test connection. Your own account's limits apply. |
-| Paid cloud | Choose OpenAI or Other OpenAI-compatible API. Enter your key, test to discover models, select a model and authorize processing. Custom APIs require their HTTPS base URL and compatible browser access. |
+| Paid cloud | Choose OpenAI, DeepSeek, or Other OpenAI-compatible API. DeepSeek fills in `https://api.deepseek.com/v1` and selects `deepseek-flash`, which is DeepSeek-V4.1-Flash-1017. `deepseek-v4-pro` is the other listed model. Enter your key, authorize processing, and Test connection. Custom APIs require their HTTPS base URL and compatible browser access. |
 
 Then choose **Enable AI Assistant**, confirm **Enable assistant**, and run a Coach task. AI suggestions require investigator review; deterministic BLOCK decisions remain enforced. Existing Browser AI remains available separately as an optional on-device model download.
 

@@ -148,6 +148,26 @@ test('provider-specific reasoning payloads preserve a useful completion budget',
   } finally { globalThis.fetch = originalFetch; clearBridgeSession(); }
 });
 
+test('paid DeepSeek uses the V4.1 Flash model id and disables thinking', async () => {
+  const deepseek = PROVIDER_PRESETS.find((item) => item.id === 'deepseek');
+  assert.equal(deepseek.free, false);
+  assert.equal(deepseek.endpoint, 'https://api.deepseek.com/v1');
+  assert.equal(deepseek.models[0].id, 'deepseek-flash');
+  assert.equal(chatUrl(deepseek.endpoint), 'https://api.deepseek.com/v1/chat/completions');
+  assert.throws(() => validateCloudConfig({ mode: 'paid', preset: 'deepseek', endpoint: '', model: 'deepseek-flash', cloudConsent: true }), /choose DeepSeek/);
+  const original = globalThis.fetch;
+  let sent;
+  globalThis.fetch = async (url, init) => { sent = { url: String(url), body: JSON.parse(init.body), headers: init.headers }; return new Response(JSON.stringify({ choices: [{ message: { content: '{"summary":"Seal Failed"}' }, finish_reason: 'stop' }] }), { status: 200 }); };
+  try {
+    const answer = await executeLocalChat([{ role: 'user', content: 'Return JSON' }], { provider: 'openai', mode: 'paid', preset: 'deepseek', endpoint: deepseek.endpoint, model: 'deepseek-V4.1-flash-1017', apiKey: 'temp', cloudConsent: true });
+    assert.equal(answer, '{"summary":"Seal Failed"}');
+    assert.equal(sent.url, 'https://api.deepseek.com/v1/chat/completions');
+    assert.equal(sent.body.model, 'deepseek-flash');
+    assert.deepEqual(sent.body.thinking, { type: 'disabled' });
+    assert.equal(sent.headers.Authorization, 'Bearer temp');
+  } finally { globalThis.fetch = original; clearBridgeSession(); }
+});
+
 test('every free provider links to its own key page and setup steps', () => {
   const free = PROVIDER_PRESETS.filter((item) => item.free);
   assert.deepEqual(free.map((item) => item.id), ['groq', 'google', 'openrouter']);

@@ -109,11 +109,13 @@ export function localDaemonUrl(endpoint) {
 }
 
 export function apiEndpoint(endpoint) {
+  const raw = String(endpoint || '').trim();
+  if (!raw) throw new Error('Enter the API address, such as https://api.deepseek.com/v1, or choose DeepSeek (paid API).');
   let parsed;
   try {
-    parsed = new URL(String(endpoint || '').trim());
+    parsed = new URL(raw);
   } catch {
-    throw new Error('API address must be a full URL, such as https://api.example.com/v1');
+    throw new Error('API address must be a full URL, such as https://api.deepseek.com/v1');
   }
   if (parsed.username || parsed.password || parsed.search || parsed.hash) throw new Error('API address must not contain credentials, query parameters or fragments. Put the API key in the key field.');
   const loopback = isLoopback(parsed.origin);
@@ -587,19 +589,27 @@ export function googleRequestBody(cfg, messages) {
   return body;
 }
 
+function deepseekModelId(model) {
+  const name = String(model || '').trim();
+  if (/^deepseek[-_ ]v4(?:\.1)?[-_ ]flash(?:[-_ ]1017)?$/i.test(name) || /^deepseek-v4-flash(?:-vision-exp)?$/i.test(name)) return 'deepseek-flash';
+  return name;
+}
+
 function cloudRequestBody(cfg, messages, url) {
+  const limit = cfg.numPredict ?? 1536;
+  const deepseek = new URL(url).hostname === 'api.deepseek.com';
   const body = {
-    model: cfg.model,
+    model: deepseek ? deepseekModelId(cfg.model) : cfg.model,
     messages: messages.map((m) => ({ role: m.role || 'user', content: String(m.content || '') })),
     stream: true
   };
-  const limit = cfg.numPredict ?? 1536;
   if (cfg.preset === 'groq' && url === 'https://api.groq.com/openai/v1' && /^openai\/gpt-oss-(?:20b|120b)$/.test(cfg.model)) {
     return { ...body, max_completion_tokens: limit, reasoning_effort: 'low', include_reasoning: false, response_format: { type: 'json_object' } };
   }
   if (url === 'https://api.openai.com/v1' && /^(?:o[134](?:-|$)|gpt-[56])/.test(cfg.model)) {
     return { ...body, max_completion_tokens: limit };
   }
+  if (deepseek) return { ...body, temperature: cfg.temperature ?? 0.2, max_tokens: limit, thinking: { type: 'disabled' } };
   return { ...body, temperature: cfg.temperature ?? 0.2, max_tokens: limit };
 }
 
