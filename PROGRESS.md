@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-15 | this commit | Housekeeping after the user confirmed the app works, including paid DeepSeek. Only `main` exists. Cache queries match the service worker. No unused file was removed. Instructions now name the DeepSeek paid path. |
 | 2026-11-15 | `79eabcb` | Paid cloud includes DeepSeek. The address is `https://api.deepseek.com/v1` and V4.1-Flash-1017 is requested as `deepseek-flash`. Thinking is turned off so the answer is not consumed by reasoning. An empty address now names that URL. Shell query is v38 and the service-worker cache is v39. |
 | 2026-11-15 | `d70c1ad` | Housekeeping. Only `main` exists and no unused file was removed. Browser AI now loads `local-ai-bridge.js?v=26`, the same copy the coach uses, so an offline reload is not left asking for `v=23`. |
 | 2026-11-15 | `0ffb2b4` | Free cloud in RCA Coach now shows setup steps and a create-a-key link for Groq, Google AI Studio, and OpenRouter. Shell query is v36 and the service-worker cache is v37. |
@@ -86,6 +87,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 ## Known gaps
 
 - The automated suite does not call a live model. A review on the published site still depends on the visitor's own key, quota, and browser access.
+- User confirmed on 2026-11-15 that paid DeepSeek works with their own key. Keep `deepseek-flash` as the V4.1-Flash-1017 ID. Do not replace it with the display name.
 - Google free-tier prompts may be retained by Google to improve its products. The app has no zero-retention switch for that provider.
 - Automatic Ollama startup and folder inspection require an optional companion; no companion is installed. Local origin/permission behavior must still be checked on the published HTTPS site.
 - Cases/keys now live in tab memory; download before close/reload. Legacy recovery is archival export plus explicit deletion, not automatic import.

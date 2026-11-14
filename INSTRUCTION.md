@@ -8,7 +8,7 @@ Work in `D:\ApolloRCA_webapp`, the clone of https://github.com/h2c-DataSci/apoll
 
 1. Open the one RCA Coach panel. The connection controls are at the top of that panel.
 2. Choose Local AI, Free cloud, or Paid cloud. Start with Free cloud if you are authorized to share the case with that provider.
-3. For Free cloud, follow Set up your own free key. Open the Groq, Google AI Studio, or OpenRouter key page, create a personal key, then paste it in the masked field. For paid cloud, use Get your key. No Cloudflare account or shared key is used. Never send your key in chat or a report.
+3. For Free cloud, follow Set up your own free key. Open the Groq, Google AI Studio, or OpenRouter key page, create a personal key, then paste it in the masked field. For DeepSeek, choose Paid cloud and DeepSeek (paid API). The address and `deepseek-flash` model are filled in. Paste your DeepSeek key and Test connection. Other paid providers use Get your key. No Cloudflare account or shared key is used. Never send your key in chat or a report.
 4. Read the notice and authorize this destination. Test connection checks the key and lists models without running inference. For paid APIs, test first to discover model IDs, then choose one. Other APIs must support OpenAI-compatible chat and browser CORS.
 5. In the existing workbench choose Enable AI Assistant, then Enable assistant. Run a task, review its findings, and accept only evidence-supported suggestions. Deterministic BLOCK remains binding.
 6. Download your report/ZIP or print before leaving. Case data and keys do not survive reload. Your browser controls the save location. Disconnect & clear key removes the active credential.
