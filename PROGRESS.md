@@ -10,7 +10,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `2a20113` — reviews sit in the coach. |
+| HEAD | `3c16a71` — layout handoff recorded. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
 | Tests | `node --test` → 179 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-15 | this commit | Housekeeping. Only `main` exists. Cache queries match the service worker. No unused file was removed. The handoff now says the four reviews stay in the coach card and the legal notice stays last. Tests remain 179. |
+| 2026-11-15 | `3c16a71` | Housekeeping. Only `main` exists. Cache queries match the service worker. No unused file was removed. The handoff now says the four reviews stay in the coach card and the legal notice stays last. Tests remain 179. |
 | 2026-11-15 | `2a20113` | The four longer reviews and their results now sit in the RCA Coach card, under the coach controls, not in the connection card. The same four actions still call the connected model. The legal notice is moved to the end of the page whenever the report appears, so it stays after the download line. Shell query is v39 and the service-worker cache is v40. |
 | 2026-11-15 | `3585ade` | Housekeeping after the user confirmed the app works, including paid DeepSeek. Only `main` exists. Cache queries match the service worker. No unused file was removed. Instructions now name the DeepSeek paid path. |
 | 2026-11-15 | `79eabcb` | Paid cloud includes DeepSeek. The address is `https://api.deepseek.com/v1` and V4.1-Flash-1017 is requested as `deepseek-flash`. Thinking is turned off so the answer is not consumed by reasoning. An empty address now names that URL. Shell query is v38 and the service-worker cache is v39. |
