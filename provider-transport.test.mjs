@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getBridgeConfig, saveBridgeConfig, clearBridgeSession, validateCloudConfig, executeLocalChat, collectStreamedAnswer, modelsUrl, chatUrl, apiEndpoint, testConfiguredConnection } from './local-ai-bridge.js';
+import { PROVIDER_PRESETS } from './provider-presets.js';
 
 test('cloud configuration is memory-only and changing destination clears consent and credentials', () => {
   clearBridgeSession();
@@ -141,5 +142,24 @@ test('provider-specific reasoning payloads preserve a useful completion budget',
     await executeLocalChat([{role:'user',content:'Return JSON'}], {...base,preset:'custom',endpoint:'https://other.example/v1',model:'gpt-5-compatible',numPredict:500});
     assert.equal(bodies.at(-1).max_tokens, 500);
     assert.equal(bodies.at(-1).temperature, 0.2);
+    await executeLocalChat([{role:'user',content:'Return JSON'}], {...base,mode:'free',preset:'groq',endpoint:'https://api.groq.com/openai/v1',model:'qwen/qwen3.8-27b'});
+    assert.equal(bodies.at(-1).max_tokens, 1536);
+    assert.equal('reasoning_effort' in bodies.at(-1), false);
   } finally { globalThis.fetch = originalFetch; clearBridgeSession(); }
+});
+
+test('free Groq accepts every model from the console limits list', () => {
+  const groq = PROVIDER_PRESETS.find((item) => item.id === 'groq');
+  assert.deepEqual(groq.models, [
+    'openai/gpt-oss-20b',
+    'openai/gpt-oss-120b',
+    'qwen/qwen3.8-27b',
+    'allam-2-7b',
+    'openai/gpt-oss-safeguard-20b',
+    'meta-llama/llama-prompt-guard-2-22m',
+    'meta-llama/llama-prompt-guard-2-86m'
+  ]);
+  for (const model of groq.models) {
+    assert.equal(validateCloudConfig({ mode: 'free', preset: 'groq', endpoint: groq.endpoint, model, cloudConsent: true }), groq.endpoint);
+  }
 });

@@ -544,7 +544,7 @@ function cloudRequestBody(cfg, messages, url) {
     stream: true
   };
   const limit = cfg.numPredict ?? 1536;
-  if (cfg.preset === 'groq' && url === 'https://api.groq.com/openai/v1') {
+  if (cfg.preset === 'groq' && url === 'https://api.groq.com/openai/v1' && /^openai\/gpt-oss-(?:20b|120b)$/.test(cfg.model)) {
     return { ...body, max_completion_tokens: limit, reasoning_effort: 'low', include_reasoning: false, response_format: { type: 'json_object' } };
   }
   if (url === 'https://api.openai.com/v1' && /^(?:o[134](?:-|$)|gpt-[56])/.test(cfg.model)) {

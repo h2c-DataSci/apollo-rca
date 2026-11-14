@@ -47,7 +47,7 @@ AI is optional. Open **RCA Coach**, then use **Connect your RCA Coach** above th
 | Path | Setup |
 |---|---|
 | Local AI | Start Ollama, leave the loopback address or enter your loopback server URL, then Test connection. Select an installed model. No folder path is needed. |
-| Free cloud | Choose Groq or OpenRouter and a listed free model. Follow Get your key, paste your own key, authorize processing, and Test connection. Your own account's limits apply. |
+| Free cloud | Choose Groq or OpenRouter and a listed free model. Groq offers the models from the console limits list: gpt-oss-20b, gpt-oss-120b, qwen3.8-27b, allam-2-7b, gpt-oss-safeguard-20b, and both Llama Prompt Guard models. Follow Get your key, paste your own key, authorize processing, and Test connection. Your own account's limits apply. |
 | Paid cloud | Choose OpenAI or Other OpenAI-compatible API. Enter your key, test to discover models, select a model and authorize processing. Custom APIs require their HTTPS base URL and compatible browser access. |
 
 Then choose **Enable AI Assistant**, confirm **Enable assistant**, and run a Coach task. AI suggestions require investigator review; deterministic BLOCK decisions remain enforced. Existing Browser AI remains available separately as an optional on-device model download.
