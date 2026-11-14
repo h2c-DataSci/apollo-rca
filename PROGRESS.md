@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | this commit | Groq free-cloud choices now include every chat model from the console limits list: gpt-oss-20b, gpt-oss-120b, qwen/qwen3.8-27b, allam-2-7b, gpt-oss-safeguard-20b, and both Llama Prompt Guard models. The default remains gpt-oss-20b. Reasoning settings stay on the two gpt-oss chat models. Shell cache is v29. |
+| 2026-11-14 |  | Groq free-cloud choices now include every chat model from the console limits list: gpt-oss-20b, gpt-oss-120b, qwen/qwen3.8-27b, allam-2-7b, gpt-oss-safeguard-20b, and both Llama Prompt Guard models. The default remains gpt-oss-20b. Reasoning settings stay on the two gpt-oss chat models. Shell cache is v29. |
 | 2026-11-14 | `7563be0` | Recorded publication of merge `0133a0a` (PR #5). Pinned Transformers.js is integrity-checked before import. Unused v11/v12 bundles and coach-ui.js removed. Offline check expects shell cache v28. Legacy localStorage is cleared after the recovery download is offered, and the saved API key is not kept. Ollama fetches use redirect error. Tests were 171/171. |
 | 2026-11-14 | `9d3672b` | Added three one-pass reviews on the connection card: whole chart, next interview, and solution screen. They use the connected model, including free or paid cloud, and do not edit the case. |
 | 2026-11-14 | this commit | User authorized publication to GitHub. Prepared push of 459973d and this documentation update to origin/main; Pages is branch-managed. Prior checks: 164 tests and browser/offline/export acceptance passed. CI/Pages outcome is verified after push and reported in chat. No Cloudflare or paid inference involved. |
