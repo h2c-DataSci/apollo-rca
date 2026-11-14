@@ -10,7 +10,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `fd4b826` — full report audit added. |
+| HEAD | `462fc5c` — AI reviews use headings and bullets. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
 | Tests | `node --test` → 176 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | this commit | Longer AI reviews are shown as a summary, then one card per finding with a heading and Holds / Missing / Contradiction bullets. A plain multi-sentence answer is split into bullets. Shell cache is v34. |
+| 2026-11-14 | `462fc5c` | Longer AI reviews are shown as a summary, then one card per finding with a heading and Holds / Missing / Contradiction bullets. A plain multi-sentence answer is split into bullets. Shell cache is v34. |
 | 2026-11-14 | `fd4b826` | Added Audit full report. One connected-model pass checks problem definition, executive summary, the cause chart, the solution matrix, the corrective-action log, and the action items. It does not edit the report. |
 | 2026-11-14 | `95c2206` | Screen solutions now reads the filled Solution challenge matrix from the report, so a completed matrix is not described as having no proposed actions. |
 | 2026-11-14 | `a0bc7a9` | One RCA Coach. The connection controls are the top of that panel, not a second coach. The React coach section stays in place. |
