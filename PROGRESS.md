@@ -10,7 +10,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `0133a0a` — merged housekeeping PR #5. |
+| HEAD | `7563be0` — docs after merge `0133a0a` (PR #5). |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
 | Tests | `node --test` → 171 passed, 0 failed, before merge of PR #5. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | this commit | Recorded publication of merge `0133a0a` (PR #5). Pinned Transformers.js is integrity-checked before import. Unused v11/v12 bundles and coach-ui.js removed. Offline check expects shell cache v28. Legacy localStorage is cleared after the recovery download is offered, and the saved API key is not kept. Ollama fetches use redirect error. Tests were 171/171. |
+| 2026-11-14 | `7563be0` | Recorded publication of merge `0133a0a` (PR #5). Pinned Transformers.js is integrity-checked before import. Unused v11/v12 bundles and coach-ui.js removed. Offline check expects shell cache v28. Legacy localStorage is cleared after the recovery download is offered, and the saved API key is not kept. Ollama fetches use redirect error. Tests were 171/171. |
 | 2026-11-14 | `9d3672b` | Added three one-pass reviews on the connection card: whole chart, next interview, and solution screen. They use the connected model, including free or paid cloud, and do not edit the case. |
 | 2026-11-14 | this commit | User authorized publication to GitHub. Prepared push of 459973d and this documentation update to origin/main; Pages is branch-managed. Prior checks: 164 tests and browser/offline/export acceptance passed. CI/Pages outcome is verified after push and reported in chat. No Cloudflare or paid inference involved. |
 | 2026-11-14 | this commit | Committed the three-path RCA Coach implementation, session-only privacy, provider adapters, browser verification tools and EGM documentation. Formatting check passed; credential scan found only synthetic test keys. Prior validation: 164 tests passed plus browser/offline/report checks. Local commit only; no push or publication. |
