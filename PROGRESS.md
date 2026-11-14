@@ -10,7 +10,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | `f4de6ba` — Groq model list is on main. This cleanup follows it. |
+| HEAD | `2d65a99` — unused styles removed; MIT license added. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
 | Tests | `node --test` → 172 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | this commit | Removed unused `styles-v11.css` and its identical copy `styles-CjEoaxHy.css`. The live page still uses `styles-v13.css`. Kept `browser-dCISOrnY.js` (report ZIP), `rolldown-runtime-v11.js`, and `es-DawnZXYc.js` because the current bundle loads them. Added the MIT `LICENSE`. Deleted the merged `housekeeping/sri-stale-legacy` branch. Dependabot pull requests were left open. |
+| 2026-11-14 | `2d65a99` | Removed unused `styles-v11.css` and its identical copy `styles-CjEoaxHy.css`. The live page still uses `styles-v13.css`. Kept `browser-dCISOrnY.js` (report ZIP), `rolldown-runtime-v11.js`, and `es-DawnZXYc.js` because the current bundle loads them. Added the MIT `LICENSE`. Deleted the merged `housekeeping/sri-stale-legacy` branch. Dependabot pull requests were left open. |
 | 2026-11-14 | `1bac0d6` | Groq free-cloud choices now include every chat model from the console limits list: gpt-oss-20b, gpt-oss-120b, qwen/qwen3.8-27b, allam-2-7b, gpt-oss-safeguard-20b, and both Llama Prompt Guard models. The default remains gpt-oss-20b. Reasoning settings stay on the two gpt-oss chat models. Shell cache is v29. |
 | 2026-11-14 | `7563be0` | Recorded publication of merge `0133a0a` (PR #5). Pinned Transformers.js is integrity-checked before import. Unused v11/v12 bundles and coach-ui.js removed. Offline check expects shell cache v28. Legacy localStorage is cleared after the recovery download is offered, and the saved API key is not kept. Ollama fetches use redirect error. Tests were 171/171. |
 | 2026-11-14 | `9d3672b` | Added three one-pass reviews on the connection card: whole chart, next interview, and solution screen. They use the connected model, including free or paid cloud, and do not edit the case. |
