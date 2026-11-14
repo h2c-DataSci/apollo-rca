@@ -73,7 +73,7 @@ No Cloudflare or AI-backend deployment account is needed or authorized. Each vis
 
 ## Audit findings for implementation ownership
 
-The active editor is bundled in routes-v13.js and calls globalThis.h2cExternal* installed by local-ai-bridge.js. coach-ui.js is a separate overlay; editing it alone does not change the active workbench. routes-v13.js also directly persists intake, hypotheses and raw notes. h2c-shell.js persists intake-related content and undo backups. Audit the live path before any storage migration. ai-service.js currently attributes provenance to MODEL_CONFIG.id; update provenance to the actual provider/model used so exports remain accurate.
+The active editor is bundled in routes-v13.js and calls globalThis.h2cExternal* installed by local-ai-bridge.js. The old coach-ui.js overlay is not loaded by the live page and has been removed. routes-v13.js also directly persists intake, hypotheses and raw notes. h2c-shell.js persists intake-related content and undo backups. Audit the live path before any storage migration. ai-service.js currently attributes provenance to MODEL_CONFIG.id; update provenance to the actual provider/model used so exports remain accurate.
 
 The current bridge parser records streamed errors but only throws when the answer is empty. Reject failed partial responses in both collected and live streaming paths before enabling more providers.
 

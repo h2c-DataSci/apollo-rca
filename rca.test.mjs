@@ -50,7 +50,7 @@ test('base path: no root-absolute asset URLs outside /apollo-rca/', () => {
   assert.deepEqual(bad, []);
 });
 test('no secrets / telemetry in client code', () => {
-  for (const f of ['ai-config.js','ai-service.js','ai-worker.js','ai-transport.js','coach-ui.js']) { const s = readFileSync(new URL('./' + f, import.meta.url), 'utf8'); assert.ok(!/api[_-]?key|secret|token\s*[:=]|sk-[A-Za-z0-9]/i.test(s), f); assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(s), f + ' makes network calls'); }
+  for (const f of ['ai-config.js','ai-service.js','ai-worker.js','ai-transport.js']) { const s = readFileSync(new URL('./' + f, import.meta.url), 'utf8'); assert.ok(!/api[_-]?key|secret|token\s*[:=]|sk-[A-Za-z0-9]/i.test(s), f); assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(s), f + ' makes network calls'); }
 });
 import { exportCase, validateImport } from './case-io.js';
 test('export/import round trip, hypotheses keep status, evidence IDs survive', () => {
@@ -66,23 +66,22 @@ test('import rejects malformed, wrong format, duplicate IDs, and downgrades AI n
   assert.equal(validateImport(base({ ev: [], n: [{ task: 't', text: 'x', status: 'VALIDATED' }] })).notes[0].status, 'ai-assisted');
 });
 test('base path: router basepath is /apollo-rca and no URL-rewrite hack remains', () => {
-  const j = readFileSync(new URL('./index-v12.js', import.meta.url), 'utf8'); assert.ok(j.includes('basepath:`/apollo-rca`')); assert.ok(!j.includes('basepath:``,serializationAdapters'));
+  const j = readFileSync(new URL('./index-v13.js', import.meta.url), 'utf8'); assert.ok(j.includes('basepath:`/apollo-rca`')); assert.ok(!j.includes('basepath:``,serializationAdapters'));
   assert.ok(!readFileSync(new URL('./index.html', import.meta.url), 'utf8').includes('replaceState'));
 });
-test('no root-absolute asset URLs in built JS', () => { const j = readFileSync(new URL('./index-v12.js', import.meta.url), 'utf8'); assert.ok(!/[`"']\/assets\//.test(j)); });
+test('no root-absolute asset URLs in built JS', () => { const j = readFileSync(new URL('./index-v13.js', import.meta.url), 'utf8'); assert.ok(!/[`"']\/assets\//.test(j)); });
 test('privacy: no third-party hosts referenced in index.html or app code (except documented model/library hosts)', () => {
   const h = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
   const allowed = /^(?:https?:\/\/)(?:127\.0\.0\.1(?::\*|:11434)?|localhost(?::\*|:11434)?|\[::1\]:\*|cdn\.jsdelivr\.net|huggingface\.co|\*\.huggingface\.co|cdn-lfs\.huggingface\.co|www\.youtube-nocookie\.com)(?:[/?#]|$)/;
   const found = [...h.matchAll(/https?:\/\/(?!www\.w3\.org)[^"'\s<);]+/g)].map((m) => m[0]).filter((u) => !u.startsWith('https://h2c-datasci.github.io') && !allowed.test(u));
   assert.deepEqual(found, []);
 });
-test('privacy: no third-party hosts, manifest or Grok references in the bundle head config', () => { const j = readFileSync(new URL('./index-v12.js', import.meta.url), 'utf8'); assert.ok(!j.includes('fonts.googleapis.com') && !j.includes('.grok.me')); });
+test('privacy: no third-party hosts, manifest or Grok references in the bundle head config', () => { const j = readFileSync(new URL('./index-v13.js', import.meta.url), 'utf8'); assert.ok(!j.includes('fonts.googleapis.com') && !j.includes('.grok.me')); });
 test('no /assets/ root-absolute URLs anywhere in index.html (router manifest preloads)', () => assert.ok(!readFileSync(new URL('./index.html', import.meta.url), 'utf8').includes('"/assets/')));
-test('vite preload helper resolves under /apollo-rca/ (no /assets/ 404s)', () => { const j = readFileSync(new URL('./index-v12.js', import.meta.url), 'utf8'); assert.ok(j.includes('return`/apollo-rca/`+e') && !j.includes('"assets/routes')); });
+test('vite preload helper resolves under /apollo-rca/ (no /assets/ 404s)', () => { const j = readFileSync(new URL('./index-v13.js', import.meta.url), 'utf8'); assert.ok(j.includes('return`/apollo-rca/`+e') && !j.includes('"assets/routes')); });
 test('one-click New analysis: shared clear path with confirm + undo backup, visible without AI', () => {
-  const s = readFileSync(new URL('./coach-ui.js', import.meta.url), 'utf8');
-  assert.ok(s.includes('id: \'h2c-new\'') && s.includes('Clear analysis and start new?') && s.includes('BACKUP_KEY') && s.includes('undoClear'));
-  assert.equal((s.match(/removeItem\(APP_KEY\)/g) || []).length, 1, 'single clear implementation');
+  const s = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
+  assert.ok(s.includes('Clear analysis and start new?') && s.includes("const BACKUP = 'h2c-last-cleared-v1'") && s.includes("u.textContent = 'Undo'"));
 });
 test('chart colors: STOP is red with white text, unknown is yellow with black text', () => {
   const routes = readFileSync(new URL('./routes-v13.js', import.meta.url), 'utf8');

@@ -1,12 +1,13 @@
 // Web Worker: Transformers.js + ONNX model. Loaded lazily; never at first paint.
 import { MODEL_CONFIG } from './ai-config.js';
+import { importVerifiedLibrary } from './ai-library.js';
 let tf, generator, tokenizer, stopper;
 const post = (m) => self.postMessage(m);
 self.onmessage = async (e) => {
   const { type, id } = e.data;
   try {
     if (type === 'load') {
-      tf = tf || (await import(MODEL_CONFIG.libraryUrl));
+      tf = tf || (await importVerifiedLibrary(MODEL_CONFIG.libraryUrl, MODEL_CONFIG.libraryIntegrity));
       const webgpu = !!(self.navigator && self.navigator.gpu);
       const progress_callback = (p) => { if (p.status === 'progress' && p.total) post({ type: 'progress', value: Math.round((p.loaded / p.total) * 100) }); };
       const opts = webgpu ? { device: 'webgpu', dtype: MODEL_CONFIG.dtypeWebGPU, progress_callback } : { dtype: MODEL_CONFIG.dtypeWasm, progress_callback };

@@ -13,7 +13,7 @@ function escapeHtml(str) {
 // and local AI daemon bridge for low-resource hardware.
 
 import { PROVIDER_PRESETS } from './provider-presets.js';
-import { sessionStore, listLegacyData, removeLegacyData } from './session-store.js';
+import { sessionStore, listLegacyData, removeLegacyData, legacyRecoveryPlan } from './session-store.js';
 
 import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=24';
 import { DEEPER_TASKS, runDeeperReview, currentCaseBrief } from './coach-deeper.js?v=1';
@@ -1476,20 +1476,24 @@ function ensureSessionNotice() {
   const note = document.createElement('aside'); note.className = 'h2c-session-notice no-print';
   note.style.cssText = 'margin:12px 0;padding:10px 12px;border:1px solid #e7ded0;border-radius:6px;font:12px/1.5 system-ui;background:#fffdf8';
   note.textContent = 'Private session: work stays in this tab. Download your report before closing or reloading. ';
-  const legacy = listLegacyData();
-  if (Object.keys(legacy).length) {
-    note.append(document.createTextNode('Older saved data exists on this device; it has not been loaded or sent to AI. '));
+  const plan = legacyRecoveryPlan(listLegacyData());
+  if (plan.offer) {
+    note.append(document.createTextNode('Older saved data was found on this device. Download a recovery copy now. It is not loaded into this case and is not sent to AI. '));
     const exportBtn = document.createElement('button'); exportBtn.type = 'button'; exportBtn.textContent = 'Download older saved data';
     exportBtn.onclick = () => {
-      const data = Object.fromEntries(Object.entries(listLegacyData()).filter(([k]) => k !== 'h2c-local-ai-bridge-v1'));
-      const url = URL.createObjectURL(new Blob([JSON.stringify({ format: 'h2c-legacy-recovery-v1', data }, null, 2)], { type: 'application/json' }));
+      const url = URL.createObjectURL(new Blob([JSON.stringify({ format: 'h2c-legacy-recovery-v1', data: plan.data }, null, 2)], { type: 'application/json' }));
       const a = document.createElement('a'); a.href = url; a.download = 'apollo-rca-older-saved-data.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
-    const clearBtn = document.createElement('button'); clearBtn.type = 'button'; clearBtn.textContent = 'Delete older saved data & keys';
-    clearBtn.onclick = () => { if (!confirm('Delete older Apollo RCA data and saved API keys from this browser? Download a recovery copy first if needed. This cannot be undone.')) return; const failed = removeLegacyData(); if (failed.length) { alert('Some older data could not be removed. Check browser storage permissions.'); return; } note.remove(); ensureSessionNotice(); };
-    for (const b of [exportBtn, clearBtn]) { b.style.cssText = 'margin:4px;padding:5px;border:1px solid #cbd5e1;border-radius:4px'; note.append(b); }
+    exportBtn.style.cssText = 'margin:4px;padding:5px;border:1px solid #cbd5e1;border-radius:4px';
+    note.append(exportBtn);
+  } else if (plan.hadSecret) {
+    note.append(document.createTextNode('A saved API key from an older version was removed and was not kept. '));
   }
   main.querySelector('header')?.after(note);
+  if (plan.clear) {
+    const failed = removeLegacyData();
+    if (failed.length) note.append(document.createTextNode('Some older data could not be removed. Check browser storage permissions.'));
+  }
 }
 window.addEventListener('beforeunload', (event) => {
   if (KEYS.some((k) => sessionStore.getItem(k))) { event.preventDefault(); event.returnValue = ''; }
