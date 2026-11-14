@@ -7,7 +7,7 @@ const RULES = `You are an RCA coach, not the investigator. A causal set is one a
 export const DEEPER_TASKS = [
   { id: 'chart', label: 'Review whole chart', ask: 'Review every primary effect together. List unpaired causal sets, evidence that is missing, and any blame. Do not rewrite the chart.' },
   { id: 'interview', label: 'Plan next interview', ask: 'Write neutral evidence-seeking questions. Do not accuse anyone. Each question must name the gap it is meant to close.' },
-  { id: 'solutions', label: 'Screen solutions', ask: 'Check each proposed action. Flag any that do not change a condition. Do not add a new solution as if it were already accepted.' }
+  { id: 'solutions', label: 'Screen solutions', ask: 'The proposed actions are the rows under "Proposed actions already entered in the solution challenge matrix". Evaluate each of those rows, including its four tests. Do not say that no actions were provided when that list has an action. Flag any that do not change a condition. Do not add a new solution as if it were already accepted.' }
 ];
 
 function stripImages(node) {
@@ -29,8 +29,37 @@ export function caseBrief(raw, limit = 6000) {
   return text.length > limit ? text.slice(0, limit) : text;
 }
 
-export function currentCaseBrief() {
-  return caseBrief(sessionStore.getItem('realitychart-intake-v1') || '{}');
+export function readSolutionMatrix(doc = globalThis.document) {
+  if (!doc || typeof doc.querySelectorAll !== 'function') return [];
+  const heading = [...doc.querySelectorAll('h3')].find((node) => /solution challenge matrix/i.test(node.textContent || ''));
+  const section = heading && typeof heading.closest === 'function' ? heading.closest('section') : null;
+  if (!section || typeof section.querySelectorAll !== 'function') return [];
+  return [...section.querySelectorAll('textarea')].map((area) => {
+    const card = typeof area.closest === 'function' ? area.closest('div') : null;
+    const root = card || section;
+    const title = String(root.querySelector?.('p')?.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+    const status = [...(root.querySelectorAll?.('span') || [])].map((node) => String(node.textContent || '').trim()).find((text) => /pass|block|incomplete/i.test(text)) || '';
+    const checks = [...(root.querySelectorAll?.('label') || [])].map((label) => ({
+      name: String(label.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80),
+      yes: !!label.querySelector?.('input')?.checked
+    })).filter((item) => item.name);
+    return { title, action: String(area.value || '').trim().slice(0, 500), status, checks };
+  }).filter((row) => row.action || row.checks.length);
+}
+
+export function solutionMatrixText(rows) {
+  return (rows || []).map((row) => {
+    const tests = (row.checks || []).map((item) => `${item.name}: ${item.yes ? 'yes' : 'no'}`).join('; ');
+    return `${row.title || 'Action'} [${row.status || 'unmarked'}]: ${row.action || '(no action text)'}${tests ? ` | ${tests}` : ''}`;
+  }).join('\n');
+}
+
+export function currentCaseBrief(doc = globalThis.document) {
+  const intake = caseBrief(sessionStore.getItem('realitychart-intake-v1') || '{}', 8000);
+  const matrix = solutionMatrixText(readSolutionMatrix(doc));
+  if (!matrix) return intake;
+  const block = `\nProposed actions already entered in the solution challenge matrix:\n${matrix}`;
+  return `${intake.slice(0, Math.max(500, 14000 - block.length))}${block}`;
 }
 
 export function parseDeeper(raw) {
