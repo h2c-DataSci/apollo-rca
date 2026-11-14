@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-14 | this commit | Housekeeping. Only `main` is present. The live bundles are still loaded, so none were deleted. Stale notes that said the site was unpublished and the suite was 164 tests now point at this file. |
 | 2026-11-14 | `462fc5c` | Longer AI reviews are shown as a summary, then one card per finding with a heading and Holds / Missing / Contradiction bullets. A plain multi-sentence answer is split into bullets. Shell cache is v34. |
 | 2026-11-14 | `fd4b826` | Added Audit full report. One connected-model pass checks problem definition, executive summary, the cause chart, the solution matrix, the corrective-action log, and the action items. It does not edit the report. |
 | 2026-11-14 | `95c2206` | Screen solutions now reads the filled Solution challenge matrix from the report, so a completed matrix is not described as having no proposed actions. |
@@ -78,7 +79,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 ## Known gaps
 
-- Publication requested on 2026-11-14; follow origin/main CI and branch-managed Pages deployment for publication status. Real authenticated inference is not tested; all analysis tests used mocks, and real connectivity checks used invalid/no credentials without model execution.
+- The automated suite does not call a live model. A review on the published site still depends on the visitor's own key, quota, and browser access.
 - Automatic Ollama startup and folder inspection require an optional companion; no companion is installed. Local origin/permission behavior must still be checked on the published HTTPS site.
 - Cases/keys now live in tab memory; download before close/reload. Legacy recovery is archival export plus explicit deletion, not automatic import.
 - `index.html` asset URLs use the `/apollo-rca/` prefix, so a server at the repo root is not path-identical to Pages.

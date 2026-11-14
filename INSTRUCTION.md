@@ -6,7 +6,7 @@ Work in `D:\ApolloRCA_webapp`, the clone of https://github.com/h2c-DataSci/apoll
 
 ## Using RCA Coach
 
-1. Open RCA Coach. Its connection panel appears above the workbench.
+1. Open the one RCA Coach panel. The connection controls are at the top of that panel.
 2. Choose Local AI, Free cloud, or Paid cloud. Start with Free cloud if you are authorized to share the case with that provider.
 3. For cloud AI, choose a provider and model. Open Get your key in a new tab, create your personal provider key, and paste it in the masked field. No Cloudflare account or shared key is used. Never send your key in chat or a report.
 4. Read the notice and authorize this destination. Test connection checks the key and lists models without running inference. For paid APIs, test first to discover model IDs, then choose one. Other APIs must support OpenAI-compatible chat and browser CORS.

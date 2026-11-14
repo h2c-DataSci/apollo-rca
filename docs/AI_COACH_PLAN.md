@@ -1,6 +1,6 @@
 # RCA Coach: three-path implementation plan
 
-Status: implementation completed in the local working tree on 2026-11-14; authenticated live inference and published deployment remain unverified. This document preserves the design requirements and residual risks. The optional local companion is not implemented.
+Status: the three-path coach is in the published app. This file keeps the design and residual risks. Current HEAD, test count, and cache versions are in [PROGRESS.md](../PROGRESS.md). The optional local companion is not implemented. The automated suite does not send a real API key or run a live model.
 
 ## Outcome and scope
 

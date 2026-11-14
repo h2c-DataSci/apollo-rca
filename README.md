@@ -92,6 +92,7 @@ The current test count and HEAD are recorded in [PROGRESS.md](PROGRESS.md). Node
 | `browser-ai.js` | In-browser ONNX loader |
 | `session-store.js` / `provider-presets.js` | Memory-only case storage and public provider connection presets. |
 | `local-ai-bridge.js` | Ollama on `127.0.0.1:11434`, or a user-supplied HTTPS API. No cloud fallback. |
+| `coach-deeper.js` | Longer reviews: whole chart, next interview, solution screen, and full report audit. |
 | `sw.js` | App-shell cache. Install fails if a shell file is missing. Runtime cache is capped. |
 | `rca.test.mjs` and `test/` | Node test runner. No package install required. |
 
@@ -105,7 +106,7 @@ The existing short coach buttons stay. On the connection card, four longer revie
 
 Local mode enforces loopback. The website cannot start Ollama, install models, inspect folders or change OLLAMA_MODELS. On this Windows computer keep Ollama runtime on C: and its existing models at D:\Ollama\models. A read-only check found installed `qwen3.5:4b` and `qwen3.5:2b`; no model was run or downloaded. No local companion has been installed.
 
-Implementation verification: 164 automated tests passed, plus synthetic mocked inference in isolated Edge, real credential-free browser model-list connectivity, a sample report download, and a real service-worker offline reload. Authenticated live inference and published-site validation remain pending; no API keys, paid inference or Cloudflare account were used. Publication to origin/main was authorized on 2026-11-14; the branch-managed Pages deployment publishes the site after push.
+Implementation verification: the current `node --test` count is in [PROGRESS.md](PROGRESS.md). Earlier browser checks used mocked answers, a credential-free model-list request, a sample report download, and an offline reload. The automated suite still does not send a real API key or run a live model. GitHub Pages publishes `main`.
 
 ## Training videos
 
