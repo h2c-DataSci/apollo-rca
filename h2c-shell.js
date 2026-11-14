@@ -16,6 +16,7 @@ import { PROVIDER_PRESETS } from './provider-presets.js';
 import { sessionStore, listLegacyData, removeLegacyData } from './session-store.js';
 
 import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=24';
+import { DEEPER_TASKS, runDeeperReview, currentCaseBrief } from './coach-deeper.js?v=1';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
@@ -1239,6 +1240,56 @@ function ensureLocalBridgeUI() {
   `);
   coachSection.before(bridge);
   for (const el of bridge.querySelectorAll('input:not([type="checkbox"]), select, button')) el.style.cssText += ';min-height:38px;border:1px solid #cbd5e1;border-radius:5px;padding:6px 9px;max-width:100%;background:#fff;color:#1a202c';
+  const deeper = document.createElement('div');
+  deeper.className = 'h2c-deeper';
+  deeper.style.marginTop = '12px';
+  const deeperNote = document.createElement('p');
+  deeperNote.style.margin = '0 0 8px';
+  deeperNote.textContent = 'Longer reviews use the connected model once. A free or paid cloud model can read the whole case in one pass. Nothing is written into the chart.';
+  const deeperRow = document.createElement('div');
+  deeperRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
+  const deeperOut = document.createElement('div');
+  deeperOut.className = 'h2c-deeper-out';
+  deeperOut.setAttribute('role', 'status');
+  deeperOut.style.marginTop = '8px';
+  for (const task of DEEPER_TASKS) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = task.label;
+    button.style.cssText = 'min-height:38px;border:1px solid #c9a227;border-radius:5px;padding:6px 9px;background:#043d2e;color:#f1d16b;font-weight:700;cursor:pointer';
+    button.addEventListener('click', async () => {
+      deeperRow.querySelectorAll('button').forEach((item) => { item.disabled = true; });
+      deeperOut.textContent = 'Reviewing. Reasoning is not shown.';
+      try {
+        const review = await runDeeperReview(task.id, currentCaseBrief());
+        deeperOut.replaceChildren();
+        const summary = document.createElement('p');
+        summary.textContent = review.summary;
+        deeperOut.append(summary);
+        for (const finding of review.findings) {
+          const line = document.createElement('p');
+          const ids = finding.evidenceIds.length ? ` (${finding.evidenceIds.join(', ')})` : '';
+          line.textContent = `${finding.kind}: ${finding.text}${ids}`;
+          deeperOut.append(line);
+        }
+        if (review.nextStep) {
+          const next = document.createElement('p');
+          next.textContent = `Next: ${review.nextStep}`;
+          deeperOut.append(next);
+        }
+        const caution = document.createElement('p');
+        caution.textContent = 'This is not a finding. Check the evidence before you accept anything.';
+        deeperOut.append(caution);
+      } catch (error) {
+        deeperOut.textContent = error && error.message ? error.message : 'The review failed. Nothing was changed.';
+      } finally {
+        deeperRow.querySelectorAll('button').forEach((item) => { item.disabled = false; });
+      }
+    });
+    deeperRow.append(button);
+  }
+  deeper.append(deeperNote, deeperRow, deeperOut);
+  bridge.append(deeper);
   const $ = (q) => bridge.querySelector(q);
   const mode = $('.h2c-ai-mode'), preset = $('.h2c-ai-preset'), model = $('.h2c-bridge-model');
   const choice = $('.h2c-ai-model-choice');

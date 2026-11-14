@@ -99,7 +99,7 @@ There is no `local-bridge.js` or `ai-coach.js`. Those names in older notes are w
 
 ## AI transport and privacy
 
-`provider-presets.js` contains public connection metadata only. `local-ai-bridge.js` holds configuration in memory, enforces consent and free-provider restrictions, aborts streams and rejects partial failed output. Model-list tests make no inference calls. Groq reasoning requests use a bounded completion budget, low reasoning effort and JSON output; other providers use their supported payloads.
+The existing short coach buttons stay. On the connection card, three longer reviews use the same connected model once: review the whole chart, plan the next interview, and screen solutions. A free or paid cloud model can cover the whole case in that one pass. The result is advice only. It is not written into the chart, and a failed or partial answer changes nothing. `local-ai-bridge.js` holds configuration in memory, enforces consent and free-provider restrictions, aborts streams and rejects partial failed output. Model-list tests make no inference calls. Groq reasoning requests use a bounded completion budget, low reasoning effort and JSON output; other providers use their supported payloads.
 
 `session-store.js` holds case data, hypotheses, notes and clear/undo backups in memory. The active bundled editor and shell share this store. Shell and Help wait for the editor's first React commit before modifying the page. Service worker shell v27 reloads assets on install and runtime cache v2 retires stale runtime entries; credential-bearing requests and cross-origin inference are excluded from caching.
 
