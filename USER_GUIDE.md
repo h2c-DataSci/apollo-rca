@@ -93,19 +93,18 @@ Click the floating `▶ 7 Videos` button to access the official video curriculum
 
 ---
 
-## 4. Local AI Daemon Bridge (Older Laptops & Low-Spec Hardware)
+## 4. AI provider
 
-For older laptops or resource-constrained environments, you can run private AI models on your CPU with **0 MB browser memory overhead**:
+The coach can use a model you already have. It does not download one for you.
 
-1. Click **` RCA Coach`** in the top navigation toolbar.
-2. The **Local AI Daemon Bridge** panel opens at the top of your workspace.
-3. Start Ollama in your computer's terminal:
-   ```bash
-   ollama run gemma2:2b
-   ```
-4. Click **`⚡ Test Connection`** to verify connection to `http://127.0.0.1:11434`.
-5. Use the quick action buttons (*Review wording*, *Suggest rewrite*, *Extract timeline*, *Check evidence gap*, *Clarifying questions*, *Suggest hypotheses*, *Review solution alignment*, *Validate integrity*).
-6. Review suggestions in the advisory card and click **`Accept into Case`**, **`Modify`**, or **`Dismiss`**.
+1. Click **RCA Coach**.
+2. In **AI provider**, leave **Ollama on this computer** selected. The address is `http://127.0.0.1:11434`. The model field starts as `qwen3:2b`, which is the usual Ollama tag for Qwen3 2B.
+3. Start the Ollama app you already installed. Do not move the model folder. If `OLLAMA_MODELS` already points at `D:\Ollama\models`, leave it.
+4. Click **Test connection**. The card lists the tags Ollama reports. If one of them is a Qwen3 2B tag, the model field changes to that exact tag.
+5. Click **Enable assistant**. The case stays put until you accept a suggestion.
+6. To use a different model you already run, type its tag. To use your own hosted API, choose **My API key**, enter the HTTPS address and the key. The key stays in this browser. A failed call does not switch to another provider.
+
+Browser model remains available if you choose that provider instead. Standard Mode still works with AI off.
 
 ---
 

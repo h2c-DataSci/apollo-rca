@@ -713,7 +713,7 @@ describe('Apollo RCA — Stress & Stability Benchmark Suite', () => {
     // Verify Local AI Daemon Bridge config defaults and recommended models work offline
     const cfg = getBridgeConfig();
     assert.equal(cfg.endpoint, 'http://127.0.0.1:11434');
-    assert.equal(cfg.model, 'gemma2:2b');
+    assert.equal(cfg.model, 'qwen3:2b');
     assert.ok(RECOMMENDED_LOCAL_MODELS.length >= 3);
   });
 

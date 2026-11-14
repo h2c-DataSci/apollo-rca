@@ -7,7 +7,9 @@ import {
   getBridgeConfig,
   saveBridgeConfig,
   testLocalDaemonConnection,
-  executeLocalChat
+  executeLocalChat,
+  pickInstalledQwen,
+  stripModelThinking
 } from './local-ai-bridge.js';
 
 test('local-ai-bridge: refuses a non-local endpoint before any request', async () => {
@@ -19,7 +21,8 @@ test('local-ai-bridge: refuses a non-local endpoint before any request', async (
 
 test('local-ai-bridge: default config and recommended models are well-formed', () => {
   assert.equal(DEFAULT_BRIDGE_CONFIG.endpoint, 'http://127.0.0.1:11434');
-  assert.equal(DEFAULT_BRIDGE_CONFIG.model, 'gemma2:2b');
+  assert.equal(DEFAULT_BRIDGE_CONFIG.model, 'qwen3:2b');
+  assert.equal(DEFAULT_BRIDGE_CONFIG.provider, 'ollama');
   assert.equal(DEFAULT_BRIDGE_CONFIG.numPredict, 384);
   assert.ok(Array.isArray(RECOMMENDED_LOCAL_MODELS));
   assert.ok(RECOMMENDED_LOCAL_MODELS.some(m => m.id === 'gemma2:2b'));
@@ -136,5 +139,83 @@ test('local-ai-bridge: graceful offline failure when daemon is not running', asy
   // Port 19999 has no server running
   const status = await testLocalDaemonConnection('http://127.0.0.1:19999');
   assert.equal(status.online, false);
-  assert.ok(status.message.includes('Could not connect'));
+  assert.ok(/not reachable|Could not connect/i.test(status.message + status.error));
 });
+
+test('pickInstalledQwen prefers the exact Qwen3 2B tag', () => {
+  assert.equal(pickInstalledQwen(['gemma2:2b', 'qwen3:2b', 'qwen3:8b']), 'qwen3:2b');
+  assert.equal(pickInstalledQwen(['qwen3:2b-instruct-q4_K_M']), 'qwen3:2b-instruct-q4_K_M');
+  assert.equal(pickInstalledQwen(['llama3.2:1b']), '');
+});
+
+test('stripModelThinking hides a Qwen thinking trace', () => {
+  assert.equal(stripModelThinking('<think>hidden chain</think>{"summary":"Oil Released"}'), '{"summary":"Oil Released"}');
+  assert.throws(() => stripModelThinking('<think>only reasoning</think>'), /internal reasoning/);
+});
+
+test('local-ai-bridge: missing Ollama model does not fall through or download', async () => {
+  let v1 = false;
+  const server = http.createServer((req, res) => {
+    if (req.url === '/v1/chat/completions') v1 = true;
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: "model 'qwen3:2b' not found" }));
+  });
+  await new Promise((r) => server.listen(18891, '127.0.0.1', r));
+  try {
+    await assert.rejects(
+      () => executeLocalChat([{ role: 'user', content: 'Oil Released at Unit 3 lube-oil skid' }], { endpoint: 'http://127.0.0.1:18891', model: 'qwen3:2b', provider: 'ollama' }),
+      /not installed/
+    );
+    assert.equal(v1, false);
+  } finally {
+    server.close();
+  }
+});
+
+test('local-ai-bridge: Apollo example strips thinking and keeps the JSON', async () => {
+  let body = null;
+  const server = http.createServer((req, res) => {
+    let raw = '';
+    req.on('data', (chunk) => { raw += chunk; });
+    req.on('end', () => {
+      body = JSON.parse(raw);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ message: { content: '<think>do not show</think>{"summary":"Oil Released","proposedText":"Oil Released"}', thinking: 'hidden' } }));
+    });
+  });
+  await new Promise((r) => server.listen(18892, '127.0.0.1', r));
+  try {
+    const reply = await executeLocalChat([
+      { role: 'system', content: 'You are an RCA Coach.' },
+      { role: 'user', content: 'Review primary effect: Oil Released' }
+    ], { endpoint: 'http://127.0.0.1:18892', model: 'qwen3:2b', provider: 'ollama' });
+    assert.equal(reply, '{"summary":"Oil Released","proposedText":"Oil Released"}');
+    assert.equal(body.model, 'qwen3:2b');
+    assert.equal(body.think, false);
+    assert.match(body.messages[1].content, /Oil Released/);
+    assert.ok(!reply.includes('do not show'));
+  } finally {
+    server.close();
+  }
+});
+
+test('bring-your-own API requires a key and does not call another host', async () => {
+  await assert.rejects(() => executeLocalChat([{ role: 'user', content: 'Oil Released' }], { provider: 'openai', endpoint: 'http://example.com/v1', model: 'any', apiKey: 'sk-user' }), /https/);
+  let seen = '';
+  const server = http.createServer((req, res) => {
+    seen = req.headers.authorization || '';
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ choices: [{ message: { content: '{"summary":"Oil Released"}' } }] }));
+  });
+  await new Promise((r) => server.listen(18893, '127.0.0.1', r));
+  try {
+    const reply = await executeLocalChat([{ role: 'user', content: 'Review: Oil Released' }], {
+      provider: 'openai', endpoint: 'http://127.0.0.1:18893/v1', model: 'my-model', apiKey: 'sk-local-test'
+    });
+    assert.equal(reply, '{"summary":"Oil Released"}');
+    assert.equal(seen, 'Bearer sk-local-test');
+  } finally {
+    server.close();
+  }
+});
+

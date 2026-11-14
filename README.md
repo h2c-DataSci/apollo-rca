@@ -80,11 +80,28 @@ On 2026-11-13 the suite was **140 passed, 0 failed**. Node 18, 20, and 22 are th
 | `help-kb.js` / `help-diagrams.js` | Knowledge text and original diagrams |
 | `h2c-videos.js` | Seven YouTube episodes. Players load from `youtube-nocookie.com` only after a click. Sync Official Durations reads the player length. |
 | `browser-ai.js` | In-browser ONNX loader |
-| `local-ai-bridge.js` | Loopback daemon client |
+| `local-ai-bridge.js` | Ollama on `127.0.0.1:11434`, or a user-supplied HTTPS API. No cloud fallback. |
 | `sw.js` | App-shell cache. Install fails if a shell file is missing. Runtime cache is capped. |
 | `rca.test.mjs` and `test/` | Node test runner. No package install required. |
 
 There is no `local-bridge.js` or `ai-coach.js`. Those names in older notes are wrong.
+
+## AI provider
+
+This is a static page. It has no server of its own, so the browser calls the model. There is no cloud API key in the repo.
+
+| Setting | Value |
+|---|---|
+| Provider | `ollama` (default), `openai` for your own API, or `browser` for the ONNX model |
+| Ollama address | `http://127.0.0.1:11434` |
+| Default model tag | `qwen3:2b` |
+| Stored in | `localStorage` key `h2c-local-ai-bridge-v1` |
+
+`qwen3:2b` is the usual Ollama tag for Qwen3 2B. This build machine could not see a running Ollama, so that tag was not confirmed against `D:\Ollama\models`. On your computer, **Test connection** reads `/api/tags` and selects the installed Qwen3 2B tag when one is listed. It does not download or move models.
+
+To use another model you already have, type its tag. To use your own API, choose **My API key**, set the HTTPS base URL and the key. The key is sent only to that address. Ollama itself stays on localhost.
+
+Startup: leave `OLLAMA_MODELS` as it is, start the Ollama you already installed, open RCA Coach, test the connection, then **Enable assistant**.
 
 ## Training videos
 

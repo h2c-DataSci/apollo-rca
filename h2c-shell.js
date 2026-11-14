@@ -12,7 +12,7 @@ function escapeHtml(str) {
 // interactive lively 7-step Apollo RCA workflow hub, real-time color-coded validation,
 // and local AI daemon bridge for low-resource hardware.
 
-import { getBridgeConfig, saveBridgeConfig, testLocalDaemonConnection } from './local-ai-bridge.js?v=21';
+import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=22';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
@@ -1211,115 +1211,134 @@ function ensureLocalBridgeUI() {
   if (!coachSection) return;
 
   let bridge = document.querySelector('.h2c-local-bridge-card');
+  if (bridge && bridge.dataset.v !== '2') {
+    bridge.remove();
+    bridge = null;
+  }
   if (bridge) {
     if (coachSection.contains(bridge) || bridge.previousElementSibling !== coachSection) coachSection.after(bridge);
     return;
   }
   const cfg = getBridgeConfig();
-    bridge = document.createElement('div');
-    bridge.className = 'no-print h2c-local-bridge-card';
-    bridge.style.cssText = 'margin-top: 12px; margin-bottom: 12px; background: #fff; border: 1px solid #e7ded0; border-left: 4px solid #c9a227; border-radius: 8px; padding: 12px 14px; font-family: system-ui, sans-serif;';
-    setSafeHtml(bridge, `
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 16px;">🖥️</span>
-          <strong style="font-size: 13.5px; color: #1a202c;">Local AI Daemon Bridge (Ollama / Gemma 2 / LiteRT)</strong>
-          <span style="font-size: 11px; background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; padding: 2px 7px; border-radius: 4px; font-weight: 700;">Low-Spec Laptop Optimized (0 MB Browser RAM)</span>
-        </div>
-        <span class="h2c-bridge-status-pill" style="font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #f3f4f6; color: #4b5563;">⚪ Daemon Inactive</span>
-      </div>
-      <p style="font-size: 12px; color: #4a5568; margin: 0 0 10px 0; line-height: 1.45;">
-        Connect local offline models running on your computer. Instant CPU execution, 100% offline, and zero browser memory usage.
-      </p>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">
-          Endpoint:
-          <input type="text" class="h2c-bridge-endpoint" value="${escapeHtml(cfg.endpoint)}" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 175px;" />
-        </label>
-        <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">
-          Model:
-          <select class="h2c-bridge-model" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
-            <option value="gemma2:2b" ${cfg.model === 'gemma2:2b' ? 'selected' : ''}>Google Gemma 2 (2B) - Recommended</option>
-            <option value="qwen2.5:1.5b" ${cfg.model === 'qwen2.5:1.5b' ? 'selected' : ''}>Qwen 2.5 (1.5B) - Fast &amp; Compact</option>
-            <option value="llama3.2:1b" ${cfg.model === 'llama3.2:1b' ? 'selected' : ''}>Llama 3.2 (1B) - Lowest RAM</option>
-          </select>
-        </label>
-        <button type="button" class="h2c-bridge-test-btn" style="font-size: 12px; font-weight: 700; background: #043d2e; color: #f1d16b; border: 1px solid #c9a227; padding: 5px 12px; border-radius: 5px; cursor: pointer;">
-          ⚡ Test Connection
-        </button>
-      </div>
-      <div class="h2c-bridge-feedback" style="margin-top: 8px; font-size: 11.5px; line-height: 1.4; display: none;"></div>
-    `);
+  bridge = document.createElement('div');
+  bridge.dataset.v = '2';
+  bridge.className = 'no-print h2c-local-bridge-card';
+  bridge.style.cssText = 'margin-top: 12px; margin-bottom: 12px; background: #fff; border: 1px solid #e7ded0; border-left: 4px solid #c9a227; border-radius: 8px; padding: 12px 14px; font-family: system-ui, sans-serif;';
+  setSafeHtml(bridge, `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+      <strong style="font-size: 13.5px; color: #1a202c;">AI provider</strong>
+      <span class="h2c-bridge-status-pill" style="font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #f3f4f6; color: #4b5563;">Not checked</span>
+    </div>
+    <p style="font-size: 12px; color: #4a5568; margin: 0 0 10px 0; line-height: 1.45;">
+      Ollama on this computer is the default. The usual tag for Qwen3 2B is qwen3:2b. Test Connection uses the tag that is actually installed. Your API key, if you add one, stays in this browser and is sent only to the address you type.
+    </p>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">Provider
+        <select class="h2c-bridge-provider" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+          <option value="ollama" ${cfg.provider === 'ollama' ? 'selected' : ''}>Ollama on this computer</option>
+          <option value="openai" ${cfg.provider === 'openai' ? 'selected' : ''}>My API key</option>
+          <option value="browser" ${cfg.provider === 'browser' ? 'selected' : ''}>Browser model</option>
+        </select>
+      </label>
+      <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">Address
+        <input type="text" class="h2c-bridge-endpoint" value="${escapeHtml(cfg.endpoint)}" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 220px;" />
+      </label>
+      <label style="font-size: 12px; font-weight: 600; color: #2d3748; display: flex; align-items: center; gap: 6px;">Model
+        <input type="text" class="h2c-bridge-model" list="h2c-bridge-models" value="${escapeHtml(cfg.model)}" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 160px;" />
+      </label>
+      <datalist id="h2c-bridge-models"></datalist>
+      <label class="h2c-bridge-key-label" style="font-size: 12px; font-weight: 600; color: #2d3748; display: ${cfg.provider === 'openai' ? 'flex' : 'none'}; align-items: center; gap: 6px;">API key
+        <input type="password" class="h2c-bridge-key" autocomplete="off" value="${escapeHtml(cfg.apiKey || '')}" style="font-size: 12px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 160px;" />
+      </label>
+      <button type="button" class="h2c-bridge-test-btn" style="font-size: 12px; font-weight: 700; background: #043d2e; color: #f1d16b; border: 1px solid #c9a227; padding: 5px 12px; border-radius: 5px; cursor: pointer;">Test connection</button>
+    </div>
+    <div class="h2c-bridge-feedback" style="margin-top: 8px; font-size: 11.5px; line-height: 1.4; display: none;"></div>
+  `);
+  coachSection.after(bridge);
 
-    // Keep the card beside the coach, not inside it. React owns the section's children.
-    coachSection.after(bridge);
+  const testBtn = bridge.querySelector('.h2c-bridge-test-btn');
+  const endpointInput = bridge.querySelector('.h2c-bridge-endpoint');
+  const modelInput = bridge.querySelector('.h2c-bridge-model');
+  const providerInput = bridge.querySelector('.h2c-bridge-provider');
+  const keyInput = bridge.querySelector('.h2c-bridge-key');
+  const keyLabel = bridge.querySelector('.h2c-bridge-key-label');
+  const list = bridge.querySelector('#h2c-bridge-models');
+  const pill = bridge.querySelector('.h2c-bridge-status-pill');
+  const feedback = bridge.querySelector('.h2c-bridge-feedback');
 
-    const testBtn = bridge.querySelector('.h2c-bridge-test-btn');
-    const endpointInput = bridge.querySelector('.h2c-bridge-endpoint');
-    const modelSelect = bridge.querySelector('.h2c-bridge-model');
-    const pill = bridge.querySelector('.h2c-bridge-status-pill');
-    const feedback = bridge.querySelector('.h2c-bridge-feedback');
+  const saveChanges = () => saveBridgeConfig({
+    provider: providerInput.value,
+    endpoint: endpointInput.value.trim(),
+    model: modelInput.value.trim(),
+    apiKey: keyInput.value,
+    enabled: providerInput.value !== 'browser'
+  });
+  providerInput.addEventListener('change', () => {
+    keyLabel.style.display = providerInput.value === 'openai' ? 'flex' : 'none';
+    saveChanges();
+  });
+  endpointInput.addEventListener('change', saveChanges);
+  modelInput.addEventListener('change', saveChanges);
+  keyInput.addEventListener('change', saveChanges);
 
-    const saveChanges = () => {
-      saveBridgeConfig({
+  testBtn.onclick = async () => {
+    testBtn.disabled = true;
+    testBtn.textContent = 'Testing...';
+    pill.textContent = 'Checking...';
+    feedback.style.display = 'block';
+    feedback.replaceChildren();
+    feedback.style.color = '#4b5563';
+    feedback.textContent = 'Checking ' + endpointInput.value + '...';
+    saveChanges();
+    try {
+      const res = await testConfiguredConnection({
+        provider: providerInput.value,
         endpoint: endpointInput.value.trim(),
-        model: modelSelect.value
+        model: modelInput.value.trim(),
+        apiKey: keyInput.value
       });
-    };
-
-    endpointInput.addEventListener('change', saveChanges);
-    modelSelect.addEventListener('change', saveChanges);
-
-    testBtn.onclick = async () => {
-      testBtn.disabled = true;
-      testBtn.textContent = 'Testing...';
-      pill.textContent = '⏳ Checking...';
-      pill.style.background = '#fef3c7';
-      pill.style.color = '#92400e';
-      feedback.style.display = 'block';
       feedback.replaceChildren();
-      feedback.style.color = '#4b5563';
-      feedback.textContent = 'Pinging local daemon at ' + endpointInput.value + '...';
-
-      saveChanges();
-      try {
-        const res = await testLocalDaemonConnection(endpointInput.value);
-        feedback.replaceChildren();
-        if (res.online) {
-          pill.textContent = '🟢 Connected (' + String(res.type || 'local') + ')';
-          pill.style.background = '#d1fae5';
-          pill.style.color = '#065f46';
-          feedback.style.color = '#065f46';
-          const title = document.createElement('strong');
-          title.textContent = '✓ Connection verified. ';
-          feedback.append(title, document.createTextNode(String(res.message || '')));
-          if (Array.isArray(res.models) && res.models.length) {
-            feedback.append(document.createTextNode(' Models: ' + res.models.join(', ')));
-          }
-          saveBridgeConfig({ enabled: true });
-        } else {
-          pill.textContent = '⚪ Daemon Offline';
-          pill.style.background = '#fee2e2';
-          pill.style.color = '#991b1b';
-          feedback.style.color = '#b91c1c';
-          const title = document.createElement('strong');
-          title.textContent = '✕ Local daemon not detected. ';
-          const hint = document.createElement('span');
-          hint.style.color = '#4b5563';
-          hint.textContent = 'On this computer run: ollama run ' + modelSelect.value;
-          feedback.append(title, document.createTextNode(String(res.error || res.message || '')), document.createElement('br'), hint);
+      if (res.online) {
+        const picked = providerInput.value === 'ollama' ? pickInstalledQwen(res.models) : '';
+        if (picked && (modelInput.value.trim() === 'qwen3:2b' || modelInput.value.trim() === 'gemma2:2b' || !res.models.includes(modelInput.value.trim()))) {
+          modelInput.value = picked;
+          saveBridgeConfig({ model: picked });
         }
-      } catch (error) {
-        pill.textContent = '⚪ Daemon Offline';
+        list.replaceChildren();
+        for (const name of res.models || []) {
+          const option = document.createElement('option');
+          option.value = name;
+          list.append(option);
+        }
+        pill.textContent = 'Connected';
+        pill.style.background = '#d1fae5';
+        pill.style.color = '#065f46';
+        feedback.style.color = '#065f46';
+        const title = document.createElement('strong');
+        title.textContent = 'Connected. ';
+        feedback.append(title, document.createTextNode(String(res.message || '')));
+        if (res.models && res.models.length) feedback.append(document.createTextNode(' Installed: ' + res.models.join(', ')));
+        if (modelInput.value && res.models && res.models.length && !res.models.includes(modelInput.value)) {
+          feedback.append(document.createElement('br'), document.createTextNode('The typed model is not in that list. Choose one of the installed tags. Nothing was downloaded.'));
+        }
+      } else {
+        pill.textContent = 'Not connected';
         pill.style.background = '#fee2e2';
         pill.style.color = '#991b1b';
         feedback.style.color = '#b91c1c';
-        feedback.textContent = error && error.message ? error.message : 'Connection check failed.';
-      } finally {
-        testBtn.disabled = false;
-        testBtn.textContent = '⚡ Test Connection';
+        feedback.textContent = String(res.error || res.message || 'Connection failed.');
       }
-    };
+    } catch (error) {
+      pill.textContent = 'Not connected';
+      pill.style.background = '#fee2e2';
+      pill.style.color = '#991b1b';
+      feedback.style.color = '#b91c1c';
+      feedback.textContent = error && error.message ? error.message : 'Connection check failed.';
+    } finally {
+      testBtn.disabled = false;
+      testBtn.textContent = 'Test connection';
+    }
+  };
 }
 
 function ensureBrowserAiButton() {
@@ -1334,7 +1353,7 @@ function ensureBrowserAiButton() {
   btn.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    import('./browser-ai.js?v=22').then((mod) => mod.openBrowserAiDialog()).catch(() => {});
+    import('./browser-ai.js?v=23').then((mod) => mod.openBrowserAiDialog()).catch(() => {});
   });
   anchor.insertAdjacentElement('afterend', btn);
 }
@@ -1422,6 +1441,7 @@ function initShell() {
 }
 
 function bootShell() {
+  installExternalCoach();
   initShell();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register(new URL('./sw.js', import.meta.url)).catch(() => {});
