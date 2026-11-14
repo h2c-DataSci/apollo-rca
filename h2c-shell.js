@@ -383,6 +383,33 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
   border-radius: 12px 12px 0 0 !important;
   box-shadow: none !important;
 }
+.h2c-local-bridge-card + .h2c-official-coach:has(+ .h2c-deeper) {
+  border-bottom: 0 !important;
+  border-radius: 0 !important;
+  margin-bottom: 0 !important;
+  box-shadow: none !important;
+}
+.h2c-official-coach + .h2c-deeper {
+  margin: 0 0 1.5rem !important;
+  padding: 0 18px 16px;
+  border: 2px solid #c9a227;
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  background: linear-gradient(180deg, #fbf7ee 0%, #fffdfa 100%);
+  box-shadow: 0 4px 18px rgba(4, 61, 46, 0.08), 0 1px 3px rgba(0,0,0,0.04);
+}
+.h2c-deeper button {
+  min-height: 40px;
+  border: 1px solid #d7c7a2;
+  border-radius: 8px;
+  padding: 6px 12px;
+  background: #fff;
+  color: #14261c;
+  font: 600 13px/1.2 system-ui, sans-serif;
+  cursor: pointer;
+}
+.h2c-deeper button:hover { border-color: #c9a227; }
+.h2c-deeper button:disabled { opacity: 0.55; cursor: default; }
 .h2c-local-bridge-card + .h2c-official-coach {
   margin-top: 0 !important;
   border-top: 0 !important;
@@ -961,6 +988,7 @@ function ensureBottomLegalShowcase() {
       };
     }
   }
+  if (showcase.parentElement !== main || main.lastElementChild !== showcase) main.appendChild(showcase);
 }
 
 function updateStepsHub() {
@@ -1303,11 +1331,20 @@ function renderReview(review, root) {
   root.append(caution);
 }
 
+function placeCoachReviews(coachSection) {
+  const deeper = document.querySelector('.h2c-deeper');
+  if (coachSection && deeper && deeper.previousElementSibling !== coachSection) coachSection.after(deeper);
+}
+
 function ensureLocalBridgeUI() {
   const coachSection = document.querySelector('section[aria-label="RCA coach"]');
   if (!coachSection) return;
   let bridge = document.querySelector('.h2c-local-bridge-card');
-  if (bridge) { if (bridge.nextElementSibling !== coachSection) coachSection.before(bridge); return; }
+  if (bridge) {
+    if (bridge.nextElementSibling !== coachSection) coachSection.before(bridge);
+    placeCoachReviews(coachSection);
+    return;
+  }
   const cfg = getBridgeConfig();
   bridge = document.createElement('div');
   bridge.className = 'no-print h2c-local-bridge-card';
@@ -1333,8 +1370,7 @@ function ensureLocalBridgeUI() {
   coachSection.before(bridge);
   for (const el of bridge.querySelectorAll('input:not([type="checkbox"]), select, button')) el.style.cssText += ';min-height:38px;border:1px solid #cbd5e1;border-radius:5px;padding:6px 9px;max-width:100%;background:#fff;color:#1a202c';
   const deeper = document.createElement('div');
-  deeper.className = 'h2c-deeper';
-  deeper.style.marginTop = '12px';
+  deeper.className = 'no-print h2c-deeper';
   const deeperNote = document.createElement('p');
   deeperNote.style.margin = '0 0 8px';
   deeperNote.textContent = 'Longer reviews use the connected model once. Audit full report checks every section of the formal report. Nothing is written into the chart.';
@@ -1347,8 +1383,8 @@ function ensureLocalBridgeUI() {
   for (const task of DEEPER_TASKS) {
     const button = document.createElement('button');
     button.type = 'button';
+    button.className = 'h2c-review-btn';
     button.textContent = task.label;
-    button.style.cssText = 'min-height:38px;border:1px solid #c9a227;border-radius:5px;padding:6px 9px;background:#043d2e;color:#f1d16b;font-weight:700;cursor:pointer';
     button.addEventListener('click', async () => {
       deeperRow.querySelectorAll('button').forEach((item) => { item.disabled = true; });
       deeperOut.textContent = 'Reviewing. Reasoning is not shown.';
@@ -1364,7 +1400,7 @@ function ensureLocalBridgeUI() {
     deeperRow.append(button);
   }
   deeper.append(deeperNote, deeperRow, deeperOut);
-  bridge.append(deeper);
+  coachSection.after(deeper);
   const $ = (q) => bridge.querySelector(q);
   const mode = $('.h2c-ai-mode'), preset = $('.h2c-ai-preset'), model = $('.h2c-bridge-model');
   const choice = $('.h2c-ai-model-choice');
@@ -1567,6 +1603,14 @@ function initShell() {
 
   if (document.body) {
     new MutationObserver(applyProminent).observe(document.body, { childList: true });
+  }
+  const main = document.querySelector('main');
+  if (main) {
+    new MutationObserver(() => {
+      placeCoachReviews(document.querySelector('section[aria-label="RCA coach"]'));
+      const legal = document.getElementById('legal-disclosure');
+      if (legal && main.lastElementChild !== legal) main.appendChild(legal);
+    }).observe(main, { childList: true });
   }
 }
 
