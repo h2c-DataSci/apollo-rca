@@ -148,7 +148,16 @@ test('provider-specific reasoning payloads preserve a useful completion budget',
   } finally { globalThis.fetch = originalFetch; clearBridgeSession(); }
 });
 
-test('free Groq accepts every model from the console limits list', () => {
+test('every free provider links to its own key page and setup steps', () => {
+  const free = PROVIDER_PRESETS.filter((item) => item.free);
+  assert.deepEqual(free.map((item) => item.id), ['groq', 'google', 'openrouter']);
+  for (const item of free) {
+    assert.match(item.keyUrl, /^https:\/\//);
+    assert.match(item.setup, /create a key|create a key in a project|Keys/);
+  }
+});
+
+test('free Groq keeps the three chat models', () => {
   const groq = PROVIDER_PRESETS.find((item) => item.id === 'groq');
   assert.deepEqual(groq.models, [
     'openai/gpt-oss-20b',

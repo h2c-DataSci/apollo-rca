@@ -12,7 +12,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Branch | `main`, even with `origin/main` |
 | HEAD | `2ef7aae` — housekeeping check recorded. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Tests | `node --test` → 177 passed, 0 failed. |
+| Tests | `node --test` → 178 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -21,7 +21,8 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-14 | `2ef7aae` | Housekeeping. Only `main` exists. No unused bundle was removed; `404.html` stays because Pages uses it. The handoff now separates shell query `v=35` from service-worker cache `v36`, and notes Google free-tier retention. Tests remain 177. |
+| 2026-11-15 | this commit | Free cloud in RCA Coach now shows setup steps and a create-a-key link for Groq, Google AI Studio, and OpenRouter. Shell query is v36 and the service-worker cache is v37. |
+| 2026-11-14 | `2ef7aae` | Housekeeping. Only `main` exists. No unused bundle was removed; `404.html` stays because Pages uses it. The handoff now separates shell query `v=35` from service-worker cache `v36`, and notes Google free-tier retention. |
 | 2026-11-14 | `eb028af` | Groq free-cloud list now keeps only the three chat models useful for RCA: gpt-oss-20b, gpt-oss-120b, and qwen/qwen3.8-27b. Removed Allam, the safeguard model, and both Prompt Guard classifiers. Shell cache is v36. |
 | 2026-11-14 | `a5b5b48` | Free cloud can use a Google AI key. The selector lists gemini-3.8-flash, gemini-3.5-flash-lite, gemini-3.1-flash-lite, gemma-4-31b-it, and gemma-4-26b-a4b-it. Calls use generateContent. A quota error does not switch models. |
 | 2026-11-14 | `56b6dc3` | Housekeeping. Only `main` is present. The live bundles are still loaded, so none were deleted. Stale notes that said the site was unpublished and the suite was 164 tests now point at this file. |
@@ -69,8 +70,8 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Help knowledge base stays. No copyrighted book images.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
-- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v36` and `apollo-rca-runtime-v2`.
-- Script queries: shell `v=35`, help `v=27`, videos `v=25`, local bridge `v=26`, browser AI `v=24`, deeper reviews `v=6`. The shell script query stays `v=35` while the service-worker cache name is `v36`, because the last preset change did not edit `h2c-shell.js`. Bump a file's query when that file changes.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v37` and `apollo-rca-runtime-v2`.
+- Script queries: shell `v=36`, help `v=27`, videos `v=25`, local bridge `v=26`, browser AI `v=24`, deeper reviews `v=6`. Bump a file's query when that file changes.
 - Episode lengths last read from the player: 55:50, 20:22, 07:57, 06:59, 08:19, 07:20, 07:10. Episode 6 id is `Q4-Bu2qUaaE`.
 
 ## Do not

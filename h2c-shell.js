@@ -414,6 +414,10 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
 .h2c-review-label { font-weight: 700; color: #043d2e; }
 .h2c-review-ids { margin: 6px 0 0; font-size: 12px; color: #3d4a42; }
 .h2c-review-note { font-size: 12px; color: #5c6e80; }
+.h2c-key-steps { margin: 6px 0 6px 1.2rem; }
+.h2c-key-steps li { margin: 2px 0; }
+.h2c-key-links, .h2c-key-note { margin: 6px 0; }
+.h2c-ai-steps a { color: #043d2e; font-weight: 700; }
 .h2c-official-coach .h2c-local-bridge-card {
   margin-top: 12px !important;
   background: #fff !important;
@@ -1391,11 +1395,35 @@ function ensureLocalBridgeUI() {
     models(local ? [] : p?.models || []);
     choice.value = model.value;
     const steps = $('.h2c-ai-steps'); steps.replaceChildren();
+    const externalLink = (href, text) => { const link = document.createElement('a'); link.href = href; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = text; return link; };
     if (local) steps.textContent = 'Start Ollama, then Test connection to find your installed models. Use Enable assistant in the Coach when connected.';
-    else {
+    else if (mode.value === 'free') {
+      const title = document.createElement('strong');
+      title.textContent = 'Set up your own free key';
+      const list = document.createElement('ol');
+      list.className = 'h2c-key-steps';
+      for (const line of ['Open one provider below and create a key in your own account. This app does not include a key.', 'Choose that same provider here, paste the key, and pick a listed model.', 'Check the authorization box, then Test connection. The key stays in this tab only.']) {
+        const item = document.createElement('li');
+        item.textContent = line;
+        list.append(item);
+      }
+      const links = document.createElement('p');
+      links.className = 'h2c-key-links';
+      presets().filter((item) => item.free && item.keyUrl).forEach((item, index) => {
+        if (index) links.append(document.createTextNode(' · '));
+        links.append(externalLink(item.keyUrl, `${item.label.replace(/\s+\(.*\)$/, '')} — create a key ↗`));
+      });
+      steps.append(title, list, links);
+      if (p?.setup) {
+        const note = document.createElement('p');
+        note.className = 'h2c-key-note';
+        note.append(document.createTextNode(p.setup + ' '), externalLink(p.privacyUrl || p.keyUrl, 'Privacy policy ↗'));
+        steps.append(note);
+      }
+    } else {
       steps.append(document.createTextNode('Create a key with your provider, paste it above, review the notice, then Test connection. '));
-      if (p?.keyUrl) { const link = document.createElement('a'); link.href = p.keyUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Get your key ↗'; steps.append(link); }
-      if (p?.privacyUrl) { const link = document.createElement('a'); link.href = p.privacyUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = ' · Privacy policy ↗'; steps.append(link); }
+      if (p?.keyUrl) steps.append(externalLink(p.keyUrl, 'Get your key ↗'));
+      if (p?.privacyUrl) steps.append(externalLink(p.privacyUrl, ' · Privacy policy ↗'));
     }
     $('.h2c-ai-risk').textContent = local ? 'Local mode stays on loopback. A folder path does not start or import a model.' : mode.value === 'free' ? 'Free models use your provider account and its quota. Confirm billing is disabled or capped. Availability and provider retention settings can change. No automatic paid fallback. OpenRouter may route to different underlying free providers.' : 'Your provider may charge you. The app cannot guarantee the final cost or verify account billing settings. Only use a provider you trust.';
     resetStatus(); save();
