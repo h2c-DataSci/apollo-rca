@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getBridgeConfig, saveBridgeConfig, clearBridgeSession, validateCloudConfig, executeLocalChat, collectStreamedAnswer, modelsUrl, chatUrl, apiEndpoint, testConfiguredConnection } from './local-ai-bridge.js';
+import { getBridgeConfig, saveBridgeConfig, clearBridgeSession, validateCloudConfig, executeLocalChat, collectStreamedAnswer, modelsUrl, chatUrl, apiEndpoint, testConfiguredConnection, googleRequestBody } from './local-ai-bridge.js';
 import { PROVIDER_PRESETS } from './provider-presets.js';
 
 test('cloud configuration is memory-only and changing destination clears consent and credentials', () => {
@@ -162,4 +162,46 @@ test('free Groq accepts every model from the console limits list', () => {
   for (const model of groq.models) {
     assert.equal(validateCloudConfig({ mode: 'free', preset: 'groq', endpoint: groq.endpoint, model, cloudConsent: true }), groq.endpoint);
   }
+});
+
+test('free Google AI lists the five text models and does not switch on quota', async () => {
+  const google = PROVIDER_PRESETS.find((item) => item.id === 'google');
+  assert.deepEqual(google.models, ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-31b-it', 'gemma-4-26b-a4b-it']);
+  for (const model of google.models) {
+    assert.equal(validateCloudConfig({ mode: 'free', preset: 'google', endpoint: google.endpoint, model, cloudConsent: true }), google.endpoint);
+  }
+  assert.throws(() => validateCloudConfig({ mode: 'free', preset: 'google', endpoint: google.endpoint, model: 'gemini-2.5-pro', cloudConsent: true }), /listed free/);
+  const gemini = googleRequestBody({ model: 'gemini-3.8-flash', numPredict: 1536 }, [{ role: 'system', content: 'Reply with JSON.' }, { role: 'user', content: 'Seal Failed' }]);
+  assert.equal(gemini.generationConfig.responseMimeType, 'application/json');
+  assert.equal('role' in gemini.systemInstruction, false);
+  const gemma = googleRequestBody({ model: 'gemma-4-31b-it' }, [{ role: 'system', content: 'Reply with JSON.' }, { role: 'user', content: 'Seal Failed' }]);
+  assert.equal(gemma.systemInstruction.role, 'system');
+  const urls = [];
+  const bodies = [];
+  const headers = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    urls.push(String(url));
+    bodies.push(JSON.parse(init.body));
+    headers.push(init.headers);
+    if (urls.length === 1) return new Response('{"error":{"status":"RESOURCE_EXHAUSTED"}}', { status: 429 });
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ thought: true, text: 'hidden' }, { text: '{"summary":"Seal Failed"}' }] }, finishReason: 'STOP' }] }), { status: 200 });
+  };
+  try {
+    await assert.rejects(() => executeLocalChat([
+      { role: 'system', content: 'Reply with JSON.' },
+      { role: 'user', content: 'Seal Failed' }
+    ], { provider: 'openai', mode: 'free', preset: 'google', endpoint: google.endpoint, model: 'gemini-3.8-flash', apiKey: 'temp', cloudConsent: true }), /quota or rate limit/);
+    assert.equal(urls.length, 1);
+    assert.equal(headers[0]['x-goog-api-key'], 'temp');
+    assert.equal('authorization' in headers[0] || 'Authorization' in headers[0], false);
+    const answer = await executeLocalChat([
+      { role: 'system', content: 'Reply with JSON.' },
+      { role: 'user', content: 'Seal Failed' }
+    ], { provider: 'openai', mode: 'free', preset: 'google', endpoint: google.endpoint, model: 'gemma-4-26b-a4b-it', apiKey: 'temp', cloudConsent: true });
+    assert.equal(answer, '{"summary":"Seal Failed"}');
+    assert.equal(urls[1], 'https://generativelanguage.googleapis.com/v1beta/models/gemma-4-26b-a4b-it:generateContent');
+    assert.equal(bodies[1].systemInstruction.role, 'system');
+    assert.equal(urls.length, 2);
+  } finally { globalThis.fetch = original; clearBridgeSession(); }
 });

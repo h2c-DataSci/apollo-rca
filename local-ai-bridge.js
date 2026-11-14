@@ -221,8 +221,7 @@ async function testOpenAi(cfg) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 5000);
   try {
-    const headers = { Accept: 'application/json' };
-    if (cfg.apiKey) headers.Authorization = `Bearer ${cfg.apiKey}`;
+    const headers = cloudHeaders(cfg);
     const res = await fetch(modelsUrl(url), { method: 'GET', headers, signal: ctrl.signal, redirect: 'error', cache: 'no-store' });
     if (!res.ok) {
       const detail = await errorText(res);
@@ -251,16 +250,24 @@ export function chatUrl(endpoint) {
 }
 
 function responseFailure(obj) {
+  if (obj?.promptFeedback?.blockReason) return 'The provider blocked the request. Nothing was applied.';
   if (obj?.error) return 'The provider reported a generation error. Nothing was applied.';
-  const reason = obj?.choices?.[0]?.finish_reason || obj?.done_reason;
-  return reason && reason !== 'stop' ? `The model did not finish normally (${String(reason).slice(0, 40)}). Nothing was applied.` : '';
+  const reason = String(obj?.choices?.[0]?.finish_reason || obj?.done_reason || obj?.candidates?.[0]?.finishReason || '').toLowerCase();
+  if (!reason || reason === 'stop') return '';
+  return `The model did not finish normally (${reason.slice(0, 40)}). Nothing was applied.`;
+}
+
+function geminiText(obj) {
+  const parts = obj?.candidates?.[0]?.content?.parts;
+  if (!Array.isArray(parts)) return '';
+  return parts.filter((part) => part && typeof part.text === 'string' && part.thought !== true).map((part) => part.text).join('');
 }
 
 function visibleAnswer(payload) {
   const failure = responseFailure(payload); if (failure) throw new Error(failure);
   const message = payload && payload.message || {};
   const choice = payload && payload.choices && payload.choices[0] && payload.choices[0].message || {};
-  const text = stripModelThinking(message.content || choice.content || payload.response || '');
+  const text = stripModelThinking(message.content || choice.content || payload.response || geminiText(payload) || '');
   if (!text) throw new Error('The model returned an empty answer. Nothing was applied.');
   return text;
 }
@@ -320,7 +327,7 @@ function chunkText(obj) {
   if (typeof message.content === 'string') return message.content;
   if (typeof obj.response === 'string') return obj.response;
   if (choice.message && typeof choice.message.content === 'string') return choice.message.content;
-  return '';
+  return geminiText(obj);
 }
 
 export function collectStreamedAnswer(raw, onChunk) {
@@ -543,6 +550,43 @@ async function sameHostOpenAi(url, cfg, messages) {
   }
 }
 
+function isGoogle(cfg) {
+  return cfg.preset === 'google' || String(cfg.endpoint || '').startsWith('https://generativelanguage.googleapis.com/');
+}
+
+function cloudHeaders(cfg, json = false) {
+  const headers = { Accept: 'application/json' };
+  if (json) headers['Content-Type'] = 'application/json';
+  if (!cfg.apiKey) return headers;
+  if (isGoogle(cfg)) headers['x-goog-api-key'] = cfg.apiKey;
+  else headers.Authorization = `Bearer ${cfg.apiKey}`;
+  return headers;
+}
+
+export function googleGenerateUrl(endpoint, model) {
+  return `${String(endpoint || '').replace(/\/$/, '')}/models/${encodeURIComponent(model)}:generateContent`;
+}
+
+export function googleRequestBody(cfg, messages) {
+  const system = [];
+  const contents = [];
+  for (const message of messages) {
+    const text = String(message.content || '');
+    if ((message.role || 'user') === 'system') system.push(text);
+    else contents.push({ role: message.role === 'assistant' ? 'model' : 'user', parts: [{ text }] });
+  }
+  const body = {
+    contents: contents.length ? contents : [{ role: 'user', parts: [{ text: '' }] }],
+    generationConfig: { temperature: cfg.temperature ?? 0.2, maxOutputTokens: cfg.numPredict ?? 1536, responseMimeType: 'application/json' }
+  };
+  if (system.length) {
+    const instruction = { parts: [{ text: system.join('\n\n') }] };
+    if (/^gemma-4-/.test(cfg.model)) instruction.role = 'system';
+    body.systemInstruction = instruction;
+  }
+  return body;
+}
+
 function cloudRequestBody(cfg, messages, url) {
   const body = {
     model: cfg.model,
@@ -564,15 +608,15 @@ async function openAiChat(cfg, messages) {
   if (!isLoopback(url) && !String(cfg.apiKey || '').trim()) throw new Error('Add your API key. This app does not include one.');
   const ms = timeoutMs(cfg, 25000);
   const generation = beginGeneration(ms);
-  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
-  if (cfg.apiKey) headers.Authorization = `Bearer ${cfg.apiKey}`;
+  const headers = cloudHeaders(cfg, true);
+  const google = isGoogle(cfg);
   try {
-    const res = await fetch(chatUrl(url), {
+    const res = await fetch(google ? googleGenerateUrl(url, cfg.model) : chatUrl(url), {
       method: 'POST',
       headers,
       redirect: 'error',
       cache: 'no-store',
-      body: JSON.stringify(cloudRequestBody(cfg, messages, url)),
+      body: JSON.stringify(google ? googleRequestBody(cfg, messages) : cloudRequestBody(cfg, messages, url)),
       signal: generation.signal
     });
     if (!res.ok) {
