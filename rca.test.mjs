@@ -76,12 +76,12 @@ test('csp keeps Ollama on localhost and 127.0.0.1 and drops the invalid IPv6 sou
   assert.match(h, /connect-src[^;]*http:\/\/localhost:\*/);
   assert.doesNotMatch(h, /http:\/\/\[::1\]:\*/);
   assert.doesNotMatch(h.match(/script-src[^;]*/)[0], /cdn\.jsdelivr\.net/);
-  assert.match(h.match(/connect-src[^;]*/)[0], /https:\/\/cdn\.jsdelivr\.net/);
+  assert.doesNotMatch(h.match(/connect-src[^;]*/)[0], /cdn\.jsdelivr\.net/);
 });
 
 test('privacy: no third-party hosts referenced in index.html or app code (except documented model/library hosts)', () => {
   const h = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
-  const allowed = /^(?:https?:\/\/)(?:127\.0\.0\.1(?::\*|:11434)?|localhost(?::\*|:11434)?|\[::1\]:\*|cdn\.jsdelivr\.net|huggingface\.co|\*\.huggingface\.co|cdn-lfs\.huggingface\.co|www\.youtube-nocookie\.com)(?:[/?#]|$)/;
+  const allowed = /^(?:https?:\/\/)(?:127\.0\.0\.1(?::\*|:11434)?|localhost(?::\*|:11434)?|\[::1\]:\*|huggingface\.co|\*\.huggingface\.co|cdn-lfs\.huggingface\.co|www\.youtube-nocookie\.com)(?:[/?#]|$)/;
   const found = [...h.matchAll(/https?:\/\/(?!www\.w3\.org)[^"'\s<);]+/g)].map((m) => m[0]).filter((u) => !u.startsWith('https://h2c-datasci.github.io') && !allowed.test(u));
   assert.deepEqual(found, []);
 });
