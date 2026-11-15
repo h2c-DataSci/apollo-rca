@@ -9,10 +9,10 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Product | H2C Root Cause Analyst |
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
-| Branch | `security/csp-vendored-transformers`. Do not push this work to `main`; Pages deploys from `main`. |
-| HEAD | `931566b` — Vendored Transformers.js is marked `-text` so Windows CI keeps the pinned sha384. Transformers.js remains vendored and the invalid IPv6 CSP token is gone. `origin/main` remains `23a6a2d` until the pull request is merged. |
+| Branch | `security/vendor-onnx-wasm`. Do not push this work to `main`; Pages deploys from `main`. |
+| HEAD | Vendored ONNX Runtime wasm for the published coach worker. SHA is recorded after the commit. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Tests | `node --test` → 181 passed, 0 failed. |
+| Tests | `node --test` after this change. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-15 | pending | The published coach worker (`rca-coach.worker-v13.js`) no longer fetches ONNX wasm from jsDelivr. The four `onnxruntime-web@1.31.0-dev.20260914-8d85527a0` files (`ort-wasm-simd-threaded.asyncify.{wasm,mjs}` and the unsuffixed Safari fallback pair) are stored under `vendor/onnx-wasm/`, marked `-text`, and checked with sha384. Each file is under 27 MB (GitHub Pages limit is 100 MB). They are not in the shell cache, so ordinary visits are not forced to download 41 MB. `cdn.jsdelivr.net` is removed from `connect-src`; model weights still use `https:` and the Hugging Face hosts. Shell cache is v42. Layout, Feedback, About the developer, sign-in, and RealityChart colors are unchanged. |
 | 2026-11-15 | `931566b` | Windows CI only: the vendored Transformers.js sha384 test failed because Git converted the file's trailing LF to CRLF. `.gitattributes` now marks `vendor/transformers-3.7.6.min.js` as `-text`. App behavior, layout, and RealityChart colors are unchanged. Tests remain 181. |
 | 2026-11-15 | `5f8513f` | Security follow-up on a branch, not main. Transformers.js 3.7.6 is vendored and checked with its sha384 because a worker import cannot take an integrity attribute. `cdn.jsdelivr.net` remains in `connect-src` for the ONNX wasm files and is removed from `script-src`. `rolldown-runtime-v11.js` stays because `index-v13.js`, `routes-v13.js`, and `es-DawnZXYc.js` still import it. The invalid `http://[::1]:*` CSP token is removed. Ollama remains allowed on `localhost` and `127.0.0.1`. Shell cache is v41. |
 | 2026-11-15 | `3c16a71` | Housekeeping. Only `main` exists. Cache queries match the service worker. No unused file was removed. The handoff now says the four reviews stay in the coach card and the legal notice stays last. Tests remain 179. |
@@ -77,7 +78,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Help knowledge base stays. No copyrighted book images.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
-- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v41` and `apollo-rca-runtime-v2`.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v42` and `apollo-rca-runtime-v2`.
 - Script queries: shell `v=39`, help `v=27`, videos `v=25`, local bridge `v=27`, browser AI `v=26`, deeper reviews `v=7`. Bump a file's query when that file changes.
 - The four longer reviews stay under the RCA Coach controls, with their results in that card. The connection card is only the path, provider, model, and key.
 - The legal notice stays the last block in `main`, after the Download report line.

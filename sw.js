@@ -1,4 +1,4 @@
-const CACHE = 'apollo-rca-shell-v41';
+const CACHE = 'apollo-rca-shell-v42';
 const RUNTIME = 'apollo-rca-runtime-v2';
 const OWN_PREFIX = 'apollo-rca-';
 const RUNTIME_MAX_ENTRIES = 40;
