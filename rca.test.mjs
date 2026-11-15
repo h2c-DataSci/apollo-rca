@@ -70,6 +70,15 @@ test('base path: router basepath is /apollo-rca and no URL-rewrite hack remains'
   assert.ok(!readFileSync(new URL('./index.html', import.meta.url), 'utf8').includes('replaceState'));
 });
 test('no root-absolute asset URLs in built JS', () => { const j = readFileSync(new URL('./index-v13.js', import.meta.url), 'utf8'); assert.ok(!/[`"']\/assets\//.test(j)); });
+test('csp keeps Ollama on localhost and 127.0.0.1 and drops the invalid IPv6 source', () => {
+  const h = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  assert.match(h, /connect-src[^;]*http:\/\/127\.0\.0\.1:\*/);
+  assert.match(h, /connect-src[^;]*http:\/\/localhost:\*/);
+  assert.doesNotMatch(h, /http:\/\/\[::1\]:\*/);
+  assert.doesNotMatch(h.match(/script-src[^;]*/)[0], /cdn\.jsdelivr\.net/);
+  assert.match(h.match(/connect-src[^;]*/)[0], /https:\/\/cdn\.jsdelivr\.net/);
+});
+
 test('privacy: no third-party hosts referenced in index.html or app code (except documented model/library hosts)', () => {
   const h = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
   const allowed = /^(?:https?:\/\/)(?:127\.0\.0\.1(?::\*|:11434)?|localhost(?::\*|:11434)?|\[::1\]:\*|cdn\.jsdelivr\.net|huggingface\.co|\*\.huggingface\.co|cdn-lfs\.huggingface\.co|www\.youtube-nocookie\.com)(?:[/?#]|$)/;
