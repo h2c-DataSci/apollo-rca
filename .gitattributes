@@ -1,0 +1,4 @@
+# Keep the pinned Transformers.js file byte-identical on every checkout.
+# Windows Git defaults to core.autocrlf=true, which would convert the
+# trailing LF to CRLF and fail the sha384 integrity test.
+vendor/transformers-3.7.6.min.js -text
