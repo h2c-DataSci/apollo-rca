@@ -1,0 +1,14 @@
+# Extends the default gitleaks rules shipped with v8.30.1.
+title = "gitleaks config"
+
+[extend]
+useDefault = true
+
+# False positive: generic-api-key matches a short identifier inside the
+# vendored, sha384-pinned Transformers.js 3.7.6 minified bundle (one 857 KB line).
+# Limited to this exact path and rule. Remove if the vendor file is replaced
+# and the scan is clean without it.
+[[allowlists]]
+description = "False positive in vendored minified Transformers.js 3.7.6 (sha384-pinned). generic-api-key only."
+targetRules = ["generic-api-key"]
+paths = ['''^vendor/transformers-3\.7\.6\.min\.js$''']
