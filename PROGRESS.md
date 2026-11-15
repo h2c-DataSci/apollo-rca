@@ -10,9 +10,9 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `security/vendor-onnx-wasm`. Do not push this work to `main`; Pages deploys from `main`. |
-| HEAD | Vendored ONNX Runtime wasm for the published coach worker. SHA is recorded after the commit. |
+| HEAD | `d107794` on `security/vendor-onnx-wasm`. Vendored ONNX Runtime wasm for the published coach worker. Not merged. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Tests | `node --test` after this change. |
+| Tests | `node --test` → 186 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
