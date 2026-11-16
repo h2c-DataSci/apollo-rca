@@ -769,7 +769,7 @@ describe('Apollo RCA — 7-Episode Video Training QA/QC Suite', () => {
     it('Cache busting query parameters (v=22) are synchronized across index.html and h2c-help.js', () => {
       const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
       assert.ok(indexHtml.includes('/apollo-rca/h2c-shell.js?v=41'), 'index.html must load h2c-shell.js?v=41');
-      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=28'), 'index.html must load h2c-help.js?v=28');
+      assert.ok(indexHtml.includes('/apollo-rca/h2c-help.js?v=29'), 'index.html must load h2c-help.js?v=29');
 
       const helpJs = readFileSync(new URL('../h2c-help.js', import.meta.url), 'utf8');
       assert.ok(helpJs.includes("./h2c-videos.js?v=25'"), 'h2c-help.js must import h2c-videos.js?v=25');

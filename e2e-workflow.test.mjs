@@ -19,7 +19,8 @@ describe('Phase 3: End-to-End RCA Workflow & Stability Tests', () => {
     assert.equal(html.includes('>Timeline<'), true);
     assert.match(routes, /e\.effects\.length>1\?\(0,B\.jsxs\)\(`details`/);
     assert.match(routes, /onClick:\(\)=>\{let n=fe\(ke\)/);
-    assert.match(routes, /sampleMatch\(e\)\?null/);
+    assert.match(routes, /e\.target\.closest\(`g`\)/);
+    assert.match(routes, /children:`Zoom in`/);
     const timelineAt = html.indexOf('>Timeline<');
     const generateAt = html.indexOf('Generate chart');
     assert.ok(timelineAt > 0 && generateAt > timelineAt);
