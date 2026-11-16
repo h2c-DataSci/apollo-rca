@@ -244,26 +244,32 @@ test('bring-your-own API requires a key and does not call another host', async (
 
 test('Ollama NDJSON stream keeps the answer and drops thinking as chunks arrive', async () => {
   const pieces = [];
+  let releaseFinal = () => {};
+  const finalReady = new Promise((resolve) => { releaseFinal = resolve; });
   const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'application/x-ndjson' });
     res.write(JSON.stringify({ message: { role: 'assistant', thinking: 'hidden chain', content: '' }, done: false }) + '\n');
     res.write(JSON.stringify({ message: { role: 'assistant', content: '<think>nope</think>{"summary":' }, done: false }) + '\n');
-    setTimeout(() => {
+    finalReady.then(() => {
       res.end(JSON.stringify({ message: { role: 'assistant', content: '"Oil Released"}' }, done: true, done_reason: 'stop' }) + '\n');
-    }, 40);
+    });
   });
   await new Promise((r) => server.listen(18894, '127.0.0.1', r));
+  const pending = executeLocalChat([{ role: 'user', content: 'Review: Oil Released' }], {
+    endpoint: 'http://127.0.0.1:18894', model: 'qwen3:2b', provider: 'ollama', onChunk: (piece) => pieces.push(piece)
+  });
   try {
-    const pending = executeLocalChat([{ role: 'user', content: 'Review: Oil Released' }], {
-      endpoint: 'http://127.0.0.1:18894', model: 'qwen3:2b', provider: 'ollama', onChunk: (piece) => pieces.push(piece)
-    });
-    await new Promise((r) => setTimeout(r, 15));
+    const started = Date.now();
+    while (!/summary/.test(pieces.join('')) && Date.now() - started < 1000) await new Promise((r) => setTimeout(r, 10));
     assert.match(pieces.join(''), /summary/);
     assert.equal(pieces.join('').includes('hidden'), false);
     assert.equal(pieces.join('').includes('nope'), false);
+    releaseFinal();
     assert.equal(await pending, '{"summary":"Oil Released"}');
   } finally {
+    releaseFinal();
     server.close();
+    await pending.catch(() => {});
   }
 });
 
