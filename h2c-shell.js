@@ -17,7 +17,7 @@ import { sessionStore, listLegacyData, removeLegacyData, legacyRecoveryPlan } fr
 
 import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=27';
 import { DEEPER_TASKS, runDeeperReview, briefForReview, presentFinding } from './coach-deeper.js?v=7';
-import { AUDIT_KEY, isCloudAuditMode, runCloudSectionAudit, saveCoachAudit, loadCoachAudit, clearCoachAudit, auditAsReview, visibleAudit, fingerprint, appendAuditPdf, auditMarkdown, exportableAudit } from './coach-audit.js?v=1';
+import { AUDIT_KEY, AUDIT_SECTIONS, isCloudAuditMode, runCloudSectionAudit, saveCoachAudit, loadCoachAudit, clearCoachAudit, auditAsReview, visibleAudit, fingerprint, appendAuditPdf, auditMarkdown, exportableAudit, workflowAnchor, reportAnchor } from './coach-audit.js?v=1';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
@@ -452,6 +452,7 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
 .h2c-audit-attention { background: #fbf3d5; color: #6a4b00; }
 .h2c-audit-critical { background: #fde8e8; color: #9f1239; }
 .h2c-audit-jump, .h2c-audit-card button { margin: 2px 4px 0 0; min-height: 32px; border: 1px solid #d7c7a2; border-radius: 6px; background: #fff; color: #14261c; font: 600 12px/1.2 system-ui, sans-serif; cursor: pointer; }
+.h2c-audit-hit { outline: 3px solid #c9a227; outline-offset: 3px; }
 .h2c-audit-stale { font-size: 12px; color: #9f1239; }
 .h2c-audit-toggle { display: flex; align-items: center; gap: 6px; font: 12px/1.4 system-ui, sans-serif; color: #14261c; }
 .h2c-key-steps { margin: 6px 0 6px 1.2rem; }
@@ -1350,7 +1351,7 @@ function statusClass(status) {
   return 'h2c-audit-attention';
 }
 
-function fillAuditBody(body, audit, section) {
+function fillAuditBody(body, audit, section, interactive) {
   const badge = document.createElement('span');
   badge.className = `h2c-audit-badge ${statusClass(section.status)}`;
   badge.textContent = section.statusLabel;
@@ -1362,6 +1363,16 @@ function fillAuditBody(body, audit, section) {
     stale.className = 'h2c-audit-stale';
     stale.textContent = 'Chart modified since this audit. Run Audit full report again before relying on it.';
     body.append(stale);
+    if (interactive) {
+      const again = document.createElement('button');
+      again.type = 'button';
+      again.textContent = 'Audit again';
+      again.addEventListener('click', () => {
+        const button = [...document.querySelectorAll('.h2c-review-btn')].find((item) => item.textContent === 'Audit full report');
+        button?.click();
+      });
+      body.append(again);
+    }
   }
   const list = document.createElement('ul');
   for (const finding of section.findings) {
@@ -1374,10 +1385,48 @@ function fillAuditBody(body, audit, section) {
 
 function jumpToRef(ref) {
   const wanted = String(ref || '').toLowerCase();
+  if (!wanted) return;
   const marked = document.querySelector(`[data-pe="${CSS.escape(ref)}"], [id="${CSS.escape(ref)}"]`);
-  const textHit = marked || [...document.querySelectorAll('svg text, h2, h3, p, li')].find((node) => String(node.textContent || '').toLowerCase().includes(wanted));
+  const textHit = marked || [...document.querySelectorAll('#realitychart text, svg text, h2, h3, p, li')].find((node) => String(node.textContent || '').toLowerCase().includes(wanted));
   if (!textHit) return;
+  textHit.classList.add('h2c-audit-hit');
+  setTimeout(() => textHit.classList.remove('h2c-audit-hit'), 2000);
   textHit.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function auditCard(audit, key) {
+  const section = audit.sections[key];
+  const card = document.createElement('details');
+  card.className = 'h2c-audit-card no-print';
+  card.open = section.status !== 'pass' || !!audit.stale;
+  const summary = document.createElement('summary');
+  summary.textContent = `RC Coach API Audit — ${section.title}`;
+  const body = document.createElement('div');
+  body.className = 'h2c-audit-body';
+  fillAuditBody(body, audit, section, true);
+  if (key === 'causalRelationships') {
+    for (const [id, note] of Object.entries(audit.nodeAnnotations || {})) {
+      const jump = document.createElement('button');
+      jump.type = 'button';
+      jump.textContent = `${note.statusLabel}: ${id}`;
+      jump.addEventListener('click', () => jumpToRef(id));
+      body.append(jump);
+    }
+  }
+  const dismiss = document.createElement('button');
+  dismiss.type = 'button';
+  dismiss.textContent = 'Dismiss';
+  dismiss.addEventListener('click', () => {
+    const current = loadCoachAudit();
+    if (!current) return;
+    current.dismissed = { ...(current.dismissed || {}), [key]: true };
+    saveCoachAudit(current);
+    paintCoachAudit.token = '';
+    paintCoachAudit();
+  });
+  body.append(dismiss);
+  card.append(summary, body);
+  return card;
 }
 
 function paintCoachAudit() {
@@ -1386,66 +1435,44 @@ function paintCoachAudit() {
   const token = audit ? JSON.stringify([audit.timestamp, !!audit.stale, audit.includeInReport !== false, audit.dismissed || {}]) : '';
   const article = document.querySelector('article.print-sheet');
   const download = [...document.querySelectorAll('button')].some((button) => /Download report/.test(button.textContent || ''));
+  const expectedCards = AUDIT_SECTIONS.filter(([key]) => !(audit.dismissed && audit.dismissed[key])).length;
   const ready = !audit
     ? !document.querySelector('.h2c-audit-card, .h2c-audit-note, .h2c-audit-toggle')
-    : (!article || audit.includeInReport === false || !!article.querySelector('.h2c-audit-note')) && (!download || !!document.querySelector('.h2c-audit-toggle'));
+    : document.querySelectorAll('.h2c-audit-card').length >= expectedCards
+      && (!article || audit.includeInReport === false || !!article.querySelector('.h2c-audit-note'))
+      && (!download || !!document.querySelector('.h2c-audit-toggle'));
   if (paintCoachAudit.token === token && ready) return;
   paintCoachAudit.token = token;
   document.querySelectorAll('.h2c-audit-card, .h2c-audit-note, .h2c-audit-toggle').forEach((node) => node.remove());
   if (!audit) return;
-  const placements = [
-    ['problemDefinition', /^(define|1\.\s*problem definition)$/i],
-    ['causalRelationships', /^(causes|chart|reality chart|node inspector)$/i],
-    ['evidenceAndTesting', /^evidence$/i],
-    ['solutionsAndTracking', /^(solutions|track|3\.\s*solution challenge matrix|4\.\s*corrective actions tracking log)$/i]
-  ];
-  const headings = [...document.querySelectorAll('h2, h3')];
-  for (const [key, pattern] of placements) {
-    if (audit.dismissed && audit.dismissed[key]) continue;
-    const heading = headings.find((node) => pattern.test(String(node.textContent || '').trim()) && !node.closest('article.print-sheet') && !node.closest('.h2c-deeper'));
-    if (!heading) continue;
-    const card = document.createElement('details');
-    card.className = 'h2c-audit-card no-print';
-    card.open = audit.sections[key].status !== 'pass';
-    const summary = document.createElement('summary');
-    summary.textContent = `RC Coach API Audit — ${audit.sections[key].title}`;
-    const body = document.createElement('div');
-    body.className = 'h2c-audit-body';
-    fillAuditBody(body, audit, audit.sections[key]);
-    for (const [id, note] of Object.entries(audit.nodeAnnotations || {})) {
-      if (key !== 'causalRelationships') break;
-      const jump = document.createElement('button');
-      jump.type = 'button';
-      jump.textContent = `${note.statusLabel}: ${id}`;
-      jump.addEventListener('click', () => jumpToRef(id));
-      body.append(jump);
+  const placed = new Set();
+  for (const heading of document.querySelectorAll('h2, h3')) {
+    if (heading.closest('article.print-sheet') || heading.closest('.h2c-deeper') || heading.closest('.h2c-audit-card')) continue;
+    const key = workflowAnchor(heading.textContent);
+    if (!key || placed.has(key) || (audit.dismissed && audit.dismissed[key])) continue;
+    placed.add(key);
+    heading.insertAdjacentElement('afterend', auditCard(audit, key));
+  }
+  const hub = document.querySelector('.h2c-workflow-hub');
+  if (hub) {
+    for (const [key] of AUDIT_SECTIONS) {
+      if (placed.has(key) || (audit.dismissed && audit.dismissed[key])) continue;
+      hub.append(auditCard(audit, key));
     }
-    const dismiss = document.createElement('button');
-    dismiss.type = 'button';
-    dismiss.textContent = 'Dismiss';
-    dismiss.addEventListener('click', () => {
-      const current = loadCoachAudit();
-      if (!current) return;
-      current.dismissed = { ...(current.dismissed || {}), [key]: true };
-      saveCoachAudit(current);
-      paintCoachAudit();
-    });
-    body.append(dismiss);
-    card.append(summary, body);
-    heading.insertAdjacentElement('afterend', card);
   }
   if (article && audit.includeInReport !== false) {
+    const noted = new Set();
     for (const block of article.querySelectorAll('header, section')) {
-      const heading = String(block.querySelector('h2, h3')?.textContent || '').trim();
-      const match = placements.find(([, pattern]) => pattern.test(heading));
-      if (!match || (audit.dismissed && audit.dismissed[match[0]])) continue;
+      const key = reportAnchor(block.querySelector('h2, h3')?.textContent || '');
+      if (!key || noted.has(key)) continue;
+      noted.add(key);
       const note = document.createElement('aside');
       note.className = 'h2c-audit-note';
       const title = document.createElement('h3');
       title.textContent = 'RC Coach API Audit Notes';
       const body = document.createElement('div');
       body.className = 'h2c-audit-body';
-      fillAuditBody(body, audit, audit.sections[match[0]]);
+      fillAuditBody(body, audit, audit.sections[key], false);
       note.append(title, body);
       block.append(note);
     }
@@ -1458,6 +1485,12 @@ function paintCoachAudit() {
     const overall = document.createElement('p');
     overall.textContent = `${audit.overall.statusLabel}. ${audit.overall.summary}`;
     body.append(overall);
+    if (audit.stale) {
+      const stale = document.createElement('p');
+      stale.className = 'h2c-audit-stale';
+      stale.textContent = 'Chart modified since this audit. Run Audit full report again before relying on it.';
+      body.append(stale);
+    }
     for (const step of audit.overall.nextSteps || []) {
       const line = document.createElement('p');
       line.textContent = `Next: ${step}`;

@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { sessionStore } from './session-store.js';
 import {
   AUDIT_KEY, isCloudAuditMode, parseCoachAudit, runCloudSectionAudit, saveCoachAudit, loadCoachAudit,
-  clearCoachAudit, visibleAudit, fingerprint, appendAuditPdf, exportableAudit, auditMarkdown
+  clearCoachAudit, visibleAudit, fingerprint, appendAuditPdf, exportableAudit, auditMarkdown, workflowAnchor, reportAnchor
 } from './coach-audit.js';
 
 const cloud = { mode: 'paid', provider: 'openai', model: 'deepseek-flash', cloudConsent: true, numPredict: 1536 };
@@ -76,6 +76,22 @@ test('a paid audit is stored in session memory and can be omitted from the repor
   assert.match(writes.join('\n'), /Retrain does not change a condition/);
   clearCoachAudit();
   assert.equal(loadCoachAudit(), null);
+});
+
+test('audit notes attach to the live step headings and report sections', () => {
+  assert.equal(workflowAnchor('Problem definition'), 'problemDefinition');
+  assert.equal(workflowAnchor('Chart and report'), 'causalRelationships');
+  assert.equal(workflowAnchor('Evidence'), 'evidenceAndTesting');
+  assert.equal(workflowAnchor('Define'), '');
+  assert.equal(reportAnchor('1. Problem definition'), 'problemDefinition');
+  assert.equal(reportAnchor('2. Executive summary'), 'causalRelationships');
+  assert.equal(reportAnchor('5. Action items — points of ignorance'), 'evidenceAndTesting');
+  assert.equal(reportAnchor('3. Solution challenge matrix'), 'solutionsAndTracking');
+  assert.equal(reportAnchor('4. Corrective actions tracking log'), 'solutionsAndTracking');
+  const shell = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
+  assert.match(shell, /Audit again/);
+  assert.match(shell, /h2c-audit-hit/);
+  assert.match(shell, /isCloudAuditMode/);
 });
 
 test('report exports can receive the audit without putting it in browser storage', () => {

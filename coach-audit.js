@@ -30,6 +30,24 @@ export function isCloudAuditMode(cfg) {
   return !!cfg && (cfg.mode === 'free' || cfg.mode === 'paid') && cfg.provider !== 'ollama' && cfg.provider !== 'browser';
 }
 
+export function workflowAnchor(text) {
+  const title = String(text || '').replace(/\s+/g, ' ').trim();
+  if (/^problem definition$/i.test(title)) return 'problemDefinition';
+  if (/^chart and report$/i.test(title)) return 'causalRelationships';
+  if (/^evidence$/i.test(title)) return 'evidenceAndTesting';
+  return '';
+}
+
+export function reportAnchor(text) {
+  const title = String(text || '').replace(/\s+/g, ' ').trim();
+  if (/^1\.\s*problem definition$/i.test(title)) return 'problemDefinition';
+  if (/^2\.\s*executive summary$/i.test(title)) return 'causalRelationships';
+  if (/^5\.\s*action items/i.test(title)) return 'evidenceAndTesting';
+  if (/^3\.\s*solution challenge matrix$/i.test(title)) return 'solutionsAndTracking';
+  if (/^4\.\s*corrective actions/i.test(title)) return 'solutionsAndTracking';
+  return '';
+}
+
 export function fingerprint(text) {
   const value = String(text || '');
   let hash = 2166136261;
