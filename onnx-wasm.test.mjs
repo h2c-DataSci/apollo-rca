@@ -52,7 +52,7 @@ test('the unsuffixed Safari-fallback wasm binary is a valid WebAssembly module',
 
 test('shell cache was bumped and does not precache the 41 MB wasm files', () => {
   const sw = readFileSync(new URL('./sw.js', import.meta.url), 'utf8');
-  assert.match(sw, /const CACHE = 'apollo-rca-shell-v52'/);
+  assert.match(sw, /const CACHE = 'apollo-rca-shell-v53'/);
   assert.doesNotMatch(sw, /ort-wasm-simd-threaded/);
   assert.match(sw, /vendor\/transformers-3\.7\.6\.min\.js/);
 });

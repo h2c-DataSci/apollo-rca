@@ -10,9 +10,9 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main`. Only `main` exists. |
-| HEAD | `c6380d1`. Locked state. The chart and the evidence list update each other (`23386be`, `0ea0e08`). |
+| HEAD | Workflow now requires hypothesized causes before the chart, then a blank solution matrix before download. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Cache | Shell query `h2c-shell.js?v=42`, `h2c-help.js?v=30`. Service worker `apollo-rca-shell-v52`, runtime `apollo-rca-runtime-v2`. |
+| Cache | Shell query `h2c-shell.js?v=42`, `h2c-help.js?v=31`. Service worker `apollo-rca-shell-v53`, runtime `apollo-rca-runtime-v2`. |
 | Tests | `node --test` → 194 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
@@ -22,6 +22,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-17 | pending | The blank form now follows the investigation. After the timeline, each observation needs a hypothesized cause and a layer (1 direct, or 2–4 naming the cause it explains). Generate RealityChart stays off until that list is complete. The chart and the table stay in step. The solution matrix, corrective actions, and schedule are blank until the chart is final. Download and the final RC Coach check turn on only after every action, owner, and due date are filled. RC Coach can check each step and never overrules the investigator. Service-worker cache is v53. |
 | 2026-11-17 | `d0122b3` | Locked the current chart and evidence behavior as the accepted state. Housekeeping only: `main` matches `origin/main`, and only that branch exists. Shell queries match the service worker (`h2c-shell.js?v=42`, `h2c-help.js?v=30`, cache `apollo-rca-shell-v52`). No file was removed. The vendored Transformers file, the ONNX wasm files, `rolldown-runtime-v11.js`, `404.html`, and the loaded bundles stay. Tests remain 194. |
 | 2026-11-16 | `23386be` | Evidence rows now update the chart again. A balloon shows the statement, not only the source name, and the chart redraws as the row is edited. Service-worker cache is v52. |
 | 2026-11-16 | `0ea0e08` | A selected cause in the chart can add, edit, or remove its evidence. Those edits update the evidence list, and edits in the list update the chart. A row edited from the chart stays linked to that cause. Service-worker cache is v51. |
@@ -92,7 +93,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Help knowledge base stays. No copyrighted book images.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
-- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v52` and `apollo-rca-runtime-v2`.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v53` and `apollo-rca-runtime-v2`.
 - Script queries: shell `v=42`, help `v=30`, help knowledge `v=25`, videos `v=25`, local bridge `v=27`, browser AI `v=26`, deeper reviews `v=7`, cloud section audit `v=1`. Bump a file's query when that file changes.
 - A Free or Paid API audit may place notes on the steps and in the report. Local AI does not. The audit record stays in tab memory under `h2c-coach-api-audit-v1` and is not written to localStorage.
 - The four longer reviews stay under the RCA Coach controls, with their results in that card. The connection card is only the path, provider, model, and key.

@@ -8,8 +8,7 @@ Independent, privacy-first web tool for investigations that follow Apollo RCA an
 - Feedback: [Google Form](https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform)
 - Training channel: [youtube.com/@h2c_Learnings](https://www.youtube.com/@h2c_Learnings)
 - Current handoff: [PROGRESS.md](PROGRESS.md)
-- Locked state: `d0122b3` on `main` (2026-11-17). The chart, evidence list, and report order below are the accepted behavior. Do not roll them back.
-- Earlier starting point: `b1afdd3` on `main` (2026-11-09). Later work, including this locked state, sits on top of it.
+- Earlier starting point: `b1afdd3` on `main` (2026-11-09). The sequence below is the current investigation order.
 
 ## Documentation rule
 
@@ -34,15 +33,17 @@ Seven steps: Define, Causes, RealityChart, Evidence, Test, Solutions, Track.
 
 - Up to three primary effects.
 - Each causal set is an action plus at least one condition.
-- Order on the page: timeline, then Generate chart and RCA report, then the chart, then evidence, then organization, then the written report. Load sample case builds the chart and report immediately and hides Generate. A real case still uses Generate, and that button stays under the timeline.
-- The chart is editable. Click a cause to open the inspector. Double-click a title to edit it. Drag empty space to pan. Zoom in, Zoom out, the wheel, and Fit all work.
-- Evidence comes after the chart. The list and the chart update each other. A balloon shows the evidence statement. Select a cause to add, edit, or remove its evidence. A cause with no match keeps a question mark.
+- Order on the page: problem definition, timeline, then the evidence and hypothesized causes, then Generate RealityChart. Each observation needs the cause it supports, labelled as a hypothesis. Layer 1 is a direct cause of the primary effect. Layers 2, 3, and 4 are deeper causes and must name the cause they explain. The chart is not generated until that list is complete.
+- The chart is editable. Click a cause to open the inspector. Double-click a title to edit it. Drag empty space to pan. Zoom in, Zoom out, the wheel, and Fit all work. Adding, renaming, or removing a cause updates the evidence table, and edits in the table update the chart.
+- When the chart is final, Generate blank solution matrix and corrective actions opens an empty matrix and schedule. Fill every action, the responsible person, and the due date. Download stays off until that is done.
+- RC Coach can check each step. The final check becomes available with Download. Coach comments are optional. The investigator keeps the final say.
+- Load sample case still opens a finished example.
 - Chart colors: primary effect black `#111827` with white text, action `#dc2626`, condition `#16a34a`, STOP `#d32f2f` with white text, unknown `?` `#fbc02d` with black text.
 - Evidence tiers: Sensed, Inferred, Intuited, Emotional. Missing evidence shows `?`.
 - The downloaded PDF follows problem definition, timeline, evidence, the chart, then the summary, solutions, corrective actions, action items, and causal log. Reports export as PDF, and as ZIP when one file would damage figures.
 - One-click New analysis, with confirm and undo.
 - Help knowledge base and a Feedback link next to About the developer.
-- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v52`.
+- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v53`.
 
 ## AI
 
