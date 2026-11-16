@@ -174,16 +174,21 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
 .h2c-tb-legal {
   display: inline-flex;
   align-items: center;
+  align-self: center;
+  flex: none;
+  height: 2.75rem;
   gap: 6px;
   background: #fffdfa;
   border: 1.5px solid #d4c5a9;
   color: #4a3d24;
   font: 700 13px system-ui, -apple-system, sans-serif;
-  padding: 6px 12px;
+  padding: 0 12px;
   border-radius: 6px;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.2s ease;
 }
+.h2c-tb-legal svg { width: 16px; height: 16px; flex: none; }
 .h2c-tb-legal:hover {
   background: #fbf7ee;
   border-color: #c9a227;
