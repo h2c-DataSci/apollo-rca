@@ -9,10 +9,10 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Product | H2C Root Cause Analyst |
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
-| Branch | `main`, even with `origin/main` |
-| HEAD | `3c16a71` — layout handoff recorded. |
+| Branch | `feat/cloud-api-audit`. Do not push this work to `main`; Pages deploys from `main`. |
+| HEAD | `23a6a2d` on `origin/main` until this branch is merged. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Tests | `node --test` → 179 passed, 0 failed. |
+| Tests | `node --test` → 184 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-16 | this commit | Free and Paid API audits now return a section check for problem definition, the chart, evidence, and solutions. The notes appear on those steps and, when the report toggle is on, in the on-screen report, the PDF, a Markdown file, and the project JSON. Local AI keeps the single review and shows none of those notes. The audit stays in tab memory, not localStorage. Shell query is v40 and the service-worker cache is v41. |
 | 2026-11-15 | `3c16a71` | Housekeeping. Only `main` exists. Cache queries match the service worker. No unused file was removed. The handoff now says the four reviews stay in the coach card and the legal notice stays last. Tests remain 179. |
 | 2026-11-15 | `2a20113` | The four longer reviews and their results now sit in the RCA Coach card, under the coach controls, not in the connection card. The same four actions still call the connected model. The legal notice is moved to the end of the page whenever the report appears, so it stays after the download line. Shell query is v39 and the service-worker cache is v40. |
 | 2026-11-15 | `3585ade` | Housekeeping after the user confirmed the app works, including paid DeepSeek. Only `main` exists. Cache queries match the service worker. No unused file was removed. Instructions now name the DeepSeek paid path. |
@@ -75,8 +76,9 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Help knowledge base stays. No copyrighted book images.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
-- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v40` and `apollo-rca-runtime-v2`.
-- Script queries: shell `v=39`, help `v=27`, videos `v=25`, local bridge `v=27`, browser AI `v=26`, deeper reviews `v=7`. Bump a file's query when that file changes.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v41` and `apollo-rca-runtime-v2`.
+- Script queries: shell `v=40`, help `v=27`, videos `v=25`, local bridge `v=27`, browser AI `v=26`, deeper reviews `v=7`, cloud section audit `v=1`. Bump a file's query when that file changes.
+- A Free or Paid API audit may place notes on the steps and in the report. Local AI does not. The audit record stays in tab memory under `h2c-coach-api-audit-v1` and is not written to localStorage.
 - The four longer reviews stay under the RCA Coach controls, with their results in that card. The connection card is only the path, provider, model, and key.
 - The legal notice stays the last block in `main`, after the Download report line.
 - Episode lengths last read from the player: 55:50, 20:22, 07:57, 06:59, 08:19, 07:20, 07:10. Episode 6 id is `Q4-Bu2qUaaE`.
