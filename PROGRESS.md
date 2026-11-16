@@ -10,7 +10,7 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | Evidence edits from the chart are the tip of `main`. The previous report-order change was `36be13c`. |
+| HEAD | Evidence rows update the chart balloons. The previous chart-to-list change was `0ea0e08`. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
 | Tests | `node --test` → 194 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-16 | pending | Evidence rows now update the chart again. A balloon shows the statement, not only the source name, and the chart redraws as the row is edited. Service-worker cache is v52. |
 | 2026-11-16 | `0ea0e08` | A selected cause in the chart can add, edit, or remove its evidence. Those edits update the evidence list, and edits in the list update the chart. A row edited from the chart stays linked to that cause. Service-worker cache is v51. |
 | 2026-11-16 | `36be13c` | The generated output now follows the workflow. After Generate chart and RCA report the order is the chart, then evidence, then organization, then the written report. The downloaded PDF follows problem definition, timeline, evidence, the chart, then the summary, solutions, corrective actions, action items and causal log. Service-worker cache is v50. |
 | 2026-11-16 | `7fceb01` | Legal & Trademarks no longer stretches to the reserved header height. The toolbar row keeps its reserved space, and that button stays the same height as the others. Service-worker cache is v49. Shell query is v42. |
@@ -89,7 +90,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Help knowledge base stays. No copyrighted book images.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
-- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v51` and `apollo-rca-runtime-v2`.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v52` and `apollo-rca-runtime-v2`.
 - Script queries: shell `v=42`, help `v=30`, help knowledge `v=25`, videos `v=25`, local bridge `v=27`, browser AI `v=26`, deeper reviews `v=7`, cloud section audit `v=1`. Bump a file's query when that file changes.
 - A Free or Paid API audit may place notes on the steps and in the report. Local AI does not. The audit record stays in tab memory under `h2c-coach-api-audit-v1` and is not written to localStorage.
 - The four longer reviews stay under the RCA Coach controls, with their results in that card. The connection card is only the path, provider, model, and key.
