@@ -8,7 +8,7 @@ Independent, privacy-first web tool for investigations that follow Apollo RCA an
 - Feedback: [Google Form](https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform)
 - Training channel: [youtube.com/@h2c_Learnings](https://www.youtube.com/@h2c_Learnings)
 - Current handoff: [PROGRESS.md](PROGRESS.md)
-- Locked state: `c6380d1` on `main` (2026-11-17). The chart, evidence list, and report order below are the accepted behavior. Do not roll them back.
+- Locked state: `d0122b3` on `main` (2026-11-17). The chart, evidence list, and report order below are the accepted behavior. Do not roll them back.
 - Earlier starting point: `b1afdd3` on `main` (2026-11-09). Later work, including this locked state, sits on top of it.
 
 ## Documentation rule
