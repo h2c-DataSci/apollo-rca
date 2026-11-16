@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-16 | pending | The chart is editable again. Clicking a node no longer starts a pan, so the inspector opens. Double-click focuses the title. Drag empty space to pan. Zoom in, Zoom out, the wheel, and Fit all work. Add cause set and Remove node stay in the inspector. Service-worker cache is v47. |
+| 2026-11-16 | `f8f26d7` | The chart is editable again. Clicking a node no longer starts a pan, so the inspector opens. Double-click focuses the title. Drag empty space to pan. Zoom in, Zoom out, the wheel, and Fit all work. Add cause set and Remove node stay in the inspector. Service-worker cache is v47. |
 | 2026-11-16 | `a3b54e9` | Load sample case builds the chart and report immediately. Generate chart and RCA report sits under the timeline and is hidden for the sample. It remains for a real case. Help text matches. Service-worker cache is v46. |
 | 2026-11-16 | `5940a77` | A case with one primary effect no longer shows both "Own timeline and evidence" and the shared Timeline. The extra control stays only when there are two or three primary effects. Service-worker cache is v45. |
 | 2026-11-16 | `372ed9a` | Housekeeping. Only `main` is checked out, and it matches `origin/main`. Cache queries match the service worker: shell `v=41`, cache `apollo-rca-shell-v44`. No unused file was removed. The vendored Transformers file, the ONNX wasm files, `rolldown-runtime-v11.js`, `404.html`, and the loaded bundles stay. Open pull requests left as they are: #9 gitleaks, #6 color-guide docs, #4 setup-node, and #3 checkout. Tests remain 193. |
