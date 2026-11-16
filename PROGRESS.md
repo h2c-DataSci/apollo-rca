@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-16 | pending | Legal & Trademarks no longer stretches to the reserved header height. The toolbar row keeps its reserved space, and that button stays the same height as the others. Service-worker cache is v49. Shell query is v42. |
+| 2026-11-16 | `7fceb01` | Legal & Trademarks no longer stretches to the reserved header height. The toolbar row keeps its reserved space, and that button stays the same height as the others. Service-worker cache is v49. Shell query is v42. |
 | 2026-11-16 | `7f27c8f` | The chart now appears directly under Generate chart and RCA report. Evidence is the next section, and it appears only after the chart exists. Adding or editing evidence updates the matching chart nodes and clears a question mark when the evidence matches. Service-worker cache is v48. |
 | 2026-11-16 | `f8f26d7` | The chart is editable again. Clicking a node no longer starts a pan, so the inspector opens. Double-click focuses the title. Drag empty space to pan. Zoom in, Zoom out, the wheel, and Fit all work. Add cause set and Remove node stay in the inspector. Service-worker cache is v47. |
 | 2026-11-16 | `a3b54e9` | Load sample case builds the chart and report immediately. Generate chart and RCA report sits under the timeline and is hidden for the sample. It remains for a real case. Help text matches. Service-worker cache is v46. |
