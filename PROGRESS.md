@@ -10,9 +10,9 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main` |
-| HEAD | Housekeeping is the tip of `main`. The app code is the second audit pass `b80f105`. |
+| HEAD | The single-timeline fix is the tip of `main`. The previous housekeeping tip was `5496071`. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Tests | `node --test` → 193 passed, 0 failed. |
+| Tests | `node --test` → 194 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -21,6 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-16 | pending | A case with one primary effect no longer shows both "Own timeline and evidence" and the shared Timeline. The extra control stays only when there are two or three primary effects. Service-worker cache is v45. |
 | 2026-11-16 | `372ed9a` | Housekeeping. Only `main` is checked out, and it matches `origin/main`. Cache queries match the service worker: shell `v=41`, cache `apollo-rca-shell-v44`. No unused file was removed. The vendored Transformers file, the ONNX wasm files, `rolldown-runtime-v11.js`, `404.html`, and the loaded bundles stay. Open pull requests left as they are: #9 gitleaks, #6 color-guide docs, #4 setup-node, and #3 checkout. Tests remain 193. |
 | 2026-11-16 | `b80f105` | Second pass on the Free and Paid API audit. Notes now sit on Problem definition, Chart and report, and Evidence, with the solutions check in the workflow hub when that step has no heading of its own. A modified chart says so and offers Audit again. Report sections 1 through 5 keep one note each, and the PDF, Markdown, and project JSON still follow the include toggle. Local AI still shows none of this. Shell query is v41 and the service-worker cache is v44. The seven EGM skills are installed and `.egm/` is ignored. |
 | 2026-11-16 | `9131b4e` | Published pull request #10. Free and Paid API section audits are on `main` and GitHub Pages is deploying that commit. Local AI is unchanged. Shell query is v40 and the service-worker cache is v43. The merged `feat/cloud-api-audit` branch was deleted. Open pull requests for gitleaks, the color-guide docs, and Dependabot were left open. No unused file was removed: the vendored Transformers file, the ONNX wasm files, and `rolldown-runtime-v11.js` are still loaded. Tests remain 191. |
@@ -82,7 +83,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Help knowledge base stays. No copyrighted book images.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
-- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v44` and `apollo-rca-runtime-v2`.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v45` and `apollo-rca-runtime-v2`.
 - Script queries: shell `v=41`, help `v=27`, videos `v=25`, local bridge `v=27`, browser AI `v=26`, deeper reviews `v=7`, cloud section audit `v=1`. Bump a file's query when that file changes.
 - A Free or Paid API audit may place notes on the steps and in the report. Local AI does not. The audit record stays in tab memory under `h2c-coach-api-audit-v1` and is not written to localStorage.
 - The four longer reviews stay under the RCA Coach controls, with their results in that card. The connection card is only the path, provider, model, and key.

@@ -1,6 +1,7 @@
 // End-to-end integration and workflow test suite for H2C Root Cause Analyst
 // Verifies full 7-step Apollo RCA lifecycle, data transformations, and resilience.
 
+import { readFileSync } from 'node:fs';
 import { test, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import * as R from './rca-rules.js';
@@ -10,6 +11,14 @@ import { exportCase, validateImport } from './case-io.js';
 import { getBridgeConfig, DEFAULT_BRIDGE_CONFIG, RECOMMENDED_LOCAL_MODELS } from './local-ai-bridge.js';
 
 describe('Phase 3: End-to-End RCA Workflow & Stability Tests', () => {
+
+  it('one primary effect shows the shared Timeline only', () => {
+    const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+    const routes = readFileSync(new URL('./routes-v13.js', import.meta.url), 'utf8');
+    assert.equal(html.includes('Own timeline and evidence'), false);
+    assert.equal(html.includes('>Timeline<'), true);
+    assert.match(routes, /e\.effects\.length>1\?\(0,B\.jsxs\)\(`details`/);
+  });
 
   it('Step 1 (Define): Primary Effect validates noun + active verb without blame or cause', () => {
     // Valid PE
