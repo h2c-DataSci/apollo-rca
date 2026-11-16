@@ -9,10 +9,10 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Product | H2C Root Cause Analyst |
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
-| Branch | `feat/cloud-api-audit`. Do not push this work to `main`; Pages deploys from `main`. |
-| HEAD | `e958eb4` — cloud section audit. `origin/main` remains `23a6a2d`. |
+| Branch | `feat/cloud-api-audit`, updated onto current `main` (`e7f7384`) before merge. |
+| HEAD | merge in progress. `origin/main` is `e7f7384`. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Tests | `node --test` → 184 passed, 0 failed. |
+| Tests | `node --test` → 191 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -21,7 +21,10 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-16 | `e958eb4` | Free and Paid API audits now return a section check for problem definition, the chart, evidence, and solutions. The notes appear on those steps and, when the report toggle is on, in the on-screen report, the PDF, a Markdown file, and the project JSON. Local AI keeps the single review and shows none of those notes. The audit stays in tab memory, not localStorage. Shell query is v40 and the service-worker cache is v41. |
+| 2026-11-16 | `e958eb4` | Free and Paid API audits now return a section check for problem definition, the chart, evidence, and solutions. The notes appear on those steps and, when the report toggle is on, in the on-screen report, the PDF, a Markdown file, and the project JSON. Local AI keeps the single review and shows none of those notes. The audit stays in tab memory, not localStorage. Brought onto `main` after the vendored ONNX wasm merge. Shell query is v40 and the service-worker cache is v43. |
+| 2026-11-15 | `0e82573` | The published coach worker (`rca-coach.worker-v13.js`) no longer fetches ONNX wasm from jsDelivr. The four `onnxruntime-web@1.31.0-dev.20260914-8d85527a0` files (`ort-wasm-simd-threaded.asyncify.{wasm,mjs}` and the unsuffixed Safari fallback pair) are stored under `vendor/onnx-wasm/`, marked `-text`, and checked with sha384. Each file is under 27 MB (GitHub Pages limit is 100 MB). They are not in the shell cache, so ordinary visits are not forced to download 41 MB. `cdn.jsdelivr.net` is removed from `connect-src`; model weights still use `https:` and the Hugging Face hosts. Shell cache was v42 before this audit merge. Layout, Feedback, About the developer, sign-in, and RealityChart colors are unchanged. |
+| 2026-11-15 | `931566b` | Windows CI only: the vendored Transformers.js sha384 test failed because Git converted the file's trailing LF to CRLF. `.gitattributes` now marks `vendor/transformers-3.7.6.min.js` as `-text`. App behavior, layout, and RealityChart colors are unchanged. Tests remain 181. |
+| 2026-11-15 | `5f8513f` | Security follow-up. Transformers.js 3.7.6 is vendored and checked with its sha384 because a worker import cannot take an integrity attribute. `cdn.jsdelivr.net` remains out of `script-src`. `rolldown-runtime-v11.js` stays because `index-v13.js`, `routes-v13.js`, and `es-DawnZXYc.js` still import it. The invalid `http://[::1]:*` CSP token is removed. Ollama remains allowed on `localhost` and `127.0.0.1`. |
 | 2026-11-15 | `3c16a71` | Housekeeping. Only `main` exists. Cache queries match the service worker. No unused file was removed. The handoff now says the four reviews stay in the coach card and the legal notice stays last. Tests remain 179. |
 | 2026-11-15 | `2a20113` | The four longer reviews and their results now sit in the RCA Coach card, under the coach controls, not in the connection card. The same four actions still call the connected model. The legal notice is moved to the end of the page whenever the report appears, so it stays after the download line. Shell query is v39 and the service-worker cache is v40. |
 | 2026-11-15 | `3585ade` | Housekeeping after the user confirmed the app works, including paid DeepSeek. Only `main` exists. Cache queries match the service worker. No unused file was removed. Instructions now name the DeepSeek paid path. |
@@ -76,7 +79,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 - Help knowledge base stays. No copyrighted book images.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
-- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v41` and `apollo-rca-runtime-v2`.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v43` and `apollo-rca-runtime-v2`.
 - Script queries: shell `v=40`, help `v=27`, videos `v=25`, local bridge `v=27`, browser AI `v=26`, deeper reviews `v=7`, cloud section audit `v=1`. Bump a file's query when that file changes.
 - A Free or Paid API audit may place notes on the steps and in the report. Local AI does not. The audit record stays in tab memory under `h2c-coach-api-audit-v1` and is not written to localStorage.
 - The four longer reviews stay under the RCA Coach controls, with their results in that card. The connection card is only the path, provider, model, and key.

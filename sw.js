@@ -1,4 +1,4 @@
-const CACHE = 'apollo-rca-shell-v41';
+const CACHE = 'apollo-rca-shell-v43';
 const RUNTIME = 'apollo-rca-runtime-v2';
 const OWN_PREFIX = 'apollo-rca-';
 const RUNTIME_MAX_ENTRIES = 40;
@@ -18,6 +18,7 @@ const SHELL = [
   './h2c-videos.js?v=25',
   './local-ai-bridge.js?v=27',
   './ai-config.js',
+  './vendor/transformers-3.7.6.min.js',
   './provider-presets.js',
   './session-store.js',
   './coach-deeper.js?v=7',

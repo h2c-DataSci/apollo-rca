@@ -6,11 +6,24 @@ export const MODEL_CONFIG = {
   approxDownloadMB: 400,
   library: '@huggingface/transformers',
   libraryVersion: '3.7.6',
-  libraryUrl: 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6',
-  // sha384 of the pinned 3.7.6 file (same bytes as dist/transformers.min.js).
-  // A worker import cannot carry an integrity attribute, so the worker checks
-  // this hash with a CORS fetch before importing that same URL.
+  libraryUrl: './vendor/transformers-3.7.6.min.js',
+  // sha384 of the vendored 3.7.6 file. A worker import cannot carry an
+  // integrity attribute, so this file is served by the app and checked
+  // before it is imported.
   libraryIntegrity: 'sha384-ypqDKlGaciPzMZFxk0iPx9blYGxbZIWTqZX7f6BuiicO9rTfnXfprLBev5KE5OfK',
+  // The published coach uses rca-coach.worker-v13.js, which embeds
+  // onnxruntime-web 1.31.0-dev.20260914-8d85527a0. Those wasm files are
+  // stored under vendor/onnx-wasm/ and loaded same-origin. The asyncify
+  // pair is the default; the unsuffixed pair is the Safari < 26 fallback
+  // when WebGPU is missing. Files are not in the shell cache (about 41 MB).
+  wasmDir: './vendor/onnx-wasm/',
+  wasmVersion: '1.31.0-dev.20260914-8d85527a0',
+  wasmFiles: {
+    'ort-wasm-simd-threaded.asyncify.wasm': 'sha384-JuzrCV6BUmTUbsgNhgU94qo0vZ4l3w0VqgQAKPm0La2hXL9kmv8P9pGenfsWJY9c',
+    'ort-wasm-simd-threaded.asyncify.mjs': 'sha384-ik7L7J2uXfXmGuWHh3yOUDPpUslz/dJjcvZgdX5hcItLjxlkEpUF7mpCcATr3Dg8',
+    'ort-wasm-simd-threaded.wasm': 'sha384-LrOPe1yNsLVzhsriuQfxO06RWx/XakR0S8uiOMx7HVJP6N/IEaR1EAgJMFeTanif',
+    'ort-wasm-simd-threaded.mjs': 'sha384-rwgdUeIyqfd2lxMuhdqXYPnZiluDqSM5liz/q+ulIt4vYtB52NCoTVWBkm1KFOeN',
+  },
   dtypeWebGPU: 'q4f16',
   dtypeWasm: 'q4',
   generation: { max_new_tokens: 384, temperature: 0.2, top_p: 0.9, do_sample: true, repetition_penalty: 1.1 },
