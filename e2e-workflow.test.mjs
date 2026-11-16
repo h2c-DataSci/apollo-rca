@@ -18,6 +18,11 @@ describe('Phase 3: End-to-End RCA Workflow & Stability Tests', () => {
     assert.equal(html.includes('Own timeline and evidence'), false);
     assert.equal(html.includes('>Timeline<'), true);
     assert.match(routes, /e\.effects\.length>1\?\(0,B\.jsxs\)\(`details`/);
+    assert.match(routes, /onClick:\(\)=>\{let n=fe\(ke\)/);
+    assert.match(routes, /sampleMatch\(e\)\?null/);
+    const timelineAt = html.indexOf('>Timeline<');
+    const generateAt = html.indexOf('Generate chart');
+    assert.ok(timelineAt > 0 && generateAt > timelineAt);
   });
 
   it('Step 1 (Define): Primary Effect validates noun + active verb without blame or cause', () => {

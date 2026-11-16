@@ -89,7 +89,8 @@ try {
   await panel.waitFor();
   await panel.locator('.h2c-ai-mode').selectOption('free');
   await mkdir(output, {recursive:true});
-  await page.getByRole('button', {name:'Generate chart & RCA report',exact:true}).click();
+  const generate = page.getByRole('button', {name:'Generate chart & RCA report',exact:true});
+  if (await generate.isVisible()) await generate.click();
   const downloadReady = page.waitForEvent('download');
   await page.getByRole('button', {name:'Download .ZIP Package',exact:true}).click();
   const download = await downloadReady;
