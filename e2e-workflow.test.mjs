@@ -21,6 +21,8 @@ describe('Phase 3: End-to-End RCA Workflow & Stability Tests', () => {
     assert.match(routes, /onClick:\(\)=>\{let n=fe\(ke\)/);
     assert.match(routes, /part:`evidence`/);
     assert.match(routes, /function applyChartEvidence/);
+    assert.match(routes, /function NodeEvidence/);
+    assert.match(routes, /Add evidence for this cause/);
     assert.equal(html.includes('<h2 class="text-lg font-semibold">Evidence</h2>'), false);
     assert.match(routes, /children:`Zoom in`/);
     const timelineAt = html.indexOf('>Timeline<');
