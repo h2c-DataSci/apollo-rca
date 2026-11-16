@@ -17,6 +17,7 @@ import { sessionStore, listLegacyData, removeLegacyData, legacyRecoveryPlan } fr
 
 import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach } from './local-ai-bridge.js?v=27';
 import { DEEPER_TASKS, runDeeperReview, briefForReview, presentFinding } from './coach-deeper.js?v=7';
+import { AUDIT_KEY, isCloudAuditMode, runCloudSectionAudit, saveCoachAudit, loadCoachAudit, clearCoachAudit, auditAsReview, visibleAudit, fingerprint, appendAuditPdf, auditMarkdown, exportableAudit } from './coach-audit.js?v=1';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
@@ -70,7 +71,7 @@ function setSafeHtml(el, html) {
   el.replaceChildren(...doc.body.childNodes);
 }
 
-const KEYS = ['realitychart-intake-v1', 'realitychart-hypotheses-v1', 'realitychart-raw-notes-v1'];
+const KEYS = ['realitychart-intake-v1', 'realitychart-hypotheses-v1', 'realitychart-raw-notes-v1', AUDIT_KEY];
 const BACKUP = 'h2c-last-cleared-v1';
 let proceed = false;
 let updating = false;
@@ -441,6 +442,18 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
 .h2c-review-label { font-weight: 700; color: #043d2e; }
 .h2c-review-ids { margin: 6px 0 0; font-size: 12px; color: #3d4a42; }
 .h2c-review-note { font-size: 12px; color: #5c6e80; }
+.h2c-audit-card, .h2c-audit-note { margin: 10px 0; border: 1px solid #e7ded0; border-left: 4px solid #c9a227; border-radius: 8px; background: #fffdf8; color: #14261c; }
+.h2c-audit-card { padding: 0; }
+.h2c-audit-card summary, .h2c-audit-note h3 { cursor: pointer; padding: 8px 10px; font: 700 13px/1.4 system-ui, sans-serif; }
+.h2c-audit-body { padding: 0 10px 10px; display: grid; gap: 6px; }
+.h2c-audit-card p, .h2c-audit-note p, .h2c-audit-card li { margin: 0; font: 13px/1.45 system-ui, sans-serif; }
+.h2c-audit-badge { display: inline-block; margin-right: 6px; padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.h2c-audit-pass { background: #e8f6ee; color: #04693a; }
+.h2c-audit-attention { background: #fbf3d5; color: #6a4b00; }
+.h2c-audit-critical { background: #fde8e8; color: #9f1239; }
+.h2c-audit-jump, .h2c-audit-card button { margin: 2px 4px 0 0; min-height: 32px; border: 1px solid #d7c7a2; border-radius: 6px; background: #fff; color: #14261c; font: 600 12px/1.2 system-ui, sans-serif; cursor: pointer; }
+.h2c-audit-stale { font-size: 12px; color: #9f1239; }
+.h2c-audit-toggle { display: flex; align-items: center; gap: 6px; font: 12px/1.4 system-ui, sans-serif; color: #14261c; }
 .h2c-key-steps { margin: 6px 0 6px 1.2rem; }
 .h2c-key-steps li { margin: 2px 0; }
 .h2c-key-links, .h2c-key-note { margin: 6px 0; }
@@ -1331,6 +1344,147 @@ function renderReview(review, root) {
   root.append(caution);
 }
 
+function statusClass(status) {
+  if (status === 'pass') return 'h2c-audit-pass';
+  if (status === 'critical') return 'h2c-audit-critical';
+  return 'h2c-audit-attention';
+}
+
+function fillAuditBody(body, audit, section) {
+  const badge = document.createElement('span');
+  badge.className = `h2c-audit-badge ${statusClass(section.status)}`;
+  badge.textContent = section.statusLabel;
+  const title = document.createElement('p');
+  title.append(badge, document.createTextNode(section.title));
+  body.append(title);
+  if (audit.stale) {
+    const stale = document.createElement('p');
+    stale.className = 'h2c-audit-stale';
+    stale.textContent = 'Chart modified since this audit. Run Audit full report again before relying on it.';
+    body.append(stale);
+  }
+  const list = document.createElement('ul');
+  for (const finding of section.findings) {
+    const item = document.createElement('li');
+    item.textContent = finding.refs.length ? `${finding.text} (${finding.refs.join(', ')})` : finding.text;
+    list.append(item);
+  }
+  if (list.childNodes.length) body.append(list);
+}
+
+function jumpToRef(ref) {
+  const wanted = String(ref || '').toLowerCase();
+  const marked = document.querySelector(`[data-pe="${CSS.escape(ref)}"], [id="${CSS.escape(ref)}"]`);
+  const textHit = marked || [...document.querySelectorAll('svg text, h2, h3, p, li')].find((node) => String(node.textContent || '').toLowerCase().includes(wanted));
+  if (!textHit) return;
+  textHit.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function paintCoachAudit() {
+  const cfg = getBridgeConfig();
+  const audit = visibleAudit(loadCoachAudit(), cfg, fingerprint(briefForReview('audit')));
+  const token = audit ? JSON.stringify([audit.timestamp, !!audit.stale, audit.includeInReport !== false, audit.dismissed || {}]) : '';
+  const article = document.querySelector('article.print-sheet');
+  const download = [...document.querySelectorAll('button')].some((button) => /Download report/.test(button.textContent || ''));
+  const ready = !audit
+    ? !document.querySelector('.h2c-audit-card, .h2c-audit-note, .h2c-audit-toggle')
+    : (!article || audit.includeInReport === false || !!article.querySelector('.h2c-audit-note')) && (!download || !!document.querySelector('.h2c-audit-toggle'));
+  if (paintCoachAudit.token === token && ready) return;
+  paintCoachAudit.token = token;
+  document.querySelectorAll('.h2c-audit-card, .h2c-audit-note, .h2c-audit-toggle').forEach((node) => node.remove());
+  if (!audit) return;
+  const placements = [
+    ['problemDefinition', /^(define|1\.\s*problem definition)$/i],
+    ['causalRelationships', /^(causes|chart|reality chart|node inspector)$/i],
+    ['evidenceAndTesting', /^evidence$/i],
+    ['solutionsAndTracking', /^(solutions|track|3\.\s*solution challenge matrix|4\.\s*corrective actions tracking log)$/i]
+  ];
+  const headings = [...document.querySelectorAll('h2, h3')];
+  for (const [key, pattern] of placements) {
+    if (audit.dismissed && audit.dismissed[key]) continue;
+    const heading = headings.find((node) => pattern.test(String(node.textContent || '').trim()) && !node.closest('article.print-sheet') && !node.closest('.h2c-deeper'));
+    if (!heading) continue;
+    const card = document.createElement('details');
+    card.className = 'h2c-audit-card no-print';
+    card.open = audit.sections[key].status !== 'pass';
+    const summary = document.createElement('summary');
+    summary.textContent = `RC Coach API Audit — ${audit.sections[key].title}`;
+    const body = document.createElement('div');
+    body.className = 'h2c-audit-body';
+    fillAuditBody(body, audit, audit.sections[key]);
+    for (const [id, note] of Object.entries(audit.nodeAnnotations || {})) {
+      if (key !== 'causalRelationships') break;
+      const jump = document.createElement('button');
+      jump.type = 'button';
+      jump.textContent = `${note.statusLabel}: ${id}`;
+      jump.addEventListener('click', () => jumpToRef(id));
+      body.append(jump);
+    }
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.textContent = 'Dismiss';
+    dismiss.addEventListener('click', () => {
+      const current = loadCoachAudit();
+      if (!current) return;
+      current.dismissed = { ...(current.dismissed || {}), [key]: true };
+      saveCoachAudit(current);
+      paintCoachAudit();
+    });
+    body.append(dismiss);
+    card.append(summary, body);
+    heading.insertAdjacentElement('afterend', card);
+  }
+  if (article && audit.includeInReport !== false) {
+    for (const block of article.querySelectorAll('header, section')) {
+      const heading = String(block.querySelector('h2, h3')?.textContent || '').trim();
+      const match = placements.find(([, pattern]) => pattern.test(heading));
+      if (!match || (audit.dismissed && audit.dismissed[match[0]])) continue;
+      const note = document.createElement('aside');
+      note.className = 'h2c-audit-note';
+      const title = document.createElement('h3');
+      title.textContent = 'RC Coach API Audit Notes';
+      const body = document.createElement('div');
+      body.className = 'h2c-audit-body';
+      fillAuditBody(body, audit, audit.sections[match[0]]);
+      note.append(title, body);
+      block.append(note);
+    }
+    const summary = document.createElement('section');
+    summary.className = 'h2c-audit-note';
+    const title = document.createElement('h3');
+    title.textContent = 'RC Coach API Audit Summary';
+    const body = document.createElement('div');
+    body.className = 'h2c-audit-body';
+    const overall = document.createElement('p');
+    overall.textContent = `${audit.overall.statusLabel}. ${audit.overall.summary}`;
+    body.append(overall);
+    for (const step of audit.overall.nextSteps || []) {
+      const line = document.createElement('p');
+      line.textContent = `Next: ${step}`;
+      body.append(line);
+    }
+    summary.append(title, body);
+    article.append(summary);
+  }
+  const downloadButton = [...document.querySelectorAll('button')].find((button) => /Download report/.test(button.textContent || ''));
+  if (downloadButton && downloadButton.parentElement) {
+    const toggle = document.createElement('label');
+    toggle.className = 'h2c-audit-toggle no-print';
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.checked = audit.includeInReport !== false;
+    box.addEventListener('change', () => {
+      const current = loadCoachAudit();
+      if (!current) return;
+      current.includeInReport = box.checked;
+      saveCoachAudit(current);
+      paintCoachAudit();
+    });
+    toggle.append(box, document.createTextNode(' Include RC Coach API Audit in Report'));
+    downloadButton.parentElement.before(toggle);
+  }
+}
+
 function placeCoachReviews(coachSection) {
   const deeper = document.querySelector('.h2c-deeper');
   if (coachSection && deeper && deeper.previousElementSibling !== coachSection) coachSection.after(deeper);
@@ -1373,7 +1527,7 @@ function ensureLocalBridgeUI() {
   deeper.className = 'no-print h2c-deeper';
   const deeperNote = document.createElement('p');
   deeperNote.style.margin = '0 0 8px';
-  deeperNote.textContent = 'Longer reviews use the connected model once. Audit full report checks every section of the formal report. Nothing is written into the chart.';
+  deeperNote.textContent = 'Longer reviews use the connected model once. On a Free or Paid API, Audit full report also checks each step and can be included in the report. Local AI keeps a single review. Nothing is written into the chart.';
   const deeperRow = document.createElement('div');
   deeperRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
   const deeperOut = document.createElement('div');
@@ -1389,8 +1543,17 @@ function ensureLocalBridgeUI() {
       deeperRow.querySelectorAll('button').forEach((item) => { item.disabled = true; });
       deeperOut.textContent = 'Reviewing. Reasoning is not shown.';
       try {
-        const review = await runDeeperReview(task.id, briefForReview(task.id));
-        renderReview(review, deeperOut);
+        const cfg = getBridgeConfig();
+        if (task.id === 'audit' && isCloudAuditMode(cfg)) {
+          const brief = briefForReview(task.id);
+          const audit = await runCloudSectionAudit(brief);
+          saveCoachAudit(audit);
+          renderReview(auditAsReview(audit), deeperOut);
+          paintCoachAudit();
+        } else {
+          const review = await runDeeperReview(task.id, briefForReview(task.id));
+          renderReview(review, deeperOut);
+        }
       } catch (error) {
         deeperOut.textContent = error && error.message ? error.message : 'The review failed. Nothing was changed.';
       } finally {
@@ -1568,7 +1731,7 @@ function refreshAll() {
   if (updating) return;
   updating = true;
   try {
-    const steps = [updateTopAttributionRibbon, ensureBottomLegalShowcase, updateStepsHub, updateColorCodedValidation, placeOfficialCoach, ensureLocalBridgeUI, ensureBrowserAiButton, enforceChartColors];
+    const steps = [updateTopAttributionRibbon, ensureBottomLegalShowcase, updateStepsHub, updateColorCodedValidation, placeOfficialCoach, ensureLocalBridgeUI, ensureBrowserAiButton, enforceChartColors, paintCoachAudit];
     for (const step of steps) {
       try { step(); } catch (error) { console.error('[h2c]', error); }
     }
@@ -1644,6 +1807,15 @@ window.addEventListener('beforeunload', (event) => {
 });
 function bootShell() {
   installExternalCoach();
+  globalThis.h2cAppendCoachAuditPdf = (ctx, write, heading) => {
+    if (!isCloudAuditMode(getBridgeConfig())) return;
+    appendAuditPdf(ctx, write, heading, visibleAudit(loadCoachAudit(), getBridgeConfig(), fingerprint(briefForReview('audit'))));
+  };
+  globalThis.h2cCoachAuditExport = () => exportableAudit(visibleAudit(loadCoachAudit(), getBridgeConfig(), fingerprint(briefForReview('audit'))));
+  globalThis.h2cCoachAuditMarkdown = () => {
+    const audit = visibleAudit(loadCoachAudit(), getBridgeConfig(), fingerprint(briefForReview('audit')));
+    return audit ? auditMarkdown(audit) : '';
+  };
   initShell();
   ensureSessionNotice();
   if ('serviceWorker' in navigator) {
@@ -1675,6 +1847,6 @@ document.addEventListener('click', (e) => {
   if (proceed) { proceed = false; return; }
   e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
   if (!confirm('Clear analysis and start new?\n\nThe current case is removed from this browser. You can undo right after.')) return;
-  try { sessionStore.setItem(BACKUP, JSON.stringify({ data: Object.fromEntries(KEYS.map((k) => [k, sessionStore.getItem(k)])), at: Date.now() })); } catch {}
+  try { sessionStore.setItem(BACKUP, JSON.stringify({ data: Object.fromEntries(KEYS.map((k) => [k, sessionStore.getItem(k)])), at: Date.now() })); clearCoachAudit(); } catch {}
   proceed = true; b.click(); setTimeout(toast, 150);
 }, true);
