@@ -21,7 +21,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
-| 2026-11-16 | pending | A selected cause in the chart can add, edit, or remove its evidence. Those edits update the evidence list, and edits in the list update the chart. A row edited from the chart stays linked to that cause. Service-worker cache is v51. |
+| 2026-11-16 | `0ea0e08` | A selected cause in the chart can add, edit, or remove its evidence. Those edits update the evidence list, and edits in the list update the chart. A row edited from the chart stays linked to that cause. Service-worker cache is v51. |
 | 2026-11-16 | `36be13c` | The generated output now follows the workflow. After Generate chart and RCA report the order is the chart, then evidence, then organization, then the written report. The downloaded PDF follows problem definition, timeline, evidence, the chart, then the summary, solutions, corrective actions, action items and causal log. Service-worker cache is v50. |
 | 2026-11-16 | `7fceb01` | Legal & Trademarks no longer stretches to the reserved header height. The toolbar row keeps its reserved space, and that button stays the same height as the others. Service-worker cache is v49. Shell query is v42. |
 | 2026-11-16 | `7f27c8f` | The chart now appears directly under Generate chart and RCA report. Evidence is the next section, and it appears only after the chart exists. Adding or editing evidence updates the matching chart nodes and clears a question mark when the evidence matches. Service-worker cache is v48. |
