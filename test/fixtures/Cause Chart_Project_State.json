@@ -1,0 +1,1520 @@
+{
+  "intake": {
+    "effects": [
+      {
+        "id": "pe-1",
+        "what": "Haul Truck Fire",
+        "whenDate": "2026-11-17",
+        "whenTime": "14:20",
+        "phase": "Steady operation",
+        "where": "Pit 3 ramp, HT-07",
+        "safety": "Fire, no injuries",
+        "loss": "$169,000",
+        "frequency": "",
+        "frequencyNote": "",
+        "timeline": [
+          {
+            "id": "71692894-6735-43a4-b7d0-07ba31c65c5a",
+            "time": "14:05",
+            "description": "Hydraulic hose ruptured, oil sprayed"
+          },
+          {
+            "id": "80fa6f53-6f09-4d57-b17c-275905198775",
+            "time": "14:18",
+            "description": "Smoke seen from engine bay"
+          }
+        ],
+        "evidence": [],
+        "safetyTags": [
+          "Fire",
+          "Evacuation"
+        ],
+        "severity": "4",
+        "likelihood": "3",
+        "costSplit": {
+          "direct": "120000",
+          "hours": "6",
+          "rate": "5000",
+          "response": "15000",
+          "inspection": "4000"
+        },
+        "whereParts": {
+          "site": "Fictional Mine",
+          "area": "Pit 3",
+          "system": "Haul fleet",
+          "equipment": "Haul truck",
+          "asset": "HT-07"
+        },
+        "duration": "45 min",
+        "shift": "Day",
+        "freeze": {
+          "heat": "yes",
+          "fuel": "yes",
+          "oxygen": "yes",
+          "people": "unknown",
+          "protection": "no"
+        }
+      },
+      {
+        "id": "pe-2-1794905490532",
+        "what": "Production Lost",
+        "whenDate": "2026-11-17",
+        "whenTime": "14:20",
+        "phase": "Steady operation",
+        "where": "Pit 3 haul route",
+        "safety": "",
+        "loss": "",
+        "frequency": "",
+        "frequencyNote": "",
+        "timeline": [
+          {
+            "id": "999700d2-e2c3-4a7f-b2ca-177b4a1b5058",
+            "time": "14:20",
+            "description": "Haul stopped, ramp blocked"
+          },
+          {
+            "id": "00410b7c-9c0b-40d3-8e6f-ff44692c1a71",
+            "time": "20:20",
+            "description": "Route restored"
+          }
+        ],
+        "evidence": []
+      },
+      {
+        "id": "pe-3-1794905490910",
+        "what": "Suppression Failed",
+        "whenDate": "2026-11-17",
+        "whenTime": "14:20",
+        "phase": "Steady operation",
+        "where": "HT-07 fire system",
+        "safety": "",
+        "loss": "",
+        "frequency": "",
+        "frequencyNote": "",
+        "timeline": [
+          {
+            "id": "053afb4b-c9fc-452f-8234-ac44d205a1b6",
+            "time": "14:19",
+            "description": "Suppression pull handle used"
+          },
+          {
+            "id": "0cacb83c-a741-4ac0-9c07-18d9da8fcd84",
+            "time": "14:21",
+            "description": "Nozzle found blocked"
+          }
+        ],
+        "evidence": []
+      }
+    ],
+    "timeline": [
+      {
+        "id": "c4e9497a-a7b1-490b-a6ed-fe6c3fce50ff",
+        "time": "14:20",
+        "description": "Fire reported by dispatcher"
+      },
+      {
+        "id": "b6bc6933-85c2-4fab-8c85-066afa9aaffd",
+        "time": "14:10",
+        "description": "Operator heard hydraulic alarm"
+      }
+    ],
+    "evidence": [
+      {
+        "id": "69e7455e-ff36-49e4-bae6-4a951229ef74",
+        "text": "Observed: Hydraulic hose ruptured",
+        "tier": "Sensed",
+        "source": "Hose burst photo IMG-101",
+        "cause": "Hydraulic hose ruptured",
+        "layer": 1,
+        "kind": "action",
+        "explains": "",
+        "pe": "pe-1"
+      },
+      {
+        "id": "fc5d7081-6a56-4ded-bbf1-e63a5bfb3e35",
+        "text": "Observed: Hot turbo surface",
+        "tier": "Sensed",
+        "source": "Thermal scan 620C",
+        "cause": "Hot turbo surface",
+        "layer": 1,
+        "kind": "condition",
+        "explains": "",
+        "pe": "pe-1"
+      },
+      {
+        "id": "31d97305-6314-4e31-baa9-b90fc0309965",
+        "text": "Observed: Oil present",
+        "tier": "Sensed",
+        "source": "Oil on engine deck",
+        "cause": "Oil present",
+        "layer": 1,
+        "kind": "condition",
+        "explains": "",
+        "pe": "pe-1"
+      },
+      {
+        "id": "aa6e3ef8-6626-49e4-bf02-6b20d5ee2af9",
+        "text": "Observed: Oxygen present",
+        "tier": "Sensed",
+        "source": "",
+        "cause": "Oxygen present",
+        "layer": 1,
+        "kind": "condition",
+        "explains": "",
+        "pe": "pe-1"
+      },
+      {
+        "id": "e8f0d693-489d-4107-9298-cf02a3b7d650",
+        "text": "Observed: Operator continued driving",
+        "tier": "Sensed",
+        "source": "Operator interview",
+        "cause": "Operator continued driving",
+        "layer": 1,
+        "kind": "action",
+        "explains": "",
+        "pe": "pe-1"
+      },
+      {
+        "id": "21c9a3ae-635e-49eb-bfa9-31a9f9c61c30",
+        "text": "Observed: Truck unavailable for 6 hours",
+        "tier": "Sensed",
+        "source": "Dispatch log",
+        "cause": "Truck unavailable for 6 hours",
+        "layer": 1,
+        "kind": "condition",
+        "explains": "",
+        "pe": "pe-2-1794905490532"
+      },
+      {
+        "id": "f38db8ef-3d2d-4994-b827-a13be438ad00",
+        "text": "Observed: Suppression nozzle blocked",
+        "tier": "Sensed",
+        "source": "Post-fire inspection",
+        "cause": "Suppression nozzle blocked",
+        "layer": 1,
+        "kind": "condition",
+        "explains": "",
+        "pe": "pe-3-1794905490910"
+      },
+      {
+        "id": "e0faf667-d990-467b-bced-c446b17b5711",
+        "text": "Observed: Hose chafed against frame",
+        "tier": "Sensed",
+        "source": "Wear marks on hose",
+        "cause": "Hose chafed against frame",
+        "layer": 2,
+        "kind": "action",
+        "explains": "Hydraulic hose ruptured",
+        "pe": "pe-1"
+      },
+      {
+        "id": "e9e5bad3-1021-466f-93d4-21cbefaa1f6d",
+        "text": "Observed: Heat shield missing",
+        "tier": "Sensed",
+        "source": "",
+        "cause": "Heat Shield Not Installed After Rebuild",
+        "layer": 2,
+        "kind": "condition",
+        "explains": "Hot turbo surface",
+        "pe": "pe-1"
+      },
+      {
+        "id": "407ee2d9-6689-4dcf-83a9-4fa50a3d9e0f",
+        "text": "Observed: Alarm not noticed",
+        "tier": "Sensed",
+        "source": "Cab recording",
+        "cause": "Alarm not noticed",
+        "layer": 2,
+        "kind": "condition",
+        "explains": "Operator continued driving",
+        "pe": "pe-1"
+      },
+      {
+        "id": "eb333fc0-340b-43b6-a65a-10c4d8314d73",
+        "text": "Observed: Nozzle cap left on",
+        "tier": "Sensed",
+        "source": "Maintenance record",
+        "cause": "Nozzle cap left on",
+        "layer": 2,
+        "kind": "action",
+        "explains": "Suppression nozzle blocked",
+        "pe": "pe-3-1794905490910"
+      },
+      {
+        "id": "12aa23ce-39d8-4700-a59b-7683cc8b616a",
+        "text": "Observed: Inspection skipped",
+        "tier": "Sensed",
+        "source": "PM schedule",
+        "cause": "Inspection skipped",
+        "layer": 3,
+        "kind": "action",
+        "explains": "Nozzle cap left on",
+        "pe": "pe-3-1794905490910"
+      },
+      {
+        "id": "178dc4ee-bc53-47c9-8935-d26250eb7210",
+        "text": "Observed: Clamp missing",
+        "tier": "Sensed",
+        "source": "Maintenance photo",
+        "cause": "Clamp missing",
+        "layer": 3,
+        "kind": "condition",
+        "explains": "Hose chafed against frame",
+        "pe": "pe-1"
+      },
+      {
+        "id": "fb1468e5-3680-4eba-bbe1-6a1b2e958a54",
+        "text": "Observed: Checklist not updated",
+        "tier": "Sensed",
+        "source": "",
+        "cause": "Checklist not updated",
+        "layer": 4,
+        "kind": "condition",
+        "explains": "Inspection skipped",
+        "pe": "pe-3-1794905490910"
+      }
+    ],
+    "goals": "Zero repeat haul truck fires in 12 months",
+    "maxCost": "$50,000",
+    "payback": "under 12 months",
+    "control": "Not vendor design",
+    "investigator": "Test Investigator, reliability engineer",
+    "reportDate": "2026-10-31",
+    "solutionsOpen": true
+  },
+  "analysis": {
+    "trees": [
+      {
+        "id": "pe-1",
+        "code": "PE-1",
+        "root": {
+          "id": "p-1",
+          "kind": "primary",
+          "title": "Haul Truck Fire",
+          "verified": true,
+          "evidence": [],
+          "children": [
+            {
+              "id": "a-2",
+              "kind": "action",
+              "title": "Hydraulic Hose Ruptured",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "Hose burst photo IMG-101",
+                  "text": "Observed: Hydraulic hose ruptured",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [
+                {
+                  "id": "a-7",
+                  "kind": "action",
+                  "title": "Hose Chafed Against Frame",
+                  "verified": true,
+                  "evidence": [
+                    {
+                      "source": "Wear marks on hose",
+                      "text": "Observed: Hose chafed against frame",
+                      "tier": "Sensed",
+                      "missing": false
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "a-12",
+                      "kind": "action",
+                      "title": "Action Needed",
+                      "verified": false,
+                      "evidence": [
+                        {
+                          "source": "?",
+                          "missing": true
+                        }
+                      ],
+                      "children": [],
+                      "necessity": true,
+                      "sufficiency": true,
+                      "terminator": {
+                        "type": "question",
+                        "label": "Need More Info"
+                      },
+                      "placeholder": true
+                    },
+                    {
+                      "id": "c-10",
+                      "kind": "condition",
+                      "title": "Clamp Missing",
+                      "verified": true,
+                      "evidence": [
+                        {
+                          "source": "Maintenance photo",
+                          "text": "Observed: Clamp missing",
+                          "tier": "Sensed",
+                          "missing": false
+                        }
+                      ],
+                      "children": [],
+                      "necessity": true,
+                      "sufficiency": true,
+                      "terminator": {
+                        "type": "question",
+                        "label": "Need More Info"
+                      }
+                    }
+                  ],
+                  "necessity": true,
+                  "sufficiency": false
+                },
+                {
+                  "id": "c-11",
+                  "kind": "condition",
+                  "title": "Condition Needed",
+                  "verified": false,
+                  "evidence": [
+                    {
+                      "source": "?",
+                      "missing": true
+                    }
+                  ],
+                  "children": [],
+                  "necessity": true,
+                  "sufficiency": true,
+                  "terminator": {
+                    "type": "question",
+                    "label": "Need More Info"
+                  },
+                  "placeholder": true
+                }
+              ],
+              "necessity": true,
+              "sufficiency": true
+            },
+            {
+              "id": "c-3",
+              "kind": "condition",
+              "title": "Hot Turbo Surface",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "Thermal scan 620C",
+                  "text": "Observed: Hot turbo surface",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [
+                {
+                  "id": "a-13",
+                  "kind": "action",
+                  "title": "Action Needed",
+                  "verified": false,
+                  "evidence": [
+                    {
+                      "source": "?",
+                      "missing": true
+                    }
+                  ],
+                  "children": [],
+                  "necessity": true,
+                  "sufficiency": true,
+                  "terminator": {
+                    "type": "goto",
+                    "target": "Action Needed"
+                  },
+                  "placeholder": true
+                },
+                {
+                  "id": "c-8",
+                  "kind": "condition",
+                  "title": "Heat Shield Not Installed After Rebuild",
+                  "verified": true,
+                  "evidence": [
+                    {
+                      "source": "",
+                      "text": "Observed: Heat shield missing",
+                      "tier": "Sensed",
+                      "missing": false
+                    }
+                  ],
+                  "children": [],
+                  "necessity": true,
+                  "sufficiency": true,
+                  "terminator": {
+                    "type": "question",
+                    "label": "Need More Info"
+                  }
+                }
+              ],
+              "necessity": true,
+              "sufficiency": true
+            },
+            {
+              "id": "c-4",
+              "kind": "condition",
+              "title": "Oil Present",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "Oil on engine deck",
+                  "text": "Observed: Oil present",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "question",
+                "label": "Need More Info"
+              }
+            },
+            {
+              "id": "c-5",
+              "kind": "condition",
+              "title": "Oxygen Present",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "",
+                  "text": "Observed: Oxygen present",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "stop",
+                "reason": "Desired Condition",
+                "userSet": true
+              }
+            },
+            {
+              "id": "a-6",
+              "kind": "action",
+              "title": "Operator Continued Driving",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "Operator interview",
+                  "text": "Observed: Operator continued driving",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [
+                {
+                  "id": "a-14",
+                  "kind": "action",
+                  "title": "Action Needed",
+                  "verified": false,
+                  "evidence": [
+                    {
+                      "source": "?",
+                      "missing": true
+                    }
+                  ],
+                  "children": [],
+                  "necessity": true,
+                  "sufficiency": true,
+                  "terminator": {
+                    "type": "goto",
+                    "target": "Action Needed"
+                  },
+                  "placeholder": true
+                },
+                {
+                  "id": "c-9",
+                  "kind": "condition",
+                  "title": "Alarm Not Noticed",
+                  "verified": true,
+                  "evidence": [
+                    {
+                      "source": "Cab recording",
+                      "text": "Observed: Alarm not noticed",
+                      "tier": "Sensed",
+                      "missing": false
+                    }
+                  ],
+                  "children": [],
+                  "necessity": true,
+                  "sufficiency": true,
+                  "terminator": {
+                    "type": "question",
+                    "label": "Need More Info"
+                  }
+                }
+              ],
+              "necessity": true,
+              "sufficiency": false
+            }
+          ],
+          "necessity": true,
+          "sufficiency": true,
+          "code": "PE-1"
+        }
+      },
+      {
+        "id": "pe-2-1794905490532",
+        "code": "PE-2",
+        "root": {
+          "id": "p-15",
+          "kind": "primary",
+          "title": "Production Lost",
+          "verified": true,
+          "evidence": [],
+          "children": [
+            {
+              "id": "a-17",
+              "kind": "action",
+              "title": "Action Needed",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "?",
+                  "missing": true
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "question",
+                "label": "Need More Info"
+              },
+              "placeholder": true
+            },
+            {
+              "id": "c-16",
+              "kind": "condition",
+              "title": "Truck Unavailable For 6 Hours",
+              "verified": true,
+              "evidence": [
+                {
+                  "source": "Dispatch log",
+                  "text": "Observed: Truck unavailable for 6 hours",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "question",
+                "label": "Need More Info"
+              }
+            }
+          ],
+          "necessity": true,
+          "sufficiency": true,
+          "code": "PE-2"
+        }
+      },
+      {
+        "id": "pe-3-1794905490910",
+        "code": "PE-3",
+        "root": {
+          "id": "p-18",
+          "kind": "primary",
+          "title": "Suppression Failed",
+          "verified": true,
+          "evidence": [],
+          "children": [
+            {
+              "id": "a-23",
+              "kind": "action",
+              "title": "Action Needed",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "?",
+                  "missing": true
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "question",
+                "label": "Need More Info"
+              },
+              "placeholder": true
+            },
+            {
+              "id": "c-19",
+              "kind": "condition",
+              "title": "Suppression Nozzle Blocked",
+              "verified": true,
+              "evidence": [
+                {
+                  "source": "Post-fire inspection",
+                  "text": "Observed: Suppression nozzle blocked",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [
+                {
+                  "id": "a-20",
+                  "kind": "action",
+                  "title": "Nozzle Cap Left On",
+                  "verified": true,
+                  "evidence": [
+                    {
+                      "source": "Maintenance record",
+                      "text": "Observed: Nozzle cap left on",
+                      "tier": "Sensed",
+                      "missing": false
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "a-21",
+                      "kind": "action",
+                      "title": "Inspection Skipped",
+                      "verified": true,
+                      "evidence": [
+                        {
+                          "source": "PM schedule",
+                          "text": "Observed: Inspection skipped",
+                          "tier": "Sensed",
+                          "missing": false
+                        }
+                      ],
+                      "children": [
+                        {
+                          "id": "a-26",
+                          "kind": "action",
+                          "title": "Action Needed",
+                          "verified": false,
+                          "evidence": [
+                            {
+                              "source": "?",
+                              "missing": true
+                            }
+                          ],
+                          "children": [],
+                          "necessity": true,
+                          "sufficiency": true,
+                          "terminator": {
+                            "type": "goto",
+                            "target": "Action Needed"
+                          },
+                          "placeholder": true
+                        },
+                        {
+                          "id": "c-22",
+                          "kind": "condition",
+                          "title": "Checklist Not Updated",
+                          "verified": true,
+                          "evidence": [
+                            {
+                              "source": "",
+                              "text": "Observed: Checklist not updated",
+                              "tier": "Sensed",
+                              "missing": false
+                            }
+                          ],
+                          "children": [],
+                          "necessity": true,
+                          "sufficiency": true,
+                          "terminator": {
+                            "type": "question",
+                            "label": "Need More Info"
+                          }
+                        }
+                      ],
+                      "necessity": true,
+                      "sufficiency": true
+                    },
+                    {
+                      "id": "c-25",
+                      "kind": "condition",
+                      "title": "Condition Needed",
+                      "verified": false,
+                      "evidence": [
+                        {
+                          "source": "?",
+                          "missing": true
+                        }
+                      ],
+                      "children": [],
+                      "necessity": true,
+                      "sufficiency": true,
+                      "terminator": {
+                        "type": "question",
+                        "label": "Need More Info"
+                      },
+                      "placeholder": true
+                    }
+                  ],
+                  "necessity": true,
+                  "sufficiency": false
+                },
+                {
+                  "id": "c-24",
+                  "kind": "condition",
+                  "title": "Condition Needed",
+                  "verified": false,
+                  "evidence": [
+                    {
+                      "source": "?",
+                      "missing": true
+                    }
+                  ],
+                  "children": [],
+                  "necessity": true,
+                  "sufficiency": true,
+                  "terminator": {
+                    "type": "question",
+                    "label": "Need More Info"
+                  },
+                  "placeholder": true
+                }
+              ],
+              "necessity": true,
+              "sufficiency": true
+            }
+          ],
+          "necessity": true,
+          "sufficiency": true,
+          "code": "PE-3"
+        }
+      }
+    ],
+    "root": {
+      "id": "p-1",
+      "kind": "primary",
+      "title": "Haul Truck Fire",
+      "verified": true,
+      "evidence": [],
+      "children": [
+        {
+          "id": "a-2",
+          "kind": "action",
+          "title": "Hydraulic Hose Ruptured",
+          "verified": false,
+          "evidence": [
+            {
+              "source": "Hose burst photo IMG-101",
+              "text": "Observed: Hydraulic hose ruptured",
+              "tier": "Sensed",
+              "missing": false
+            }
+          ],
+          "children": [
+            {
+              "id": "a-7",
+              "kind": "action",
+              "title": "Hose Chafed Against Frame",
+              "verified": true,
+              "evidence": [
+                {
+                  "source": "Wear marks on hose",
+                  "text": "Observed: Hose chafed against frame",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [
+                {
+                  "id": "a-12",
+                  "kind": "action",
+                  "title": "Action Needed",
+                  "verified": false,
+                  "evidence": [
+                    {
+                      "source": "?",
+                      "missing": true
+                    }
+                  ],
+                  "children": [],
+                  "necessity": true,
+                  "sufficiency": true,
+                  "terminator": {
+                    "type": "question",
+                    "label": "Need More Info"
+                  },
+                  "placeholder": true
+                },
+                {
+                  "id": "c-10",
+                  "kind": "condition",
+                  "title": "Clamp Missing",
+                  "verified": true,
+                  "evidence": [
+                    {
+                      "source": "Maintenance photo",
+                      "text": "Observed: Clamp missing",
+                      "tier": "Sensed",
+                      "missing": false
+                    }
+                  ],
+                  "children": [],
+                  "necessity": true,
+                  "sufficiency": true,
+                  "terminator": {
+                    "type": "question",
+                    "label": "Need More Info"
+                  }
+                }
+              ],
+              "necessity": true,
+              "sufficiency": false
+            },
+            {
+              "id": "c-11",
+              "kind": "condition",
+              "title": "Condition Needed",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "?",
+                  "missing": true
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "question",
+                "label": "Need More Info"
+              },
+              "placeholder": true
+            }
+          ],
+          "necessity": true,
+          "sufficiency": true
+        },
+        {
+          "id": "c-3",
+          "kind": "condition",
+          "title": "Hot Turbo Surface",
+          "verified": false,
+          "evidence": [
+            {
+              "source": "Thermal scan 620C",
+              "text": "Observed: Hot turbo surface",
+              "tier": "Sensed",
+              "missing": false
+            }
+          ],
+          "children": [
+            {
+              "id": "a-13",
+              "kind": "action",
+              "title": "Action Needed",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "?",
+                  "missing": true
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "goto",
+                "target": "Action Needed"
+              },
+              "placeholder": true
+            },
+            {
+              "id": "c-8",
+              "kind": "condition",
+              "title": "Heat Shield Not Installed After Rebuild",
+              "verified": true,
+              "evidence": [
+                {
+                  "source": "",
+                  "text": "Observed: Heat shield missing",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "question",
+                "label": "Need More Info"
+              }
+            }
+          ],
+          "necessity": true,
+          "sufficiency": true
+        },
+        {
+          "id": "c-4",
+          "kind": "condition",
+          "title": "Oil Present",
+          "verified": false,
+          "evidence": [
+            {
+              "source": "Oil on engine deck",
+              "text": "Observed: Oil present",
+              "tier": "Sensed",
+              "missing": false
+            }
+          ],
+          "children": [],
+          "necessity": true,
+          "sufficiency": true,
+          "terminator": {
+            "type": "question",
+            "label": "Need More Info"
+          }
+        },
+        {
+          "id": "c-5",
+          "kind": "condition",
+          "title": "Oxygen Present",
+          "verified": false,
+          "evidence": [
+            {
+              "source": "",
+              "text": "Observed: Oxygen present",
+              "tier": "Sensed",
+              "missing": false
+            }
+          ],
+          "children": [],
+          "necessity": true,
+          "sufficiency": true,
+          "terminator": {
+            "type": "stop",
+            "reason": "Desired Condition",
+            "userSet": true
+          }
+        },
+        {
+          "id": "a-6",
+          "kind": "action",
+          "title": "Operator Continued Driving",
+          "verified": false,
+          "evidence": [
+            {
+              "source": "Operator interview",
+              "text": "Observed: Operator continued driving",
+              "tier": "Sensed",
+              "missing": false
+            }
+          ],
+          "children": [
+            {
+              "id": "a-14",
+              "kind": "action",
+              "title": "Action Needed",
+              "verified": false,
+              "evidence": [
+                {
+                  "source": "?",
+                  "missing": true
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "goto",
+                "target": "Action Needed"
+              },
+              "placeholder": true
+            },
+            {
+              "id": "c-9",
+              "kind": "condition",
+              "title": "Alarm Not Noticed",
+              "verified": true,
+              "evidence": [
+                {
+                  "source": "Cab recording",
+                  "text": "Observed: Alarm not noticed",
+                  "tier": "Sensed",
+                  "missing": false
+                }
+              ],
+              "children": [],
+              "necessity": true,
+              "sufficiency": true,
+              "terminator": {
+                "type": "question",
+                "label": "Need More Info"
+              }
+            }
+          ],
+          "necessity": true,
+          "sufficiency": false
+        }
+      ],
+      "necessity": true,
+      "sufficiency": true,
+      "code": "PE-1"
+    },
+    "solutions": [
+      {
+        "id": "CA-01",
+        "targetId": "c-10",
+        "targetTitle": "Clamp Missing",
+        "targetKind": "condition",
+        "effectCode": "PE-1",
+        "action": "Install clamps every 2m on hydraulic hoses",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": true,
+        "withinControl": true,
+        "meetsGoals": true,
+        "underCap": true,
+        "paybackOk": true,
+        "noNewProblems": true,
+        "include": true,
+        "coveredBy": "",
+        "owner": "Maintenance Supervisor (fictional)",
+        "due": "2026-12-15",
+        "cost": "15000"
+      },
+      {
+        "id": "CA-02",
+        "targetId": "a-7",
+        "targetTitle": "Hose Chafed Against Frame",
+        "targetKind": "action",
+        "effectCode": "PE-1",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-03",
+        "targetId": "a-2",
+        "targetTitle": "Hydraulic Hose Ruptured",
+        "targetKind": "action",
+        "effectCode": "PE-1",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-04",
+        "targetId": "c-8",
+        "targetTitle": "Heat Shield Not Installed After Rebuild",
+        "targetKind": "condition",
+        "effectCode": "PE-1",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-05",
+        "targetId": "c-3",
+        "targetTitle": "Hot Turbo Surface",
+        "targetKind": "condition",
+        "effectCode": "PE-1",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-06",
+        "targetId": "c-4",
+        "targetTitle": "Oil Present",
+        "targetKind": "condition",
+        "effectCode": "PE-1",
+        "action": "Add oil-absorbent shield and weekly leak check",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": true,
+        "withinControl": true,
+        "meetsGoals": true,
+        "underCap": true,
+        "paybackOk": true,
+        "noNewProblems": true,
+        "include": true,
+        "coveredBy": "",
+        "owner": "Reliability Engineer (fictional)",
+        "due": "2026-12-31",
+        "cost": "15000"
+      },
+      {
+        "id": "CA-07",
+        "targetId": "c-5",
+        "targetTitle": "Oxygen Present",
+        "targetKind": "condition",
+        "effectCode": "PE-1",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-08",
+        "targetId": "c-9",
+        "targetTitle": "Alarm Not Noticed",
+        "targetKind": "condition",
+        "effectCode": "PE-1",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-09",
+        "targetId": "a-6",
+        "targetTitle": "Operator Continued Driving",
+        "targetKind": "action",
+        "effectCode": "PE-1",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-10",
+        "targetId": "c-16",
+        "targetTitle": "Truck Unavailable For 6 Hours",
+        "targetKind": "condition",
+        "effectCode": "PE-2",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-11",
+        "targetId": "c-22",
+        "targetTitle": "Checklist Not Updated",
+        "targetKind": "condition",
+        "effectCode": "PE-3",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-12",
+        "targetId": "a-21",
+        "targetTitle": "Inspection Skipped",
+        "targetKind": "action",
+        "effectCode": "PE-3",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-13",
+        "targetId": "a-20",
+        "targetTitle": "Nozzle Cap Left On",
+        "targetKind": "action",
+        "effectCode": "PE-3",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      },
+      {
+        "id": "CA-14",
+        "targetId": "c-19",
+        "targetTitle": "Suppression Nozzle Blocked",
+        "targetKind": "condition",
+        "effectCode": "PE-3",
+        "action": "",
+        "blocked": false,
+        "blockReason": "",
+        "preventsRecurrence": false,
+        "withinControl": false,
+        "meetsGoals": false,
+        "underCap": false,
+        "paybackOk": false,
+        "noNewProblems": false,
+        "include": false,
+        "coveredBy": "",
+        "owner": "",
+        "due": "",
+        "cost": ""
+      }
+    ],
+    "gaps": [
+      {
+        "id": "AI-01",
+        "nodeId": "a-12",
+        "nodeTitle": "Action Needed",
+        "kind": "action",
+        "effectCode": "PE-1",
+        "gap": "Needs an action cause with evidence (none recorded)",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-02",
+        "nodeId": "c-10",
+        "nodeTitle": "Clamp Missing",
+        "kind": "condition",
+        "effectCode": "PE-1",
+        "gap": "Branch ends at Need More Info",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-03",
+        "nodeId": "c-11",
+        "nodeTitle": "Condition Needed",
+        "kind": "condition",
+        "effectCode": "PE-1",
+        "gap": "Needs a condition cause with evidence (none recorded)",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-04",
+        "nodeId": "a-13",
+        "nodeTitle": "Action Needed",
+        "kind": "action",
+        "effectCode": "PE-1",
+        "gap": "Needs an action cause with evidence (none recorded)",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-05",
+        "nodeId": "c-8",
+        "nodeTitle": "Heat Shield Not Installed After Rebuild",
+        "kind": "condition",
+        "effectCode": "PE-1",
+        "gap": "Branch ends at Need More Info",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-06",
+        "nodeId": "c-4",
+        "nodeTitle": "Oil Present",
+        "kind": "condition",
+        "effectCode": "PE-1",
+        "gap": "Branch ends at Need More Info",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-07",
+        "nodeId": "a-14",
+        "nodeTitle": "Action Needed",
+        "kind": "action",
+        "effectCode": "PE-1",
+        "gap": "Needs an action cause with evidence (none recorded)",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-08",
+        "nodeId": "c-9",
+        "nodeTitle": "Alarm Not Noticed",
+        "kind": "condition",
+        "effectCode": "PE-1",
+        "gap": "Branch ends at Need More Info",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-09",
+        "nodeId": "a-17",
+        "nodeTitle": "Action Needed",
+        "kind": "action",
+        "effectCode": "PE-2",
+        "gap": "Needs an action cause with evidence (none recorded)",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-10",
+        "nodeId": "c-16",
+        "nodeTitle": "Truck Unavailable For 6 Hours",
+        "kind": "condition",
+        "effectCode": "PE-2",
+        "gap": "Branch ends at Need More Info",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-11",
+        "nodeId": "a-23",
+        "nodeTitle": "Action Needed",
+        "kind": "action",
+        "effectCode": "PE-3",
+        "gap": "Needs an action cause with evidence (none recorded)",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-12",
+        "nodeId": "a-26",
+        "nodeTitle": "Action Needed",
+        "kind": "action",
+        "effectCode": "PE-3",
+        "gap": "Needs an action cause with evidence (none recorded)",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-13",
+        "nodeId": "c-22",
+        "nodeTitle": "Checklist Not Updated",
+        "kind": "condition",
+        "effectCode": "PE-3",
+        "gap": "Branch ends at Need More Info",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-14",
+        "nodeId": "c-25",
+        "nodeTitle": "Condition Needed",
+        "kind": "condition",
+        "effectCode": "PE-3",
+        "gap": "Needs a condition cause with evidence (none recorded)",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      },
+      {
+        "id": "AI-15",
+        "nodeId": "c-24",
+        "nodeTitle": "Condition Needed",
+        "kind": "condition",
+        "effectCode": "PE-3",
+        "gap": "Needs a condition cause with evidence (none recorded)",
+        "owner": "Test Investigator, reliability engineer",
+        "due": "2026-11-14"
+      }
+    ],
+    "summary": "This incident is chunked into 3 primary effects: PE-1 Haul Truck Fire; PE-2 Production Lost; PE-3 Suppression Failed. Each tree is an independent causal set. A cause that is itself another primary effect ends in GOTO. The immediate causal set for PE-1 is action “Hydraulic Hose Ruptured”, condition “Hot Turbo Surface”, condition “Oil Present”, condition “Oxygen Present” and action “Operator Continued Driving”. Safety significance: Fire, no injuries. Recorded loss: $169,000. The first condition that passes all four solution tests is “Clamp Missing” on PE-1, addressed by: Install clamps every 2m on hydraulic hoses. 15 investigation gaps remain and are listed as action items.",
+    "log": [
+      "PE-1: chart built from 9 hypothesized causes recorded for this primary effect.",
+      "PE-2: chart built from 1 hypothesized cause recorded for this primary effect.",
+      "PE-3: chart built from 4 hypothesized causes recorded for this primary effect.",
+      "Necessity: every verified cause in an AND set is required. Remove one and the effect does not occur.",
+      "Each leaf ends in a STOP, a Need More Info marker, or a GOTO when a cause repeats or chunks to another primary effect."
+    ],
+    "removedTargets": [],
+    "h2cCauseKey": "69e7455e-ff36-49e4-bae6-4a951229ef74|Hydraulic hose ruptured|1|action||pe-1\nfc5d7081-6a56-4ded-bbf1-e63a5bfb3e35|Hot turbo surface|1|condition||pe-1\n31d97305-6314-4e31-baa9-b90fc0309965|Oil present|1|condition||pe-1\naa6e3ef8-6626-49e4-bf02-6b20d5ee2af9|Oxygen present|1|condition||pe-1\ne8f0d693-489d-4107-9298-cf02a3b7d650|Operator continued driving|1|action||pe-1\n21c9a3ae-635e-49eb-bfa9-31a9f9c61c30|Truck unavailable for 6 hours|1|condition||pe-2-1794905490532\nf38db8ef-3d2d-4994-b827-a13be438ad00|Suppression nozzle blocked|1|condition||pe-3-1794905490910\ne0faf667-d990-467b-bced-c446b17b5711|Hose chafed against frame|2|action|Hydraulic hose ruptured|pe-1\ne9e5bad3-1021-466f-93d4-21cbefaa1f6d|Heat Shield Not Installed After Rebuild|2|condition|Hot turbo surface|pe-1\n407ee2d9-6689-4dcf-83a9-4fa50a3d9e0f|Alarm not noticed|2|condition|Operator continued driving|pe-1\neb333fc0-340b-43b6-a65a-10c4d8314d73|Nozzle cap left on|2|action|Suppression nozzle blocked|pe-3-1794905490910\n12aa23ce-39d8-4700-a59b-7683cc8b616a|Inspection skipped|3|action|Nozzle cap left on|pe-3-1794905490910\n178dc4ee-bc53-47c9-8935-d26250eb7210|Clamp missing|3|condition|Hose chafed against frame|pe-1\nfb1468e5-3680-4eba-bbe1-6a1b2e958a54|Checklist not updated|4|condition|Inspection skipped|pe-3-1794905490910",
+    "h2cEvidenceKey": "Observed: Hydraulic hose ruptured|Sensed|Hose burst photo IMG-101||Hydraulic hose ruptured|1|action||pe-1\nObserved: Hot turbo surface|Sensed|Thermal scan 620C||Hot turbo surface|1|condition||pe-1\nObserved: Oil present|Sensed|Oil on engine deck||Oil present|1|condition||pe-1\nObserved: Oxygen present|Sensed|||Oxygen present|1|condition||pe-1\nObserved: Operator continued driving|Sensed|Operator interview||Operator continued driving|1|action||pe-1\nObserved: Truck unavailable for 6 hours|Sensed|Dispatch log||Truck unavailable for 6 hours|1|condition||pe-2-1794905490532\nObserved: Suppression nozzle blocked|Sensed|Post-fire inspection||Suppression nozzle blocked|1|condition||pe-3-1794905490910\nObserved: Hose chafed against frame|Sensed|Wear marks on hose||Hose chafed against frame|2|action|Hydraulic hose ruptured|pe-1\nObserved: Heat shield missing|Sensed|||Heat Shield Not Installed After Rebuild|2|condition|Hot turbo surface|pe-1\nObserved: Alarm not noticed|Sensed|Cab recording||Alarm not noticed|2|condition|Operator continued driving|pe-1\nObserved: Nozzle cap left on|Sensed|Maintenance record||Nozzle cap left on|2|action|Suppression nozzle blocked|pe-3-1794905490910\nObserved: Inspection skipped|Sensed|PM schedule||Inspection skipped|3|action|Nozzle cap left on|pe-3-1794905490910\nObserved: Clamp missing|Sensed|Maintenance photo||Clamp missing|3|condition|Hose chafed against frame|pe-1\nObserved: Checklist not updated|Sensed|||Checklist not updated|4|condition|Inspection skipped|pe-3-1794905490910||p-1:Haul Truck Fire\na-2:Hydraulic Hose Ruptured\na-7:Hose Chafed Against Frame\na-12:Action Needed\nc-10:Clamp Missing\nc-11:Condition Needed\nc-3:Hot Turbo Surface\na-13:Action Needed\nc-8:Heat Shield Not Installed After Rebuild\nc-4:Oil Present\nc-5:Oxygen Present\na-6:Operator Continued Driving\na-14:Action Needed\nc-9:Alarm Not Noticed\np-15:Production Lost\na-17:Action Needed\nc-16:Truck Unavailable For 6 Hours\np-18:Suppression Failed\na-23:Action Needed\nc-19:Suppression Nozzle Blocked\na-20:Nozzle Cap Left On\na-21:Inspection Skipped\na-26:Action Needed\nc-22:Checklist Not Updated\nc-25:Condition Needed\nc-24:Condition Needed||Not vendor design"
+  }
+}

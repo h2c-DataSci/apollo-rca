@@ -170,10 +170,10 @@ test('paid DeepSeek uses the V4.1 Flash model id and disables thinking', async (
 
 test('every free provider links to its own key page and setup steps', () => {
   const free = PROVIDER_PRESETS.filter((item) => item.free);
-  assert.deepEqual(free.map((item) => item.id), ['groq', 'google', 'openrouter']);
+  assert.deepEqual(free.map((item) => item.id), ['groq', 'google', 'openrouter', 'huggingface']);
   for (const item of free) {
     assert.match(item.keyUrl, /^https:\/\//);
-    assert.match(item.setup, /create a key|create a key in a project|Keys/);
+    assert.match(item.setup, /create a key|create a key in a project|Keys|access token/);
   }
 });
 

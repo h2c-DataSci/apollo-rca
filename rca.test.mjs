@@ -103,8 +103,8 @@ test('chart colors: STOP is red with white text, unknown is yellow with black te
   assert.match(routes, /hex:`#16a34a`/);
   assert.match(routes, /fill:`#fbc02d`,stroke:`#fbc02d`,className:`fill-unknown`/);
   assert.match(routes, /fill:`#000000`,className:`fill-unknown-ink`,fontSize:18,fontWeight:700,children:`\?`/);
-  assert.match(routes, /Red — STOP/);
-  assert.match(routes, /Yellow — \? unknown/);
+  assert.match(routes, /Red octagon — STOP/);
+  assert.match(routes, /Yellow — \? Need More Info/);
   assert.doesNotMatch(routes, /Grey — STOP|Grey — \?/);
   assert.match(css, /\.fill-stop\{fill:#d32f2f\}/);
   assert.match(css, /\.bg-unknown\{background-color:#fbc02d\}/);

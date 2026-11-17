@@ -856,9 +856,10 @@ css.textContent = `
   left: 52px;
   bottom: 8px;
   z-index: 40;
-  width: 36px;
+  width: auto;
+  min-width: 36px;
   height: 36px;
-  padding: 0;
+  padding: 0 10px;
   background: linear-gradient(180deg, #b91c1c 0%, #991b1b 100%);
   color: #ffffff;
   border: 2px solid #ef4444;
@@ -869,6 +870,8 @@ css.textContent = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
+  gap: 4px;
 }
 .h2cv-fab:hover {
   background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
@@ -1980,8 +1983,9 @@ export function mountVideoButtons() {
     fab = document.createElement('button');
     fab.className = 'no-print h2cv-fab';
     fab.type = 'button';
-    fab.setAttribute('aria-label', 'Open 7-Step Methodology Training Videos');
-    adoptSafe(fab, `<span>7</span>`);
+    fab.setAttribute('aria-label', 'Videos (7) — Open 7-Step Methodology Training Videos');
+    fab.setAttribute('title', 'Videos (7)');
+    adoptSafe(fab, `<span>Videos (7)</span>`);
     fab.onclick = () => openVideoDrawer();
     document.body.append(fab);
   }

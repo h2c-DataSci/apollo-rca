@@ -1,6 +1,6 @@
 // Structured section audit for a Free or Paid API only. Local models are not called.
 // The result is advice. It is stored in this tab's memory, never in localStorage.
-import { executeLocalChat, getBridgeConfig, stripModelThinking } from './local-ai-bridge.js?v=27';
+import { executeLocalChat, getBridgeConfig, stripModelThinking } from './local-ai-bridge.js?v=28';
 import { sessionStore } from './session-store.js';
 
 export const AUDIT_KEY = 'h2c-coach-api-audit-v1';
