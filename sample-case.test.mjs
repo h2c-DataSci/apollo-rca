@@ -146,7 +146,7 @@ describe('Load sample case wiring and interactivity guards', () => {
     assert.match(routes, /onClick:e=>\{e\.stopPropagation\(\);if\(chartDidDrag\)return;i\(a\.id\)\}/);
     assert.match(routes, /onPointerUp:e=>\{let dragged=w\.current\?\.drag;[\s\S]*data-node/);
     assert.match(routes, /id:`node-title`/);
-    assert.match(routes, /\(0,B\.jsx\)\(Sn,\{trees:\(chartLive\|\|n\)\.trees,selectedId:i,onSelect:c\}/);
+    assert.match(routes, /\(0,B\.jsx\)\(Sn,\{trees:\(chartLive\|\|n\)\.trees,selectedId:i,onSelect:id=>\{c\(id\),setEvSel\(null\)\}/);
     assert.match(routes, /ee=\(\)=>\{[\s\S]*mergeAnalysis\(n,fe\(e\),e\)/);
     assert.match(routes, /allEvidence\(e\)\.some\(e=>\(e\.cause\|\|``\)\.trim\(\)\)\?hypothesisRoot/);
     assert.doesNotMatch(routes, /&&!sampleMatch\(e\)\?hypothesisRoot/);
@@ -159,7 +159,7 @@ describe('Load sample case wiring and interactivity guards', () => {
     assert.match(helpKb, /haul truck fire/i);
     assert.match(helpKb, /Click any node to explore/);
     assert.equal(SAMPLE_HINT.includes('click any node to explore'), true);
-    assert.match(sw, /const CACHE = 'apollo-rca-shell-v62'/);
+    assert.match(sw, /const CACHE = 'apollo-rca-shell-v63'/);
     assert.match(sw, /sample-case\.js/);
     assert.match(sw, /help-kb\.js\?v=29/);
   });

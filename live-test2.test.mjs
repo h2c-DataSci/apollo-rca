@@ -132,7 +132,7 @@ describe('live-test 2: help, videos, version label', () => {
   it('labels the videos FAB and shows the app build', () => {
     assert.match(videos, /Videos \(7\)/);
     assert.match(shell, /App build v61/);
-    assert.match(sw, /apollo-rca-shell-v62/);
+    assert.match(sw, /apollo-rca-shell-v63/);
     assert.match(sw, /coach-steps\.js\?v=2/);
     assert.match(sw, /rca-principles\.js/);
   });
@@ -241,7 +241,7 @@ describe('live-test 2 follow-up: P05 jump, evidence debounce, visual refresh', (
     assert.match(css, /#d32f2f/);
     assert.match(css, /\.h2c-chart-stage\{flex:1 1 auto/);
     assert.match(shell, /App build v61/);
-    assert.match(sw, /apollo-rca-shell-v62/);
+    assert.match(sw, /apollo-rca-shell-v63/);
   });
   it('Ask-coach buttons attach once to headings and Chart matches the Chart heading', () => {
     assert.match(shell, /heading.nextElementSibling && heading.nextElementSibling.classList.contains\('h2c-ask-coach'\)/);
@@ -258,7 +258,7 @@ describe('bold design pass 2', () => {
     assert.match(routes, /Open-source, AI-aided Apollo RealityCharting/);
     assert.match(css, /v61: bold design pass 2/);
     assert.match(shell, /App build v61/);
-    assert.match(sw, /apollo-rca-shell-v62/);
+    assert.match(sw, /apollo-rca-shell-v63/);
   });
   it('step badges never use ellipsis and mark current vs done', () => {
     assert.match(shell, /is-current/);

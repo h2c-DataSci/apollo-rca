@@ -9,11 +9,11 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Product | H2C Root Cause Analyst |
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
-| Branch | `fix/sample-chart-interactive` (PR to `main`; merge after CI is green). |
-| HEAD | Sample chart interactivity fix plus a fictional haul-truck showcase: reliable scroll-to-chart, node select on pointer-up, authored sample analysis, teaching hint. |
+| Branch | `fix/chart-evidence-sync` (PR to `main`; merge after CI is green). |
+| HEAD | Fully interactive two-way RealityChart ↔ forms/tables sync: chips, PE fields, STOP/?/GOTO, Refresh + Synced toast, sample-safe structure sync. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Cache | Shell query `h2c-shell.js?v=47`, `h2c-help.js?v=35`, `help-kb.js?v=29`, `help-diagrams.js?v=24`, `h2c-videos.js?v=27`, `local-ai-bridge.js?v=28`, `coach-steps.js?v=2`. Service worker `apollo-rca-shell-v62`, runtime `apollo-rca-runtime-v2`. |
-| Tests | `node --test` → 260 passed, 0 failed. |
+| Cache | Shell query `h2c-shell.js?v=47`, `h2c-help.js?v=35`, `help-kb.js?v=29`, `help-diagrams.js?v=24`, `h2c-videos.js?v=27`, `local-ai-bridge.js?v=28`, `coach-steps.js?v=2`. Service worker `apollo-rca-shell-v63`, runtime `apollo-rca-runtime-v2`. |
+| Tests | `node --test` → 269 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -22,6 +22,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-17 | `d3ad5e8` | Fully interactive two-way chart ↔ forms/tables sync, for live entries and the sample. Evidence chips are clickable and open in the Node Inspector (text, source, tier, kind, layer, add/remove) and write back to the Evidence table; table edits update the chart. PE title/where/when/safety/loss/frequency, cause title/type/And-Or, STOP, Need More Info, and GOTO are editable from the inspector. Refresh next to Fit and the Evidence heading forces a full re-sync and shows a Synced toast; auto-sync stays the default. Sample structure (STOP, Or, ?) is preserved because sample edits do not run fe() merge. Cache SW v63. Tests: 269 passed. Screenshot: /workspace/apollo-shots2/chart-chip-selected.png. |
 | 2026-11-17 | `368bee5` | Sample interactivity fix and haul-truck showcase. Root cause: Load sample (and the same one-shot scroll on full test, Generate, and JSON import) scrolled to #realitychart before the page finished growing, so users landed in the evidence form, not on a clickable chart. Scroll now retries on #h2c-chart-landing; pointer-up selects the node under the cursor if the gesture was not a pan. Load sample now opens a finished fictional haul-truck fire (3 PEs, And/Or, STOP, Need More Info, evidence on every cause, filled solutions, no blame/PII) from the authored analysis, with a teaching hint. Cache SW v62, help v=35, help-kb v=29. Tests: 260 passed. Screenshots: /workspace/apollo-shots2/sample-desktop-selected.png and sample-mobile-390.png. |
 | 2026-11-17 | `7cc25a0` | Bold design pass 2. Hero header with stronger typography, a gold accent, a sharper subtitle, and primary CTAs above a tidy tools row (QA, RCA Coach, Browser AI, Legal, Load full test). Stepper badges never truncate (“Before the chart”, “After the chart”) and use done / current / todo states. Chart: default to the first primary effect when several exist, fit-width with a 0.85 minimum scale, keep the PE root in view when fitted, larger titles (15/17), crisper node borders, taller canvas. Mandatory colours and legend unchanged. Cache shell v=47, SW v61. Tests: 248 passed. Screenshots: /workspace/apollo-shots2/. |
 | 2026-11-17 | `054a7ca` | Visual refresh on the same PR: typography and spacing, gold header and toolbar grouping, refined cards/buttons/inputs, workflow progress, empty hints, focus rings, and tighter mobile chrome. Attribution ribbon and developer footer stay in the right order. P05 “See …” is a button that selects and scrolls to the node. Evidence text and cause fields debounce parent updates while focused (450ms). Session-ready notify is guarded so it does not remount the app in a loop (React #185). The chart stage is `flex: 1 1 auto` so the RealityChart is visible (Tailwind `flex-1` is not in the prebuilt CSS). Ask-coach buttons attach once to headings and skip the download toolbar. Dark mode was skipped (not cheap; mandatory chart colours stay light). Cache: shell `v=46`, coach-steps `v=2`, SW `apollo-rca-shell-v60`. Tests: 245 passed. Screenshots: `/workspace/apollo-shots/before-*.png` and `after-*.png`. |

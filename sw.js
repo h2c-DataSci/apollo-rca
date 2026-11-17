@@ -1,4 +1,4 @@
-const CACHE = 'apollo-rca-shell-v62';
+const CACHE = 'apollo-rca-shell-v63';
 const RUNTIME = 'apollo-rca-runtime-v2';
 const OWN_PREFIX = 'apollo-rca-';
 const RUNTIME_MAX_ENTRIES = 40;
@@ -22,6 +22,7 @@ const SHELL = [
   './provider-presets.js',
   './session-store.js',
   './sample-case.js',
+  './chart-sync.js',
   './coach-steps.js?v=2',
   './rca-principles.js',
   './coach-deeper.js?v=7',
