@@ -1,4 +1,5 @@
-const CACHE = 'apollo-rca-shell-v63';
+importScripts('./app-build.js');
+const CACHE = self.H2C_SHELL_CACHE;
 const RUNTIME = 'apollo-rca-runtime-v2';
 const OWN_PREFIX = 'apollo-rca-';
 const RUNTIME_MAX_ENTRIES = 40;
@@ -11,7 +12,7 @@ const SHELL = [
   './index-v13.js',
   './routes-v13.js',
   './rolldown-runtime-v11.js',
-  './h2c-shell.js?v=47',
+  './h2c-shell.js?v=48',
   './h2c-help.js?v=35',
   './help-kb.js?v=29',
   './help-diagrams.js?v=24',
@@ -23,6 +24,7 @@ const SHELL = [
   './session-store.js',
   './sample-case.js',
   './chart-sync.js',
+  './app-build.js',
   './coach-steps.js?v=2',
   './rca-principles.js',
   './coach-deeper.js?v=7',

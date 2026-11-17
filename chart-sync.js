@@ -47,16 +47,19 @@ function filterPools(intake, fn) {
   };
 }
 
-export function syncChartToIntake(intake, analysis) {
+export function syncChartToIntake(intake, analysis, opts = {}) {
   if (!intake) return intake;
   const nodes = collectNodes(analysis);
   const causes = nodes.filter((n) => n.node.kind !== 'primary');
   const ids = new Set(causes.map((n) => n.node.id));
   let next = { ...intake, effects: (intake.effects || []).map((effect) => ({ ...effect })) };
 
+  const preferIntake = !!(opts && opts.preferIntake);
   for (const tree of analysis?.trees || []) {
     const pe = next.effects.find((effect) => effect.id === tree.id);
-    if (pe && tree.root?.title && pe.what !== tree.root.title) pe.what = tree.root.title;
+    if (pe && tree.root?.title && pe.what !== tree.root.title) {
+      if (!preferIntake || !(pe.what || '').trim()) pe.what = tree.root.title;
+    }
   }
 
   next = mapPools(next, (row) => {
@@ -78,8 +81,10 @@ export function syncChartToIntake(intake, analysis) {
     return {
       ...row,
       nodeId: node.id,
-      cause: node.title,
-      kind: node.kind === 'condition' ? 'condition' : (row.kind === 'condition' ? 'condition' : 'action'),
+      cause: preferIntake && (row.cause || '').trim() ? row.cause : node.title,
+      kind: preferIntake && (row.kind === 'condition' || row.kind === 'action')
+        ? row.kind
+        : (node.kind === 'condition' ? 'condition' : (row.kind === 'condition' ? 'condition' : 'action')),
       pe: row.pe || treeId,
       layer: Number(row.layer) || Math.min(4, Math.max(1, depth)),
       explains: row.explains || explains
@@ -197,4 +202,40 @@ export function patchPrimaryEffect(intake, treeId, fields) {
     ...intake,
     effects: (intake.effects || []).map((effect) => effect.id === treeId ? { ...effect, ...fields } : effect)
   };
+}
+
+export function refreshFromIntake(intake, analysis) {
+  if (!analysis) return { intake, analysis };
+  let anal = applyIntakeToChart(analysis, intake);
+  anal = ensureNodesForRows(anal, intake);
+  const nextIntake = syncChartToIntake(intake, anal, { preferIntake: true });
+  anal = applyIntakeToChart(anal, nextIntake);
+  return { intake: nextIntake, analysis: anal };
+}
+
+export function valueEvents(fn) {
+  const go = (event) => fn(event);
+  return {
+    onChange: go,
+    onInput: go,
+    onPaste: (event) => { queueMicrotask(() => fn(event)); },
+    ref: (el) => {
+      if (!el || el.h2cValBound) return;
+      el.h2cValBound = true;
+      el.addEventListener('change', go);
+      el.addEventListener('input', go);
+    }
+  };
+}
+
+export function findNodeId(analysis, id) {
+  return collectNodes(analysis).some((entry) => entry.node.id === id);
+}
+
+export function reselectNode(analysis, id, title) {
+  if (id && findNodeId(analysis, id)) return id;
+  const key = String(title || '').trim().toLowerCase();
+  if (!key) return id || null;
+  const hit = collectNodes(analysis).find((entry) => String(entry.node.title || '').trim().toLowerCase() === key);
+  return hit ? hit.node.id : id || null;
 }

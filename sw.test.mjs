@@ -24,7 +24,7 @@ function harness({ fetchImpl = async () => { throw new Error('offline fixture');
       put: async (request, response) => { if (putHook) await putHook(); entries.set(key(request), response); },
     };
   };
-  const context = vm.createContext({
+  const sandbox = {
     URL, Request, Response, Headers, Uint8Array, Set, Date,
     self: {
       location: { origin: new URL(BASE).origin, href: new URL('sw.js', BASE).href },
@@ -41,7 +41,16 @@ function harness({ fetchImpl = async () => { throw new Error('offline fixture');
       },
     },
     fetch: fetchImpl,
-  });
+  };
+  sandbox.globalThis = sandbox;
+  const context = vm.createContext(sandbox);
+  context.importScripts = (...urls) => {
+    for (const url of urls) {
+      const file = String(url).replace(new RegExp('^\\./'), '');
+      vm.runInContext(readFileSync(new URL('./' + file, import.meta.url), 'utf8'), context, { filename: file });
+    }
+  };
+  context.self.importScripts = context.importScripts;
   vm.runInContext(source, context, { filename: 'sw.js' });
   const event = (request) => {
     const waits = [];
@@ -82,7 +91,7 @@ test('cache quota failures do not replace a successful network response', async 
 
 test('offline fetch falls back to the shell cache without a rejected lifetime promise', async () => {
   const h = harness();
-  await h.cacheFor('apollo-rca-shell-v63').put(BASE + 'asset.js', new Response('offline copy'));
+  await h.cacheFor('apollo-rca-shell-v64').put(BASE + 'asset.js', new Response('offline copy'));
   const e = h.event(new Request(BASE + 'asset.js'));
   h.listeners.get('fetch')(e.value);
   assert.equal(await (await e.response()).text(), 'offline copy');
@@ -148,11 +157,11 @@ test('failed essential precache prevents skipWaiting', async () => {
 
 test('activation only deletes this app old caches', async () => {
   const h = harness();
-  for (const name of ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25', 'apollo-rca-shell-v27', 'apollo-rca-shell-v28', 'apollo-rca-shell-v29', 'apollo-rca-shell-v30', 'apollo-rca-shell-v31', 'apollo-rca-shell-v32', 'apollo-rca-shell-v33', 'apollo-rca-shell-v34', 'apollo-rca-shell-v35', 'apollo-rca-shell-v36', 'apollo-rca-shell-v37', 'apollo-rca-shell-v38', 'apollo-rca-shell-v39', 'apollo-rca-shell-v40', 'apollo-rca-shell-v41', 'apollo-rca-shell-v42', 'apollo-rca-shell-v43', 'apollo-rca-shell-v44', 'apollo-rca-shell-v45', 'apollo-rca-shell-v46', 'apollo-rca-shell-v47', 'apollo-rca-shell-v48', 'apollo-rca-shell-v49', 'apollo-rca-shell-v50', 'apollo-rca-shell-v51', 'apollo-rca-shell-v52', 'apollo-rca-shell-v53', 'apollo-rca-shell-v54', 'apollo-rca-shell-v55', 'apollo-rca-shell-v56', 'apollo-rca-shell-v57', 'apollo-rca-shell-v58', 'apollo-rca-shell-v59', 'apollo-rca-shell-v60', 'apollo-rca-shell-v61', 'apollo-rca-shell-v62', 'apollo-rca-runtime-v1', 'heat-index-shell-v2', 'model-cache']) h.cacheFor(name);
+  for (const name of ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25', 'apollo-rca-shell-v27', 'apollo-rca-shell-v28', 'apollo-rca-shell-v29', 'apollo-rca-shell-v30', 'apollo-rca-shell-v31', 'apollo-rca-shell-v32', 'apollo-rca-shell-v33', 'apollo-rca-shell-v34', 'apollo-rca-shell-v35', 'apollo-rca-shell-v36', 'apollo-rca-shell-v37', 'apollo-rca-shell-v38', 'apollo-rca-shell-v39', 'apollo-rca-shell-v40', 'apollo-rca-shell-v41', 'apollo-rca-shell-v42', 'apollo-rca-shell-v43', 'apollo-rca-shell-v44', 'apollo-rca-shell-v45', 'apollo-rca-shell-v46', 'apollo-rca-shell-v47', 'apollo-rca-shell-v48', 'apollo-rca-shell-v49', 'apollo-rca-shell-v50', 'apollo-rca-shell-v51', 'apollo-rca-shell-v52', 'apollo-rca-shell-v53', 'apollo-rca-shell-v54', 'apollo-rca-shell-v55', 'apollo-rca-shell-v56', 'apollo-rca-shell-v57', 'apollo-rca-shell-v58', 'apollo-rca-shell-v59', 'apollo-rca-shell-v60', 'apollo-rca-shell-v61', 'apollo-rca-shell-v62', 'apollo-rca-shell-v63', 'apollo-rca-runtime-v1', 'heat-index-shell-v2', 'model-cache']) h.cacheFor(name);
   const e = h.event();
   h.listeners.get('activate')(e.value);
   await Promise.all(e.waits);
-  assert.deepEqual(h.deleted, ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25', 'apollo-rca-shell-v27', 'apollo-rca-shell-v28', 'apollo-rca-shell-v29', 'apollo-rca-shell-v30', 'apollo-rca-shell-v31', 'apollo-rca-shell-v32', 'apollo-rca-shell-v33', 'apollo-rca-shell-v34', 'apollo-rca-shell-v35', 'apollo-rca-shell-v36', 'apollo-rca-shell-v37', 'apollo-rca-shell-v38', 'apollo-rca-shell-v39', 'apollo-rca-shell-v40', 'apollo-rca-shell-v41', 'apollo-rca-shell-v42', 'apollo-rca-shell-v43', 'apollo-rca-shell-v44', 'apollo-rca-shell-v45', 'apollo-rca-shell-v46', 'apollo-rca-shell-v47', 'apollo-rca-shell-v48', 'apollo-rca-shell-v49', 'apollo-rca-shell-v50', 'apollo-rca-shell-v51', 'apollo-rca-shell-v52', 'apollo-rca-shell-v53', 'apollo-rca-shell-v54', 'apollo-rca-shell-v55', 'apollo-rca-shell-v56', 'apollo-rca-shell-v57', 'apollo-rca-shell-v58', 'apollo-rca-shell-v59', 'apollo-rca-shell-v60', 'apollo-rca-shell-v61', 'apollo-rca-shell-v62', 'apollo-rca-runtime-v1']);
+  assert.deepEqual(h.deleted, ['apollo-rca-shell-v23', 'apollo-rca-shell-v24', 'apollo-rca-shell-v25', 'apollo-rca-shell-v27', 'apollo-rca-shell-v28', 'apollo-rca-shell-v29', 'apollo-rca-shell-v30', 'apollo-rca-shell-v31', 'apollo-rca-shell-v32', 'apollo-rca-shell-v33', 'apollo-rca-shell-v34', 'apollo-rca-shell-v35', 'apollo-rca-shell-v36', 'apollo-rca-shell-v37', 'apollo-rca-shell-v38', 'apollo-rca-shell-v39', 'apollo-rca-shell-v40', 'apollo-rca-shell-v41', 'apollo-rca-shell-v42', 'apollo-rca-shell-v43', 'apollo-rca-shell-v44', 'apollo-rca-shell-v45', 'apollo-rca-shell-v46', 'apollo-rca-shell-v47', 'apollo-rca-shell-v48', 'apollo-rca-shell-v49', 'apollo-rca-shell-v50', 'apollo-rca-shell-v51', 'apollo-rca-shell-v52', 'apollo-rca-shell-v53', 'apollo-rca-shell-v54', 'apollo-rca-shell-v55', 'apollo-rca-shell-v56', 'apollo-rca-shell-v57', 'apollo-rca-shell-v58', 'apollo-rca-shell-v59', 'apollo-rca-shell-v60', 'apollo-rca-shell-v61', 'apollo-rca-shell-v62', 'apollo-rca-shell-v63', 'apollo-rca-runtime-v1']);
 });
 
 test('non-GET, credential-bearing and cross-origin requests remain untouched', () => {
