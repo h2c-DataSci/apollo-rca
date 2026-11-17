@@ -2,13 +2,17 @@
 // A user-supplied HTTPS API is used only when that provider is selected.
 // There is no silent fallback to a cloud model.
 
-import { PROVIDER_PRESETS } from './provider-presets.js';
+import { PROVIDER_PRESETS, LOCAL_PRESETS, presetModelIds } from './provider-presets.js';
 
 export const DEFAULT_BRIDGE_CONFIG = {
   enabled: true,
   provider: 'ollama',
   mode: 'local',
   preset: '',
+  providerName: '',
+  apiStyle: '',
+  extraHeaders: {},
+  rememberKey: false,
   cloudConsent: false,
   endpoint: 'http://127.0.0.1:11434',
   model: 'qwen3:2b',
@@ -17,6 +21,106 @@ export const DEFAULT_BRIDGE_CONFIG = {
   temperature: 0.2,
   numPredict: 384
 };
+
+export const REMEMBER_KEY = 'h2c-coach-remember-v1';
+
+function memoryStore() {
+  try { return globalThis.localStorage || null; } catch { return null; }
+}
+
+export function clearRememberedKey() {
+  const store = memoryStore();
+  try { if (store && typeof store.removeItem === 'function') store.removeItem(REMEMBER_KEY); } catch {}
+}
+
+export function loadRememberedKey() {
+  const store = memoryStore();
+  if (!store || typeof store.getItem !== 'function') return null;
+  try {
+    const raw = store.getItem(REMEMBER_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (data && data.remembered === true && typeof data.apiKey === 'string') return data;
+  } catch {}
+  return null;
+}
+
+export function persistRememberedKey(cfg) {
+  if (!cfg || cfg.rememberKey !== true) { clearRememberedKey(); return; }
+  const store = memoryStore();
+  if (!store || typeof store.setItem !== 'function') return;
+  try {
+    store.setItem(REMEMBER_KEY, JSON.stringify({
+      remembered: true,
+      provider: cfg.provider || '',
+      preset: cfg.preset || '',
+      endpoint: cfg.endpoint || '',
+      apiKey: cfg.apiKey || ''
+    }));
+  } catch {}
+}
+
+export function redactConfig(cfg) {
+  const out = { ...(cfg || {}) };
+  delete out.apiKey;
+  if (out.extraHeaders && typeof out.extraHeaders === 'object') {
+    const headers = {};
+    for (const [key, value] of Object.entries(out.extraHeaders)) {
+      if (/authorization|api[-_]?key|secret|token|password/i.test(key)) continue;
+      headers[key] = value;
+    }
+    out.extraHeaders = headers;
+  }
+  return out;
+}
+
+export function parseExtraHeaders(raw) {
+  const out = {};
+  if (!raw) return out;
+  if (typeof raw === 'object' && !Array.isArray(raw)) {
+    for (const [key, value] of Object.entries(raw)) {
+      const name = String(key || '').trim();
+      const text = String(value ?? '').trim();
+      if (name && text && !/[\r\n]/.test(name + text)) out[name] = text;
+    }
+    return out;
+  }
+  for (const line of String(raw).split(/\r?\n/)) {
+    const idx = line.indexOf(':');
+    if (idx < 1) continue;
+    const name = line.slice(0, idx).trim();
+    const text = line.slice(idx + 1).trim();
+    if (name && text && !/[\r\n]/.test(name + text)) out[name] = text;
+  }
+  return out;
+}
+
+export function sanitizeExtraHeaders(raw, hasApiKey = false) {
+  const out = {};
+  for (const [key, value] of Object.entries(parseExtraHeaders(raw))) {
+    if (/^(cookie|set-cookie|host|content-length|connection|transfer-encoding)$/i.test(key)) continue;
+    if (hasApiKey && /^authorization$/i.test(key)) continue;
+    out[key] = value;
+  }
+  return out;
+}
+
+export function resolveApiStyle(cfg) {
+  const explicit = String(cfg?.apiStyle || '').toLowerCase();
+  if (explicit === 'anthropic' || explicit === 'gemini' || explicit === 'openai') return explicit;
+  if (cfg?.preset === 'anthropic' || String(cfg?.endpoint || '').includes('api.anthropic.com')) return 'anthropic';
+  if (cfg?.preset === 'google' || String(cfg?.endpoint || '').startsWith('https://generativelanguage.googleapis.com/')) return 'gemini';
+  return 'openai';
+}
+
+export function usesChatProtocol(cfg) {
+  if (resolveApiStyle(cfg) !== 'openai') return true;
+  if (cfg?.provider === 'openai' || cfg?.preset === 'custom' || cfg?.preset === 'lmstudio' || cfg?.preset === 'mistral' || cfg?.preset === 'huggingface' || cfg?.preset === 'anthropic') return true;
+  try {
+    const path = new URL(String(cfg?.endpoint || '').trim()).pathname.replace(/\/$/, '');
+    return path === '/v1' || path.endsWith('/v1') || path.includes('/openai');
+  } catch { return false; }
+}
 
 export const RECOMMENDED_LOCAL_MODELS = [
   {
@@ -62,7 +166,11 @@ export function getBridgeConfig() { return { ...readConfig() }; }
 export function saveBridgeConfig(cfg) {
   const current = readConfig();
   const destinationChanged = ['endpoint', 'provider', 'preset', 'mode'].some((key) => key in cfg && cfg[key] !== current[key]);
-  globalThis[sharedConfig] = { ...current, ...(destinationChanged ? { apiKey: '', cloudConsent: false } : {}), ...cfg };
+  const next = { ...current, ...(destinationChanged ? { apiKey: '', cloudConsent: false } : {}), ...cfg };
+  if (next.extraHeaders) next.extraHeaders = parseExtraHeaders(next.extraHeaders);
+  globalThis[sharedConfig] = next;
+  if (next.rememberKey === true) persistRememberedKey(next);
+  else if ('rememberKey' in (cfg || {}) || destinationChanged) clearRememberedKey();
   return getBridgeConfig();
 }
 
@@ -72,14 +180,19 @@ function configuredOptions(options) {
   return { ...saved, ...(destinationChanged ? { apiKey: '', cloudConsent: false, ...(options.provider === 'openai' ? { numPredict: 1536 } : {}) } : {}), ...options };
 }
 
-export function clearBridgeSession() { abortActiveGeneration(); globalThis[sharedConfig] = { ...DEFAULT_BRIDGE_CONFIG }; }
+export function clearBridgeSession() { abortActiveGeneration(); globalThis[sharedConfig] = { ...DEFAULT_BRIDGE_CONFIG }; clearRememberedKey(); }
 
 export function validateCloudConfig(cfg, requireConsent = true) {
   const url = apiEndpoint(cfg.endpoint);
   if (!isLoopback(url) && requireConsent && cfg.cloudConsent !== true) throw new Error('Confirm cloud processing before sending investigation information.');
   if (cfg.mode === 'free') {
-    const preset = PROVIDER_PRESETS.find((item) => item.id === cfg.preset && item.free);
-    if (!preset || url !== preset.endpoint || !preset.models.includes(cfg.model)) throw new Error('Free cloud mode requires a listed free provider and model. No paid fallback was used.');
+    if (cfg.preset === 'custom') {
+      if (!String(cfg.model || '').trim()) throw new Error('Choose a model first.');
+    } else {
+      const preset = PROVIDER_PRESETS.find((item) => item.id === cfg.preset && item.free);
+      const ids = presetModelIds(preset);
+      if (!preset || url !== preset.endpoint || (ids.length && !ids.includes(cfg.model))) throw new Error('Free cloud mode requires a listed free provider and model. No paid fallback was used.');
+    }
   }
   if (requireConsent && !String(cfg.model || '').trim()) throw new Error('Choose a model first.');
   return url;
@@ -176,7 +289,7 @@ function missingModel(message) {
 
 function unreachableMessage(endpoint, provider) {
   const where = provider === 'openai' ? 'API' : 'Ollama';
-  return provider === 'openai' ? `API connection failed. Check the address, internet connection and browser access (CORS). No other provider was called.` : `${where} is not reachable at ${endpoint}. Start Ollama on this computer, then retry. Browser local-network permission or Ollama origin settings may be required. No cloud fallback was used.`;
+  return provider === 'openai' ? `API connection failed. Check the address, internet connection and browser access (CORS). If the provider blocks browser requests, it cannot be used from this page; no proxy is used. No other provider was called.` : `${where} is not reachable at ${endpoint}. Start the local server on this computer, then retry. Browser local-network permission or origin settings may be required. No cloud fallback was used.`;
 }
 
 export async function testLocalDaemonConnection(endpoint = 'http://127.0.0.1:11434') {
@@ -186,8 +299,8 @@ export async function testLocalDaemonConnection(endpoint = 'http://127.0.0.1:114
 export async function testConfiguredConnection(options = {}) {
   const cfg = configuredOptions(options);
   if (cfg.provider === 'browser') return offline(cfg.endpoint, 'Browser ONNX is selected. No daemon call was made.');
-  if (cfg.provider === 'openai') return testOpenAi(cfg);
-  return testOllama(cfg.endpoint);
+  if (cfg.provider === 'ollama' && !usesChatProtocol(cfg)) return testOllama(cfg.endpoint);
+  return testOpenAi(cfg);
 }
 
 async function testOllama(endpoint) {
@@ -224,11 +337,12 @@ async function testOpenAi(cfg) {
   const timer = setTimeout(() => ctrl.abort(), 5000);
   try {
     const headers = cloudHeaders(cfg);
-    const res = await fetch(modelsUrl(url), { method: 'GET', headers, signal: ctrl.signal, redirect: 'error', cache: 'no-store' });
+    const res = await fetch(testModelsUrl(cfg, url), { method: 'GET', headers: testHeaders(cfg), signal: ctrl.signal, redirect: 'error', cache: 'no-store' });
     if (!res.ok) {
       const detail = await errorText(res);
       if (res.status === 429) return offline(url, 'Provider quota or rate limit reached. Try later or choose Local AI. No paid fallback was used.');
-      if (res.status === 401 || res.status === 403) return offline(url, `The API rejected the key (HTTP ${res.status}).`);
+      if (res.status === 401 || res.status === 403) return offline(url, `The API rejected the key (HTTP ${res.status}). Check the key and try again.`);
+      if (res.status === 404 || missingModel(detail)) return offline(url, `Model not found (HTTP ${res.status}). ${detail}`);
       return offline(url, `The API returned HTTP ${res.status}. ${detail}`);
     }
     const data = await res.json();
@@ -237,7 +351,7 @@ async function testOpenAi(cfg) {
     return { online: true, type: 'openai', endpoint: url, models, message: `Connected to the API at ${url}.` };
   } catch (err) {
     clearTimeout(timer);
-    return offline(url, err && err.name === 'AbortError' ? 'Connection timed out' : unreachableMessage(url, 'openai'));
+    return offline(url, err && err.name === 'AbortError' ? 'Connection timed out' : (err && err.name === 'TypeError' ? unreachableMessage(url, 'openai') : (err && err.message) || unreachableMessage(url, 'openai')));
   } finally { clearTimeout(timer); }
 }
 
@@ -475,7 +589,7 @@ export async function executeLocalChat(messages, options = {}) {
   const cfg = configuredOptions(options);
   if (cfg.enabled === false || cfg.provider === 'browser') throw new Error('External AI is off.');
   if (!Array.isArray(messages) || JSON.stringify(messages).length > 64000) throw new Error('The AI request is too large. Select a smaller task or shorten the context.');
-  if (cfg.provider === 'openai') return openAiChat(cfg, messages);
+  if (cfg.provider === 'openai' || usesChatProtocol(cfg)) return openAiChat(cfg, messages);
   return ollamaChat(cfg, messages);
 }
 
@@ -553,16 +667,64 @@ async function sameHostOpenAi(url, cfg, messages) {
 }
 
 function isGoogle(cfg) {
-  return cfg.preset === 'google' || String(cfg.endpoint || '').startsWith('https://generativelanguage.googleapis.com/');
+  return resolveApiStyle(cfg) === 'gemini';
+}
+
+function isAnthropic(cfg) {
+  return resolveApiStyle(cfg) === 'anthropic';
 }
 
 function cloudHeaders(cfg, json = false) {
-  const headers = { Accept: 'application/json' };
+  const headers = { Accept: 'application/json', ...sanitizeExtraHeaders(cfg.extraHeaders, !!cfg.apiKey) };
   if (json) headers['Content-Type'] = 'application/json';
   if (!cfg.apiKey) return headers;
   if (isGoogle(cfg)) headers['x-goog-api-key'] = cfg.apiKey;
-  else headers.Authorization = `Bearer ${cfg.apiKey}`;
+  else if (isAnthropic(cfg)) {
+    headers['x-api-key'] = cfg.apiKey;
+    headers['anthropic-version'] = headers['anthropic-version'] || '2023-06-01';
+  } else headers.Authorization = `Bearer ${cfg.apiKey}`;
   return headers;
+}
+
+function testHeaders(cfg) {
+  return cloudHeaders(cfg, false);
+}
+
+export function testModelsUrl(cfg, endpoint) {
+  const base = endpoint.replace(/\/$/, '');
+  if (isAnthropic(cfg)) return `${base}/v1/models`;
+  if (isGoogle(cfg)) return `${base}/models`;
+  return modelsUrl(endpoint);
+}
+
+export function anthropicMessagesUrl(endpoint) {
+  const base = String(endpoint || '').replace(/\/$/, '');
+  return base.endsWith('/v1') ? `${base}/messages` : `${base}/v1/messages`;
+}
+
+export function anthropicRequestBody(cfg, messages) {
+  const system = [];
+  const chat = [];
+  for (const message of messages) {
+    const text = String(message.content || '');
+    if ((message.role || 'user') === 'system') system.push(text);
+    else chat.push({ role: message.role === 'assistant' ? 'assistant' : 'user', content: text });
+  }
+  const body = {
+    model: cfg.model,
+    max_tokens: cfg.numPredict ?? 1536,
+    messages: chat.length ? chat : [{ role: 'user', content: '' }]
+  };
+  if (system.length) body.system = system.join('\n\n');
+  return body;
+}
+
+export function buildChatRequest(cfg, messages) {
+  const url = apiEndpoint(cfg.endpoint);
+  const headers = cloudHeaders(cfg, true);
+  if (isAnthropic(cfg)) return { url: anthropicMessagesUrl(url), headers, body: anthropicRequestBody(cfg, messages) };
+  if (isGoogle(cfg)) return { url: googleGenerateUrl(url, cfg.model), headers, body: googleRequestBody(cfg, messages) };
+  return { url: chatUrl(url), headers, body: cloudRequestBody(cfg, messages, url) };
 }
 
 export function googleGenerateUrl(endpoint, model) {
@@ -618,15 +780,14 @@ async function openAiChat(cfg, messages) {
   if (!isLoopback(url) && !String(cfg.apiKey || '').trim()) throw new Error('Add your API key. This app does not include one.');
   const ms = timeoutMs(cfg, 25000);
   const generation = beginGeneration(ms);
-  const headers = cloudHeaders(cfg, true);
-  const google = isGoogle(cfg);
+  const request = buildChatRequest(cfg, messages);
   try {
-    const res = await fetch(google ? googleGenerateUrl(url, cfg.model) : chatUrl(url), {
+    const res = await fetch(request.url, {
       method: 'POST',
-      headers,
+      headers: request.headers,
       redirect: 'error',
       cache: 'no-store',
-      body: JSON.stringify(google ? googleRequestBody(cfg, messages) : cloudRequestBody(cfg, messages, url)),
+      body: JSON.stringify(request.body),
       signal: generation.signal
     });
     if (!res.ok) {

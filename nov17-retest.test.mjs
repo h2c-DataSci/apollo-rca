@@ -53,7 +53,7 @@ describe('Nov 17 retest: chart editing and viewing', () => {
     assert.match(routes, /"data-node"/);
   });
   it('every export keeps the full colour legend', () => {
-    assert.match(routes, /LEGEND_H=64/);
+    assert.match(routes, /LEGEND_H=80/);
     for (const label of ['Primary effect (black)', 'STOP', 'Action', 'Condition']) assert.ok(routes.includes(label), label);
     assert.match(routes, /#d32f2f/i);
     assert.match(routes, /#fbc02d/i);
@@ -110,10 +110,10 @@ describe('Nov 17 retest: intake form', () => {
 });
 
 describe('Nov 17 retest: cache bump and preserved branding', () => {
-  it('service worker cache is v58 and assets are cache-busted', () => {
-    assert.match(sw, /apollo-rca-shell-v58/);
-    assert.match(html, /h2c-shell\.js\?v=44/);
-    assert.match(html, /h2c-help\.js\?v=33/);
+  it('service worker cache is v59 and assets are cache-busted', () => {
+    assert.match(sw, /apollo-rca-shell-v59/);
+    assert.match(html, /h2c-shell\.js\?v=45/);
+    assert.match(html, /h2c-help\.js\?v=34/);
   });
   it('keeps developer link and feedback, never shows an email address', () => {
     assert.ok((html + shell + help).includes('haroldhenrycabanilla.com'));
