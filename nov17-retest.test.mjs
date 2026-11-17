@@ -110,9 +110,9 @@ describe('Nov 17 retest: intake form', () => {
 });
 
 describe('Nov 17 retest: cache bump and preserved branding', () => {
-  it('service worker cache is v60 and assets are cache-busted', () => {
-    assert.match(sw, /apollo-rca-shell-v60/);
-    assert.match(html, /h2c-shell\.js\?v=46/);
+  it('service worker cache is v61 and assets are cache-busted', () => {
+    assert.match(sw, /apollo-rca-shell-v61/);
+    assert.match(html, /h2c-shell\.js\?v=47/);
     assert.match(html, /h2c-help\.js\?v=34/);
   });
   it('keeps developer link and feedback, never shows an email address', () => {

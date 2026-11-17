@@ -11,8 +11,8 @@ const store = readFileSync(new URL('./session-store.js', import.meta.url), 'utf8
 test('live defect fixes stay in the page source', () => {
   assert.equal(html.includes('opensourced'), false);
   assert.equal(routes.includes('opensourced'), false);
-  assert.match(html, /open-source AI-aided Web Tool/);
-  assert.match(routes, /open-source AI-aided Web Tool/);
+  assert.match(html, /Open-source, AI-aided Apollo RealityCharting/);
+  assert.match(routes, /Open-source, AI-aided Apollo RealityCharting/);
   assert.doesNotMatch(html, /#realitychart svg\{min-height:560px/);
   assert.match(routes, /setPointerCapture\?\.\(e\.pointerId\)/);
   assert.match(routes, /function reportGaps/);
