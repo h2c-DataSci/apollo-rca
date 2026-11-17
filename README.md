@@ -37,13 +37,13 @@ Seven steps, in page order: Define, Timeline, Evidence, Chart, Solutions, Schedu
 - The chart is editable and drawn at a readable size. Fit keeps titles readable, so a wide stacked chart can extend past the panel. Drag empty space to pan, including to the right-hand side. Zoom in, Zoom out, and the wheel zoom toward the pointer. Click a cause to open the inspector. Double-click a title to edit it. The And/Or junction follows the verified-cause checkbox for that whole cause set. Adding, renaming, or removing a cause updates the evidence table, and edits in the table update the chart. Evidence fields stack so the hypothesized-cause label, the layer list, and the typed cause stay fully visible.
 - When the chart is final, Generate blank solution matrix and corrective actions opens an empty matrix and schedule. Download stays off until every action, the person responsible, and the due date are filled. The caption names each missing piece. Cost / ROI does not block the report. On a narrow screen the corrective-action and action-item tables stack as cards.
 - RCA Coach can check each step. The final check becomes available with Download. Coach comments are optional. The investigator keeps the final say. The lead investigator field is labelled Lead investigator. Times use 24-hour form. Money is shown as dollars, for example $18,500. Ctrl+Z or Cmd+Z undoes a removed timeline row or primary effect. Where is required.
-- Load sample case still opens a finished example.
+- Load sample case opens a finished fictional haul-truck fire example. The chart is interactive and already has evidence, a STOP, a Need More Info marker, and a filled solution matrix.
 - Chart colors: primary effect black `#111827` with white text, action `#dc2626`, condition `#16a34a`, STOP `#d32f2f` with white text, unknown `?` `#fbc02d` with black text.
 - Evidence tiers: Sensed, Inferred, Intuited, Emotional. Missing evidence shows `?`.
 - The downloaded PDF follows problem definition, timeline, evidence, the chart, then the summary, solutions, corrective actions, action items, and causal log. Reports export as PDF, and as ZIP when one file would damage figures.
 - One-click New analysis, with confirm and undo. Open case (JSON) reloads a Cause Chart_Project_State.json export; a project JSON dropped on evidence is offered as an import, not stored as an evidence row.
 - Help knowledge base and a Feedback link next to About the developer.
-- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v61`. Script queries: shell `v=47`, help `v=34`, help knowledge `v=28`, diagrams `v=24`, videos `v=27`, local bridge `v=28`, coach steps `v=2`.
+- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v62`. Script queries: shell `v=47`, help `v=35`, help knowledge `v=29`, diagrams `v=24`, videos `v=27`, local bridge `v=28`, coach steps `v=2`.
 
 ## AI
 
