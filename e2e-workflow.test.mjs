@@ -26,7 +26,10 @@ describe('Phase 3: End-to-End RCA Workflow & Stability Tests', () => {
     assert.match(routes, /function hypothesisRoot/);
     assert.match(routes, /Generate RealityChart/);
     assert.match(routes, /onGenerate:ee/);
-    assert.match(routes, /onClick:onGenerate/);
+    assert.match(routes, /function caseChecklist/);
+    assert.match(routes, /function problemFault/);
+    assert.match(routes, /Download draft/);
+    assert.match(routes, /Add event/);
     assert.match(routes, /Hypothesized cause/);
     assert.match(routes, /Generate blank solution matrix and corrective actions/);
     assert.match(routes, /RC Coach — final check/);
