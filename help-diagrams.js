@@ -19,7 +19,7 @@ export const DIAGRAMS = {
     g.append(s('circle', { cx: 440, cy: 97, r: 16, fill: C.gold })); txt(g, 440, 102, 'AND', 11, '#043d2e', 'middle', 700); txt(g, 350, 100, 'both needed', 11, C.ink);
     txt(g, 240, 186, 'Read right to left: each effect needs an action and a condition together.', 11); }),
   steps: () => frame('Diagram: the seven steps from define to track', 200, (g) => {
-    const n = ['1 Define', '2 Causes', '3 Chart', '4 Evidence', '5 Test', '6 Solutions', '7 Track']; n.forEach((t, i) => { const row = i < 4 ? 0 : 1, col = i < 4 ? i : i - 4, x = 15 + col * 115 + (row ? 57 : 0), y = 20 + row * 80; box(g, x, y, 105, 48, i % 2 ? C.em : '#0f7a5c', t, 13); if (i !== 3 && i !== 6) arrow(g, x + 105, y + 24, x + 115, y + 24); });
+    const n = ['1 Define', '2 Timeline', '3 Evidence', '4 Chart', '5 Solutions', '6 Schedule', '7 Download']; n.forEach((t, i) => { const row = i < 4 ? 0 : 1, col = i < 4 ? i : i - 4, x = 15 + col * 115 + (row ? 57 : 0), y = 20 + row * 80; box(g, x, y, 105, 48, i % 2 ? C.em : '#0f7a5c', t, 12); if (i !== 3 && i !== 6) arrow(g, x + 105, y + 24, x + 115, y + 24); });
     g.append(s('path', { d: 'M440 68 V92 H72 V100', fill: 'none', stroke: C.arrow, 'stroke-width': 2.5, 'marker-end': 'url(#ah)' })); txt(g, 240, 175, 'Solutions are tracked, then the case is reviewed to confirm the problem stays solved.', 11); }),
   chain: () => frame('Diagram: a small cause chart with action, condition, evidence balloons and an unsupported question mark', 250, (g) => {
     box(g, 10, 100, 100, 44, C.pe, 'Oil released', 12); arrow(g, 110, 118, 145, 62); arrow(g, 110, 130, 145, 180);

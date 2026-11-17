@@ -237,7 +237,7 @@ function linesOf(audit) {
 
 export function auditMarkdown(audit) {
   if (!audit || audit.includeInReport === false) return '';
-  const body = [`# RC Coach API Audit Summary`, '', `Provider tier: ${audit.providerTier}`, `Model: ${audit.model || 'not named'}`, ''];
+  const body = [`# RCA Coach API Audit Summary`, '', `Provider tier: ${audit.providerTier}`, `Model: ${audit.model || 'not named'}`, ''];
   for (const line of linesOf(audit)) body.push(line.startsWith('- ') ? line : `\n${line}`);
   body.push('', 'These notes are coaching. They are not findings and they do not change the chart.');
   return body.join('\n');
@@ -245,7 +245,7 @@ export function auditMarkdown(audit) {
 
 export function appendAuditPdf(ctx, write, heading, audit) {
   if (!audit || audit.includeInReport === false) return;
-  heading(ctx, 'RC Coach API Audit Summary');
+  heading(ctx, 'RCA Coach API Audit Summary');
   for (const line of linesOf(audit)) write(ctx, line, 11);
   write(ctx, 'These notes are coaching. They are not findings and they do not change the chart.', 10);
 }

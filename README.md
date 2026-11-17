@@ -29,21 +29,21 @@ Help text is original summary guidance. Do not copy book pages or copyrighted fi
 
 ## What the app does
 
-Seven steps: Define, Causes, RealityChart, Evidence, Test, Solutions, Track.
+Seven steps, in page order: Define, Timeline, Evidence, Chart, Solutions, Schedule, Download.
 
 - Up to three primary effects.
 - Each causal set is an action plus at least one condition.
 - Order on the page: problem definition, timeline, then the evidence and hypothesized causes, then Generate RealityChart. Each observation needs the cause it supports, labelled as a hypothesis. Layer 1 is a direct cause of the primary effect. Layers 2, 3, and 4 are deeper causes and must name the cause they explain. The chart is not generated until that list is complete.
-- The chart is editable. Click a cause to open the inspector. Double-click a title to edit it. Drag empty space to pan. Zoom in, Zoom out, the wheel, and Fit all work. Adding, renaming, or removing a cause updates the evidence table, and edits in the table update the chart.
-- When the chart is final, Generate blank solution matrix and corrective actions opens an empty matrix and schedule. Fill every action, the responsible person, and the due date. Download stays off until that is done.
-- RC Coach can check each step. The final check becomes available with Download. Coach comments are optional. The investigator keeps the final say.
+- The chart is editable and drawn at a readable size. Fit keeps titles readable, so a wide stacked chart can extend past the panel. Drag empty space to pan, including to the right-hand side. Zoom in, Zoom out, and the wheel zoom toward the pointer. Click a cause to open the inspector. Double-click a title to edit it. The And/Or junction follows the verified-cause checkbox for that whole cause set. Adding, renaming, or removing a cause updates the evidence table, and edits in the table update the chart. Evidence fields stack so the hypothesized-cause label, the layer list, and the typed cause stay fully visible.
+- When the chart is final, Generate blank solution matrix and corrective actions opens an empty matrix and schedule. Download stays off until every action, the person responsible, and the due date are filled. The caption names each missing piece. Cost / ROI does not block the report. On a narrow screen the corrective-action and action-item tables stack as cards.
+- RCA Coach can check each step. The final check becomes available with Download. Coach comments are optional. The investigator keeps the final say. The lead investigator field is labelled Lead investigator. Times use 24-hour form. Money is shown as dollars, for example $18,500. Ctrl+Z or Cmd+Z undoes a removed timeline row or primary effect. Where is required.
 - Load sample case still opens a finished example.
 - Chart colors: primary effect black `#111827` with white text, action `#dc2626`, condition `#16a34a`, STOP `#d32f2f` with white text, unknown `?` `#fbc02d` with black text.
 - Evidence tiers: Sensed, Inferred, Intuited, Emotional. Missing evidence shows `?`.
 - The downloaded PDF follows problem definition, timeline, evidence, the chart, then the summary, solutions, corrective actions, action items, and causal log. Reports export as PDF, and as ZIP when one file would damage figures.
 - One-click New analysis, with confirm and undo.
 - Help knowledge base and a Feedback link next to About the developer.
-- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v56`.
+- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v57`. Script queries: shell `v=43`, help `v=32`, help knowledge `v=27`, diagrams `v=23`, videos `v=26`.
 
 ## AI
 
@@ -59,7 +59,7 @@ Then choose **Enable AI Assistant**, confirm **Enable assistant**, and run a Coa
 
 No Cloudflare account, shared API key, hosted AI proxy or application-owned inference backend is used. Cloud requests go directly to the provider you choose. Free mode restricts provider/model IDs and never falls back to paid models. A free model label does not verify your account's billing settings; use provider spending controls. Provider access, model availability, retention and terms can change. Groq users should review their account's Zero Data Retention controls. Google free-tier prompts may be used by Google to improve its products. OpenRouter may route to different underlying free providers.
 
-**Cases and keys now stay in tab memory. Reloading, closing the tab or a crash loses unsaved work. Download reports before leaving.** Existing older browser-saved data is not automatically loaded or deleted: the session notice offers a recovery download (excluding the old API-key configuration) and explicit deletion. Other browser preferences and app assets may still be cached. No app-controlled persistent investigation storage is used; browser/OS behavior and external provider retention cannot be universally guaranteed.
+**The case draft is restored when this tab reloads and is dropped when the tab closes.** API keys stay in memory only and are not restored. Closing the tab or a crash drops the draft. Download reports before leaving. Existing older browser-saved data is not automatically loaded or deleted: the session notice offers a recovery download (excluding the old API-key configuration) and explicit deletion. Other browser preferences and app assets may still be cached. The draft uses this tab's session storage, not long-term storage. Browser/OS behavior and external provider retention cannot be universally guaranteed.
 
 Download report uses the existing PDF/ZIP flow. ZIP packages include the PDF, full-size chart SVG/PNG, action CSV and project JSON. Print remains available. Browser settings determine the folder prompt; enable Ask where to save if desired. Downloaded files may remain in backups or synced folders.
 
@@ -95,7 +95,7 @@ The current test count and HEAD are recorded in [PROGRESS.md](PROGRESS.md). Node
 | `help-kb.js` / `help-diagrams.js` | Knowledge text and original diagrams |
 | `h2c-videos.js` | Seven YouTube episodes. Players load from `youtube-nocookie.com` only after a click. Sync Official Durations reads the player length. |
 | `browser-ai.js` | In-browser ONNX loader |
-| `session-store.js` / `provider-presets.js` | Memory-only case storage and public provider connection presets. |
+| `session-store.js` / `provider-presets.js` | Case draft for this tab (restored on reload, dropped when the tab closes) and public provider connection presets. |
 | `local-ai-bridge.js` | Ollama on `127.0.0.1:11434`, or a user-supplied HTTPS API. No cloud fallback. |
 | `coach-deeper.js` | Longer reviews: whole chart, next interview, solution screen, and full report audit. |
 | `sw.js` | App-shell cache. Install fails if a shell file is missing. Runtime cache is capped. |
@@ -105,9 +105,9 @@ There is no `local-bridge.js` or `ai-coach.js`. Those names in older notes are w
 
 ## AI transport and privacy
 
-The existing short coach buttons stay. Under the RCA Coach controls, four longer reviews use the same connected model once: review the whole chart, plan the next interview, screen solutions, and audit every section of the formal report. On a Free or Paid API, Audit full report also returns a section check for problem definition, the chart, evidence, and solutions. Those notes appear on the matching step, in the on-screen report, and in the PDF, Markdown, and project JSON when Include RC Coach API Audit in Report is checked. Local AI keeps the single review and does not show those notes. A failed or partial answer changes nothing in the chart. The audit stays in this tab's memory with the case and is not written to browser storage. The legal notice stays at the bottom of the page, after the report download line. `local-ai-bridge.js` holds configuration in memory, enforces consent and free-provider restrictions, aborts streams and rejects partial failed output. Model-list tests make no inference calls. Groq reasoning requests use a bounded completion budget, low reasoning effort and JSON output; other providers use their supported payloads.
+The existing short coach buttons stay. Under the RCA Coach controls, four longer reviews use the same connected model once: review the whole chart, plan the next interview, screen solutions, and audit every section of the formal report. On a Free or Paid API, Audit full report also returns a section check for problem definition, the chart, evidence, and solutions. Those notes appear on the matching step, in the on-screen report, and in the PDF, Markdown, and project JSON when Include RCA Coach API Audit in Report is checked. Local AI keeps the single review and does not show those notes. A failed or partial answer changes nothing in the chart. The audit is kept with the case for this tab and is not written to long-term storage. The legal notice stays at the bottom of the page, after the report download line. `local-ai-bridge.js` holds configuration in memory, enforces consent and free-provider restrictions, aborts streams and rejects partial failed output. Model-list tests make no inference calls. Groq reasoning requests use a bounded completion budget, low reasoning effort and JSON output; other providers use their supported payloads.
 
-`session-store.js` holds case data, hypotheses, notes and clear/undo backups in memory. The active bundled editor and shell share this store. Shell and Help wait for the editor's first React commit before modifying the page. The current service-worker shell reloads assets on install and runtime cache v2 retires stale runtime entries; credential-bearing requests and cross-origin inference are excluded from caching.
+`session-store.js` holds the case draft, hypotheses, notes and clear/undo backups for this browser tab. A reload restores that draft. Closing the tab drops it. It is not long-term storage, and it is not `localStorage`. Shell and Help wait for the editor's first React commit before modifying the page. The current service-worker shell reloads assets on install and runtime cache v2 retires stale runtime entries; credential-bearing requests and cross-origin inference are excluded from caching.
 
 Local mode enforces loopback. The website cannot start Ollama, install models, inspect folders or change OLLAMA_MODELS. On this Windows computer keep Ollama runtime on C: and its existing models at D:\Ollama\models. A read-only check found installed `qwen3.5:4b` and `qwen3.5:2b`; no model was run or downloaded. No local companion has been installed.
 

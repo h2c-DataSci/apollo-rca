@@ -1,11 +1,52 @@
-// Investigation data is held only in this page's memory. Reloading discards it.
-const values = new Map();
+// The draft stays in this browser tab. A reload restores it. Closing the tab drops it.
+// It is not written to long-term browser storage.
+const memory = new Map();
+const TAB_PREFIX = 'h2c-tab:';
+function tabStore() {
+  try { return globalThis.sessionStorage || null; } catch { return null; }
+}
+function readTab(key) {
+  try { return tabStore()?.getItem(TAB_PREFIX + key) ?? null; } catch { return null; }
+}
+function writeTab(key, value) {
+  try { tabStore()?.setItem(TAB_PREFIX + key, value); } catch {}
+}
+function deleteTab(key) {
+  try { tabStore()?.removeItem(TAB_PREFIX + key); } catch {}
+}
 export const SESSION_CHANGED = 'h2c-session-changed';
 export const sessionStore = {
-  getItem(key) { return values.has(String(key)) ? values.get(String(key)) : null; },
-  setItem(key, value) { values.set(String(key), String(value)); },
-  removeItem(key) { values.delete(String(key)); },
-  clear() { values.clear(); },
+  getItem(key) {
+    const name = String(key);
+    if (memory.has(name)) return memory.get(name);
+    const saved = readTab(name);
+    if (saved != null) memory.set(name, saved);
+    return saved;
+  },
+  setItem(key, value) {
+    const name = String(key);
+    const text = String(value);
+    memory.set(name, text);
+    writeTab(name, text);
+  },
+  removeItem(key) {
+    const name = String(key);
+    memory.delete(name);
+    deleteTab(name);
+  },
+  clear() {
+    const names = [...memory.keys()];
+    memory.clear();
+    for (const name of names) deleteTab(name);
+    try {
+      const store = tabStore();
+      if (!store) return;
+      for (let i = store.length - 1; i >= 0; i--) {
+        const name = store.key(i);
+        if (name && name.startsWith(TAB_PREFIX)) store.removeItem(name);
+      }
+    } catch {}
+  },
   notify() {
     if (typeof globalThis.dispatchEvent === 'function') globalThis.dispatchEvent(new Event(SESSION_CHANGED));
   }

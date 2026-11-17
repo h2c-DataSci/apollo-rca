@@ -79,7 +79,7 @@ let updating = false;
 // Injected CSS for the 7-step Workflow Hub and Real-Time Color Coded Validation
 const css = document.createElement('style');
 css.textContent = `
-main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-width:0}#realitychart{min-width:0;max-width:100%}#realitychart table{display:block;max-width:100%;overflow-x:auto}
+main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-width:0}#realitychart{min-width:0;max-width:100%}main{padding-bottom:4.5rem}.h2c-nextbar{bottom:4.25rem}@media (max-width:720px){table.h2c-cards thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}table.h2c-cards,table.h2c-cards tbody,table.h2c-cards tr,table.h2c-cards td{display:block;width:100%}table.h2c-cards tr{border:1px solid #d7deea;border-radius:8px;margin:0 0 12px;padding:8px 10px}table.h2c-cards td{border:0;padding:4px 0;white-space:normal}table.h2c-cards td[colspan]::before{content:none}table.h2c-ca td:nth-child(1)::before{content:"Action ID"}table.h2c-ca td:nth-child(2)::before{content:"Primary effect"}table.h2c-ca td:nth-child(3)::before{content:"Target cause"}table.h2c-ca td:nth-child(4)::before{content:"Corrective action"}table.h2c-ca td:nth-child(5)::before{content:"4-criteria"}table.h2c-ca td:nth-child(6)::before{content:"Responsible"}table.h2c-ca td:nth-child(7)::before{content:"Due"}table.h2c-ca td:nth-child(8)::before{content:"Cost / ROI"}table.h2c-ai td:nth-child(1)::before{content:"ID"}table.h2c-ai td:nth-child(2)::before{content:"Primary effect"}table.h2c-ai td:nth-child(3)::before{content:"Node"}table.h2c-ai td:nth-child(4)::before{content:"Gap"}table.h2c-ai td:nth-child(5)::before{content:"Owner"}table.h2c-ai td:nth-child(6)::before{content:"Due"}table.h2c-cards td::before{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#5c6b62}}
 .h2c-new-prominent{background:linear-gradient(180deg,#f6dd7a,#c9a227)!important;color:#043d2e!important;border:2px solid #8c6a1a!important;font-weight:700!important}
 .h2c-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:10000;background:#043d2e;color:#f1d16b;border:2px solid #c9a227;border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;font:600 14px system-ui;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 .h2c-toast button{background:#f1d16b;color:#043d2e;border:0;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer}.h2c-toast button:focus-visible{outline:3px solid #fff}
@@ -796,7 +796,10 @@ function getAppState() {
 
   // Timeline events count
   const timelineInputs = [...document.querySelectorAll('input[placeholder="Seal temperature rose"], input[placeholder="Event"]')];
-  const timelineCount = timelineInputs.length;
+  const timelineCount = timelineInputs.filter((desc) => {
+    const time = desc.parentElement?.querySelector('input[placeholder="14:32"]');
+    return (desc.value || '').trim() || (time?.value || '').trim();
+  }).length;
   const timelineReady = timelineCount > 0;
 
   // Chart active
@@ -812,14 +815,19 @@ function getAppState() {
   const testReady = chartReady;
 
   // Solutions count
-  const solutionsCount = realityChart ? realityChart.querySelectorAll('table tbody tr').length : 0;
-  const solutionsReady = solutionsCount > 0;
+  const solutionsCount = document.querySelectorAll('#solution-matrix table.h2c-ca tbody tr').length;
+  const solutionsReady = Boolean(document.getElementById('solution-matrix'));
 
   // Track / Organization
   const leadInvestigator = [...document.querySelectorAll('label')].find(l => l.textContent.includes('Lead investigator'))?.querySelector('input');
   const trackReady = Boolean(leadInvestigator && (leadInvestigator.value || '').trim().length > 0);
 
-  const readySteps = [hasValidWhat, timelineReady, chartReady, evidenceReady, testReady, solutionsReady, trackReady];
+  const gapEl = document.getElementById('h2c-report-gap');
+  const missing = (gapEl?.dataset.missing || '').split('|').map((part) => part.trim()).filter(Boolean);
+  const scheduleReady = Boolean(gapEl) && missing.length === 0;
+  const downloadReady = scheduleReady;
+
+  const readySteps = [hasValidWhat, timelineReady, evidenceReady, chartReady, solutionsReady, scheduleReady, downloadReady];
   const completedCount = readySteps.filter(Boolean).length;
   const pct = Math.round((completedCount / 7) * 100);
 
@@ -836,6 +844,9 @@ function getAppState() {
     testReady,
     solutionsCount,
     solutionsReady,
+    scheduleReady,
+    downloadReady,
+    missing,
     trackReady,
     completedCount,
     pct
@@ -1029,104 +1040,23 @@ function updateStepsHub() {
 
   const st = getAppState();
 
+  const scrollStep = (id, alt, heading) => {
+    const el = document.getElementById(id) || (alt && document.getElementById(alt)) || (heading && [...document.querySelectorAll('h2, h3')].find((node) => heading.test(node.textContent || '')));
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const scrollGenerate = () => {
+    const genBtn = [...document.querySelectorAll('button')].find((b) => /generate realitychart|generate chart/i.test(b.textContent || ''));
+    genBtn?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
   const steps = [
-    {
-      num: 1,
-      name: 'Define',
-      sub: 'Primary Effects',
-      status: st.hasValidWhat ? '✓ Ready' : (st.hasAnyWhat ? '⚡ In Progress' : '✕ 0 words'),
-      pillClass: st.hasValidWhat ? 'h2c-pill-ready' : (st.hasAnyWhat ? 'h2c-pill-warn' : 'h2c-pill-stop'),
-      isReady: st.hasValidWhat,
-      action: () => {
-        const el = document.getElementById('section-define') || document.querySelector('h2');
-        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    },
-    {
-      num: 2,
-      name: 'Causes',
-      sub: 'Timeline & Events',
-      status: st.timelineReady ? `✓ ${st.timelineCount} ${st.timelineCount === 1 ? 'event' : 'events'}` : '● 0 events',
-      pillClass: st.timelineReady ? 'h2c-pill-ready' : 'h2c-pill-neutral',
-      isReady: st.timelineReady,
-      action: () => {
-        const el = document.getElementById('section-timeline') || [...document.querySelectorAll('h2')].find(h => /timeline/i.test(h.textContent));
-        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    },
-    {
-      num: 3,
-      name: 'Chart',
-      sub: 'Reality Tree',
-      status: st.chartReady ? '✓ Chart Active' : '● Not Built',
-      pillClass: st.chartReady ? 'h2c-pill-ready' : 'h2c-pill-neutral',
-      isReady: st.chartReady,
-      action: () => {
-        if (st.chartReady) {
-          document.getElementById('realitychart')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-          const genBtn = [...document.querySelectorAll('button')].find(b => /generate chart/i.test(b.textContent));
-          genBtn?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          genBtn?.classList.add('animate-pulse');
-          setTimeout(() => genBtn?.classList.remove('animate-pulse'), 1200);
-        }
-      }
-    },
-    {
-      num: 4,
-      name: 'Evidence',
-      sub: 'Quality Tiers',
-      status: st.evidenceReady ? `✓ ${st.evidenceCount} ${st.evidenceCount === 1 ? 'item' : 'items'}` : '● 0 items',
-      pillClass: st.evidenceReady ? 'h2c-pill-ready' : 'h2c-pill-neutral',
-      isReady: st.evidenceReady,
-      action: () => {
-        const el = document.getElementById('section-evidence') || [...document.querySelectorAll('h2')].find(h => /evidence/i.test(h.textContent));
-        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    },
-    {
-      num: 5,
-      name: 'Test',
-      sub: 'Logic Verification',
-      status: st.testReady ? '✓ Verified' : '● QA Suite',
-      pillClass: st.testReady ? 'h2c-pill-ready' : 'h2c-pill-neutral',
-      isReady: st.testReady,
-      action: () => {
-        const qaBtn = [...document.querySelectorAll('button')].find(b => /QA \/ Stress Test/i.test(b.textContent));
-        qaBtn?.click();
-      }
-    },
-    {
-      num: 6,
-      name: 'Solutions',
-      sub: 'Action Matrix',
-      status: st.solutionsReady ? `✓ ${st.solutionsCount} ${st.solutionsCount === 1 ? 'action' : 'actions'}` : (st.chartReady ? '● Define actions' : '● Pending chart'),
-      pillClass: st.solutionsReady ? 'h2c-pill-ready' : 'h2c-pill-neutral',
-      isReady: st.solutionsReady,
-      action: () => {
-        if (st.chartReady) {
-          const el = document.querySelector('#realitychart') || [...document.querySelectorAll('h2')].find(h => /solution|chart/i.test(h.textContent));
-          el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-          const genBtn = [...document.querySelectorAll('button')].find(b => /generate chart/i.test(b.textContent));
-          genBtn?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }
-    },
-    {
-      num: 7,
-      name: 'Track',
-      sub: 'ROI & Owners',
-      status: st.trackReady ? '✓ Configured' : '● Pending',
-      pillClass: st.trackReady ? 'h2c-pill-ready' : 'h2c-pill-neutral',
-      isReady: st.trackReady,
-      action: () => {
-        const el = document.getElementById('section-track') || [...document.querySelectorAll('h2')].find(h => /organization/i.test(h.textContent));
-        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
+    { num: 1, name: 'Define', sub: 'Primary effects', status: st.hasValidWhat ? '✓ Ready' : (st.hasAnyWhat ? '⚡ In Progress' : '✕ 0 words'), pillClass: st.hasValidWhat ? 'h2c-pill-ready' : (st.hasAnyWhat ? 'h2c-pill-warn' : 'h2c-pill-stop'), isReady: st.hasValidWhat, action: () => scrollStep('h2c-problem', null, /problem definition/i) },
+    { num: 2, name: 'Timeline', sub: 'Filled events', status: st.timelineReady ? `✓ ${st.timelineCount} ${st.timelineCount === 1 ? 'event' : 'events'}` : '● 0 events', pillClass: st.timelineReady ? 'h2c-pill-ready' : 'h2c-pill-neutral', isReady: st.timelineReady, action: () => scrollStep('h2c-timeline', 'section-timeline', /timeline/i) },
+    { num: 3, name: 'Evidence', sub: 'Hypothesized causes', status: st.evidenceReady ? `✓ ${st.evidenceCount} ${st.evidenceCount === 1 ? 'item' : 'items'}` : '● Before the chart', pillClass: st.evidenceReady ? 'h2c-pill-ready' : 'h2c-pill-neutral', isReady: st.evidenceReady, action: () => scrollStep('h2c-evidence', 'section-evidence', /evidence/i) },
+    { num: 4, name: 'Chart', sub: 'RealityChart', status: st.chartReady ? '✓ Chart active' : '● Not built', pillClass: st.chartReady ? 'h2c-pill-ready' : 'h2c-pill-neutral', isReady: st.chartReady, action: () => { if (st.chartReady) document.getElementById('realitychart')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); else scrollGenerate(); } },
+    { num: 5, name: 'Solutions', sub: 'Blank matrix', status: st.solutionsReady ? '✓ Matrix open' : (st.chartReady ? '● Generate the matrix' : '● After the chart'), pillClass: st.solutionsReady ? 'h2c-pill-ready' : 'h2c-pill-neutral', isReady: st.solutionsReady, action: () => scrollStep('h2c-solutions', 'solution-matrix', /solution/i) },
+    { num: 6, name: 'Schedule', sub: 'Actions and dates', status: !st.chartReady ? '● After the chart' : st.scheduleReady ? '✓ Schedule filled' : `● ${st.missing[0] || 'Fill the schedule'}`, pillClass: st.scheduleReady ? 'h2c-pill-ready' : 'h2c-pill-neutral', isReady: st.scheduleReady, action: () => scrollStep('solution-matrix', 'h2c-organization', /corrective|organization/i) },
+    { num: 7, name: 'Download', sub: 'PDF or ZIP', status: st.downloadReady ? '✓ Ready' : (st.missing[0] ? `● ${st.missing[0]}` : '● Not ready'), pillClass: st.downloadReady ? 'h2c-pill-ready' : 'h2c-pill-neutral', isReady: st.downloadReady, action: () => scrollStep('h2c-download', 'realitychart', /download/i) }
   ];
-
   const overallClass = st.pct >= 70 ? 'h2c-pill-high' : st.pct > 0 ? 'h2c-pill-med' : 'h2c-pill-low';
 
   const sig = steps.map((s) => `${s.num}:${s.status}:${s.isReady ? 1 : 0}`).join('|');
@@ -1266,7 +1196,7 @@ function updateColorCodedValidation() {
       input.classList.add('h2c-input-ready');
       setSafeHtml(box, `<div class="h2c-val-badge h2c-val-ready" style="padding: 3px 8px; font-size: 11px;"><strong>✓ Location specified</strong></div>`);
     } else {
-      setSafeHtml(box, `<div class="h2c-val-badge h2c-val-warn" style="padding: 3px 8px; font-size: 11px;"><span>⚠ Location recommended (facility, unit, equipment)</span></div>`);
+      setSafeHtml(box, `<div class="h2c-val-badge h2c-val-warn" style="padding: 3px 8px; font-size: 11px;"><span>⚠ Location required (facility, unit, equipment)</span></div>`);
     }
   }
 }
@@ -1405,7 +1335,7 @@ function auditCard(audit, key) {
   card.className = 'h2c-audit-card no-print';
   card.open = section.status !== 'pass' || !!audit.stale;
   const summary = document.createElement('summary');
-  summary.textContent = `RC Coach API Audit — ${section.title}`;
+  summary.textContent = `RCA Coach API Audit — ${section.title}`;
   const body = document.createElement('div');
   body.className = 'h2c-audit-body';
   fillAuditBody(body, audit, section, true);
@@ -1440,7 +1370,7 @@ function paintCoachAudit() {
   const token = audit ? JSON.stringify([audit.timestamp, !!audit.stale, audit.includeInReport !== false, audit.dismissed || {}]) : '';
   const article = document.querySelector('article.print-sheet');
   const download = [...document.querySelectorAll('button')].some((button) => /Download report/.test(button.textContent || ''));
-  const expectedCards = AUDIT_SECTIONS.filter(([key]) => !(audit.dismissed && audit.dismissed[key])).length;
+  const expectedCards = !audit ? 0 : AUDIT_SECTIONS.filter(([key]) => !(audit.dismissed && audit.dismissed[key])).length;
   const ready = !audit
     ? !document.querySelector('.h2c-audit-card, .h2c-audit-note, .h2c-audit-toggle')
     : document.querySelectorAll('.h2c-audit-card').length >= expectedCards
@@ -1474,7 +1404,7 @@ function paintCoachAudit() {
       const note = document.createElement('aside');
       note.className = 'h2c-audit-note';
       const title = document.createElement('h3');
-      title.textContent = 'RC Coach API Audit Notes';
+      title.textContent = 'RCA Coach API Audit Notes';
       const body = document.createElement('div');
       body.className = 'h2c-audit-body';
       fillAuditBody(body, audit, audit.sections[key], false);
@@ -1484,7 +1414,7 @@ function paintCoachAudit() {
     const summary = document.createElement('section');
     summary.className = 'h2c-audit-note';
     const title = document.createElement('h3');
-    title.textContent = 'RC Coach API Audit Summary';
+    title.textContent = 'RCA Coach API Audit Summary';
     const body = document.createElement('div');
     body.className = 'h2c-audit-body';
     const overall = document.createElement('p');
@@ -1518,7 +1448,7 @@ function paintCoachAudit() {
       saveCoachAudit(current);
       paintCoachAudit();
     });
-    toggle.append(box, document.createTextNode(' Include RC Coach API Audit in Report'));
+    toggle.append(box, document.createTextNode(' Include RCA Coach API Audit in Report'));
     downloadButton.parentElement.before(toggle);
   }
 }

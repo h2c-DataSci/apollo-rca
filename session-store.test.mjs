@@ -56,6 +56,31 @@ test('recovery download excludes API keys and storage is cleared only after that
   assert.ok(offer > 0 && shown > offer && cleared > shown);
 });
 
+test('a draft written through the tab store can be read back and is not local storage', () => {
+  const bag = new Map();
+  const storage = {
+    getItem: (key) => bag.has(key) ? bag.get(key) : null,
+    setItem: (key, value) => bag.set(key, String(value)),
+    removeItem: (key) => bag.delete(key),
+    key: (index) => [...bag.keys()][index] ?? null,
+    get length() { return bag.size; }
+  };
+  const previous = globalThis.sessionStorage;
+  globalThis.sessionStorage = storage;
+  try {
+    sessionStore.clear();
+    sessionStore.setItem('realitychart-intake-v1', '{"what":"Oil Released"}');
+    assert.equal(bag.get('h2c-tab:realitychart-intake-v1'), '{"what":"Oil Released"}');
+    assert.equal(sessionStore.getItem('realitychart-intake-v1'), '{"what":"Oil Released"}');
+    sessionStore.removeItem('realitychart-intake-v1');
+    assert.equal(bag.has('h2c-tab:realitychart-intake-v1'), false);
+  } finally {
+    if (previous === undefined) delete globalThis.sessionStorage;
+    else globalThis.sessionStorage = previous;
+    sessionStore.clear();
+  }
+});
+
 test('active editor uses memory store and remounts on explicit session change', async () => {
   const source = await readFile(new URL('./routes-v13.js', import.meta.url), 'utf8');
   assert.equal(source.includes('localStorage'), false);

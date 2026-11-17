@@ -853,21 +853,22 @@ css.textContent = `
 /* Floating Video Academy Button */
 .h2cv-fab {
   position: fixed;
-  left: 104px;
-  bottom: 16px;
-  z-index: 9998;
+  left: 52px;
+  bottom: 8px;
+  z-index: 40;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   background: linear-gradient(180deg, #b91c1c 0%, #991b1b 100%);
   color: #ffffff;
   border: 2px solid #ef4444;
   border-radius: 999px;
-  padding: 10px 16px;
-  font: 700 13px system-ui, -apple-system, sans-serif;
+  font: 700 11px system-ui, -apple-system, sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(185, 28, 28, 0.45);
+  box-shadow: 0 2px 8px rgba(185, 28, 28, 0.4);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  justify-content: center;
 }
 .h2cv-fab:hover {
   background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
@@ -1980,10 +1981,7 @@ export function mountVideoButtons() {
     fab.className = 'no-print h2cv-fab';
     fab.type = 'button';
     fab.setAttribute('aria-label', 'Open 7-Step Methodology Training Videos');
-    adoptSafe(fab, `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81ZM9.8 15.33V8.67L15.6 12l-5.8 3.33Z"/></svg>
-      <span>▶ 7 Videos</span>
-    `);
+    adoptSafe(fab, `<span>7</span>`);
     fab.onclick = () => openVideoDrawer();
     document.body.append(fab);
   }

@@ -10,10 +10,10 @@ Hard rule: update this file after every task, and update [README.md](README.md) 
 | Repo | https://github.com/h2c-DataSci/apollo-rca |
 | Clone | `D:\ApolloRCA_webapp` |
 | Branch | `main`, even with `origin/main`. Only `main` exists. |
-| HEAD | Workflow now requires hypothesized causes before the chart, then a blank solution matrix before download. |
+| HEAD | Live-site defects from the Oil Released test are fixed on `main`. Evidence fields stack, the chart stays readable and can be panned to the right edge, and the sample report passes integrity. |
 | Live | https://h2c-datasci.github.io/apollo-rca/ |
-| Cache | Shell query `h2c-shell.js?v=42`, `h2c-help.js?v=31`. Service worker `apollo-rca-shell-v56`, runtime `apollo-rca-runtime-v2`. |
-| Tests | `node --test` → 194 passed, 0 failed. |
+| Cache | Shell query `h2c-shell.js?v=43`, `h2c-help.js?v=32`, `help-kb.js?v=27`, `help-diagrams.js?v=23`, `h2c-videos.js?v=26`. Service worker `apollo-rca-shell-v57`, runtime `apollo-rca-runtime-v2`. |
+| Tests | `node --test` → 196 passed, 0 failed. |
 | Not this app | Anything in `/workspace` outside this folder. That tree is a separate Grok Build app. |
 
 ## Work log
@@ -22,6 +22,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 | When | SHA | Done |
 |---|---|---|
+| 2026-11-17 | this commit | Fixed the Oil Released live-site defects. Evidence rows stack so labels and the layer list are fully visible. The stacked chart is drawn at a readable size; Fit, zoom, and pan reach the right edge. Help and Videos are small and can be hidden, and the page keeps bottom padding. Empty timeline rows are not counted. Navigator and Help number Evidence before Chart. Dismissing an empty RCA Coach audit no longer throws. The sample report integrity is PASS, with the disclaimer on its own line, and duplicate High Temperature actions are removed. A reload restores the draft in this tab. Download names every missing action, person, or due date, and Cost / ROI does not block it. Phone tables stack as cards. And/Or follows the verified-cause checkbox. Copy uses open-source, RCA Coach, Lead investigator, 24-hour times, and $18,500. Where is required only. Ctrl+Z / Cmd+Z undoes a removal. Service-worker cache is v57. |
 | 2026-11-17 | `91fb0b6` | The blank case now shows the next step, a readiness list, draft download, and print. Primary-effect wording, where, date, and timeline are checked before the chart. Frequency is a choice plus a note. Money accepts $18,500. Goals, max cost, and payback are separate, and sphere of control must start with Not. Removed events can be undone. Service-worker cache is v56. |
 | 2026-11-17 | `d0122b3` | Locked the current chart and evidence behavior as the accepted state. Housekeeping only: `main` matches `origin/main`, and only that branch exists. Shell queries match the service worker (`h2c-shell.js?v=42`, `h2c-help.js?v=30`, cache `apollo-rca-shell-v52`). No file was removed. The vendored Transformers file, the ONNX wasm files, `rolldown-runtime-v11.js`, `404.html`, and the loaded bundles stay. Tests remain 194. |
 | 2026-11-16 | `23386be` | Evidence rows now update the chart again. A balloon shows the statement, not only the source name, and the chart redraws as the row is edited. Service-worker cache is v52. |
@@ -86,15 +87,15 @@ Newest first. Add a row for each task. Do not delete older rows.
 
 ## Must stay true
 
-- Subtitle: "Analysis based on Apollo RCA or RealityCharting principles and is an opensourced AI-aided Web Tool for RCA."
+- Subtitle: "Analysis based on Apollo RCA or RealityCharting principles and is an open-source AI-aided Web Tool for RCA."
 - About the developer: https://www.haroldhenrycabanilla.com
 - Feedback (new tab, `noopener`): https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform
 - Chart: black primary effect, red action `#dc2626`, green condition `#16a34a`, red STOP `#d32f2f` with white text, yellow `?` `#fbc02d` with black text. Do not paint STOP or `?` grey.
 - Help knowledge base stays. No copyrighted book images.
 - Standard Mode works with AI off. AI never writes the case until the investigator accepts.
 - `frame-src` is only `https://www.youtube-nocookie.com`. Video iframes are created on click.
-- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v56` and `apollo-rca-runtime-v2`.
-- Script queries: shell `v=42`, help `v=30`, help knowledge `v=25`, videos `v=25`, local bridge `v=27`, browser AI `v=26`, deeper reviews `v=7`, cloud section audit `v=1`. Bump a file's query when that file changes.
+- Service worker deletes only Cache Storage names that start with `apollo-rca-`, and it keeps `apollo-rca-shell-v57` and `apollo-rca-runtime-v2`.
+- Script queries: shell `v=43`, help `v=32`, help knowledge `v=27`, diagrams `v=23`, videos `v=26`, local bridge `v=27`, browser AI `v=26`, deeper reviews `v=7`, cloud section audit `v=1`. Bump a file's query when that file changes.
 - A Free or Paid API audit may place notes on the steps and in the report. Local AI does not. The audit record stays in tab memory under `h2c-coach-api-audit-v1` and is not written to localStorage.
 - The four longer reviews stay under the RCA Coach controls, with their results in that card. The connection card is only the path, provider, model, and key.
 - The legal notice stays the last block in `main`, after the Download report line.
@@ -113,7 +114,7 @@ Newest first. Add a row for each task. Do not delete older rows.
 - User confirmed on 2026-11-15 that paid DeepSeek works with their own key. Keep `deepseek-flash` as the V4.1-Flash-1017 ID. Do not replace it with the display name.
 - Google free-tier prompts may be retained by Google to improve its products. The app has no zero-retention switch for that provider.
 - Automatic Ollama startup and folder inspection require an optional companion; no companion is installed. Local origin/permission behavior must still be checked on the published HTTPS site.
-- Cases/keys now live in tab memory; download before close/reload. Legacy recovery is archival export plus explicit deletion, not automatic import.
+- Cases stay in this tab. A reload restores the draft. Closing the tab drops it. API keys stay in memory and are not restored. Legacy recovery is archival export plus explicit deletion, not automatic import.
 - `index.html` asset URLs use the `/apollo-rca/` prefix, so a server at the repo root is not path-identical to Pages.
 - An old `h2c-rca-shell-*` cache is not deleted, because it lacks the `apollo-rca-` prefix.
 
