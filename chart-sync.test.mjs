@@ -12,7 +12,11 @@ import {
   addEvidenceForNode,
   patchPrimaryEffect,
   refreshFromIntake,
-  reselectNode
+  reselectNode,
+  valueEvents,
+  isPlaceholderNode,
+  isRequiredPlaceholder,
+  removeCauseNode
 } from './chart-sync.js';
 
 const routes = readFileSync(new URL('./routes-v13.js', import.meta.url), 'utf8');
@@ -197,13 +201,13 @@ describe('live v63 bug fixes', () => {
   });
 
   it('derives the footer build label from the same constant as the service-worker cache', () => {
-    assert.match(build, /var H2C_APP_BUILD = 'v64'/);
+    assert.match(build, /var H2C_APP_BUILD = 'v65'/);
     assert.match(build, /var H2C_SHELL_CACHE = 'apollo-rca-shell-' \+ H2C_APP_BUILD/);
     assert.match(sw, /importScripts\('\.\/app-build\.js'\)/);
     assert.match(sw, /const CACHE = self\.H2C_SHELL_CACHE/);
     assert.match(shell, /import '\.\/app-build\.js'/);
     assert.match(shell, /App build ' \+ \(globalThis\.H2C_APP_BUILD/);
-    assert.doesNotMatch(shell, /App build v6[123]/);
+    assert.doesNotMatch(shell, /App build v6[1-4]/);
   });
 
   it('Add cause set immediately creates nodes, selects the first new one, and scrolls it into view', () => {
@@ -215,7 +219,9 @@ describe('live v63 bug fixes', () => {
   it('explains required placeholders and offers Replace with cause instead of a no-op remove', () => {
     assert.match(routes, /This is a required placeholder/);
     assert.match(routes, /children:`Replace with cause`/);
-    assert.match(routes, /P\.placeholder\)return/);
+    assert.match(routes, /isPlaceholderNode\(P\)/);
+    assert.match(routes, /isRequiredPlaceholder\(L\(P\.id\),P\)/);
+    assert.match(routes, /removeCauseNode\(r\.root,P\.id\)/);
     assert.match(routes, /replacePlaceholder=/);
   });
 
@@ -225,8 +231,144 @@ describe('live v63 bug fixes', () => {
     assert.match(routes, /queueMicrotask\(\(\)=>c\(keep\)\)/);
   });
 
-  it('binds form fields to input and change events, not only keystrokes', () => {
-    assert.match(routes, /\.\.\.valueEvents\(e=>r\(t\.id,\{what:e\.target\.value\}\)\)/);
-    assert.match(routes, /valueEvents/);
+  it('binds typable Problem definition fields to EvField and keeps valueEvents on pickers', () => {
+    assert.match(routes, /EvField,\{className:H,value:t\.what/);
+    assert.match(routes, /EvField,\{className:H,value:t\.where/);
+    assert.match(routes, /t\(e=>\(\{\.\.\.e,effects:e\.effects\.map/);
+    assert.match(routes, /valueEvents\(e=>r\(t\.id,\{whenDate:e\.target\.value\}\)/);
+    assert.match(readFileSync(new URL('./chart-sync.js', import.meta.url), 'utf8'), /el\.h2cValFn = fn/);
+  });
+});
+
+describe('live v64 retest fixes', () => {
+  it('valueEvents always calls the latest handler, not a stale first-render closure', () => {
+    let latest = 0;
+    const el = {
+      addEventListener(type, fn) { this['on' + type] = fn; }
+    };
+    const first = valueEvents(() => { latest = 1; });
+    first.ref(el);
+    const second = valueEvents(() => { latest = 2; });
+    second.ref(el);
+    el.onchange({});
+    assert.equal(latest, 2);
+    second.onChange({});
+    assert.equal(latest, 2);
+    assert.equal(typeof el.oninput, 'undefined');
+  });
+
+  it('editing a Problem definition field on a loaded sample keeps all events, causes, and evidence', () => {
+    const sample = getSampleCase();
+    const intake = sample.intake;
+    const peId = intake.effects[0].id;
+    const stale = {
+      effects: [{ id: peId, what: '', where: '', whenDate: '', whenTime: '', phase: 'Steady operation', safety: '', loss: '', frequency: '', frequencyNote: '', timeline: [], evidence: [] }],
+      evidence: [],
+      timeline: []
+    };
+    const typed = { where: 'W' };
+    const wrong = { ...stale, effects: stale.effects.map((effect) => effect.id === peId ? { ...effect, ...typed } : effect) };
+    assert.equal(wrong.effects.length, 1);
+    assert.equal((wrong.evidence || []).length, 0);
+
+    const right = patchPrimaryEffect(intake, peId, typed);
+    assert.ok(right.effects.length >= 3);
+    assert.equal(right.effects.length, intake.effects.length);
+    assert.equal(allEvidenceRows(right).length, allEvidenceRows(intake).length);
+    assert.equal(right.timeline.length, intake.timeline.length);
+    assert.equal(right.effects[0].where, 'W');
+    assert.equal(right.effects[0].what, intake.effects[0].what);
+    assert.equal(right.effects[1].what, intake.effects[1].what);
+
+    const anal = applyIntakeToChart(sample.analysis, right);
+    const before = collectNodes(sample.analysis).map((n) => n.node.title);
+    const after = collectNodes(anal).map((n) => n.node.title);
+    assert.equal(after.length, before.length);
+    assert.ok(after.includes('Oxygen Present'));
+    assert.ok(after.includes('Hydraulic Hose Ruptured'));
+    assert.ok(after.includes('Oil Present'));
+    const terms = walkTerms(anal.trees[0].root);
+    assert.ok(terms.some((t) => t.terminator.type === 'stop' && t.title === 'Oxygen Present'));
+  });
+
+  it('removing a placeholder does not duplicate causes or re-parent other branches', () => {
+    const sample = getSampleCase();
+    const intake = {
+      ...sample.intake,
+      evidence: [
+        ...sample.intake.evidence,
+        { id: 'ev-na1', text: '', source: '', tier: 'Inferred', cause: 'New Action 1', kind: 'action', layer: 2, explains: 'Oil Present', pe: 'pe-1' },
+        { id: 'ev-se1', text: '', source: '', tier: 'Inferred', cause: 'State Exists 1', kind: 'condition', layer: 2, explains: 'Oil Present', pe: 'pe-1' }
+      ]
+    };
+    const anal = ensureNodesForRows(applyIntakeToChart(sample.analysis, intake), intake);
+    const nodes = () => collectNodes(anal);
+    let oil = collectNodes(anal).find((n) => n.node.title === 'Oil Present');
+    const se = collectNodes(anal).find((n) => n.node.title === 'State Exists 1');
+    const na = collectNodes(anal).find((n) => n.node.title === 'New Action 1');
+    assert.ok(oil && se && na);
+    assert.equal(se.parent.title, 'Oil Present');
+    assert.equal(na.parent.title, 'Oil Present');
+    assert.equal(isPlaceholderNode(se.node), true);
+    assert.equal(isPlaceholderNode(na.node), true);
+    assert.equal(isRequiredPlaceholder(anal.trees[0].root, se.node), true);
+    assert.equal(isRequiredPlaceholder(anal.trees[0].root, na.node), true);
+
+    const hoseBefore = collectNodes(anal).find((n) => n.node.title === 'Hydraulic Hose Ruptured');
+    const hoseParent = hoseBefore.parent.title;
+    const hoseKids = (hoseBefore.node.children || []).map((c) => c.title).sort();
+    const oilCount = collectNodes(anal).filter((n) => n.node.title === 'Oil Present').length;
+    const oilTerm = oil.node.terminator ? oil.node.terminator.type : null;
+
+    const blocked = removeCauseNode(anal.trees[0].root, se.node.id);
+    assert.equal(blocked.removed, false);
+    assert.equal(blocked.requiredPlaceholder, true);
+    const afterBlocked = collectNodes({ trees: [{ root: blocked.root, id: 'pe-1' }] });
+    assert.equal(afterBlocked.filter((n) => n.node.title === 'Oil Present').length, oilCount);
+    assert.ok(afterBlocked.some((n) => n.node.title === 'State Exists 1'));
+    const hoseAfter = afterBlocked.find((n) => n.node.title === 'Hydraulic Hose Ruptured');
+    assert.equal(hoseAfter.parent.title, hoseParent);
+    assert.deepEqual((hoseAfter.node.children || []).map((c) => c.title).sort(), hoseKids);
+    const oilAfter = afterBlocked.find((n) => n.node.title === 'Oil Present');
+    assert.equal(oilAfter.node.terminator ? oilAfter.node.terminator.type : null, oilTerm);
+    assert.ok(!afterBlocked.some((n) => n.node.title === 'Oil Present' && n.node.terminator && n.node.terminator.type === 'goto'));
+
+    // Removing a real extra sibling under another branch must not retitle or re-parent Oil Present / Hydraulic Hose.
+    const truck = collectNodes(anal).find((n) => n.node.title === 'Truck Kept Moving After Alarm');
+    anal.trees[0].root = structuredClone(anal.trees[0].root);
+    const truckNode = collectNodes(anal).find((n) => n.node.title === 'Truck Kept Moving After Alarm');
+    truckNode.node.children = [
+      ...truckNode.node.children,
+      { id: 'extra-cond', kind: 'condition', title: 'Spare Condition', verified: true, evidence: [], children: [], necessity: true, sufficiency: true }
+    ];
+    // Need to actually mutate the tree root's child
+    const walkSet = (node) => {
+      if (node.id === truckNode.node.id) {
+        if (!node.children.some((c) => c.id === 'extra-cond')) {
+          node.children = [...node.children, { id: 'extra-cond', kind: 'condition', title: 'Spare Condition', verified: true, evidence: [], children: [], necessity: true, sufficiency: true }];
+        }
+      }
+      (node.children || []).forEach(walkSet);
+    };
+    walkSet(anal.trees[0].root);
+    const removed = removeCauseNode(anal.trees[0].root, 'extra-cond');
+    assert.equal(removed.removed, true);
+    assert.equal(removed.selectedId, truckNode.node.id);
+    const afterRm = collectNodes({ trees: [{ root: removed.root, id: 'pe-1' }] });
+    assert.equal(afterRm.filter((n) => n.node.title === 'Oil Present').length, oilCount);
+    const hoseFinal = afterRm.find((n) => n.node.title === 'Hydraulic Hose Ruptured');
+    assert.equal(hoseFinal.parent.title, hoseParent);
+    assert.deepEqual((hoseFinal.node.children || []).map((c) => c.title).sort(), hoseKids);
+    const oilFinal = afterRm.find((n) => n.node.title === 'Oil Present');
+    assert.equal(oilFinal.node.terminator ? oilFinal.node.terminator.type : null, oilTerm);
+    assert.ok(afterRm.some((n) => n.node.title === 'State Exists 1'));
+    assert.ok(!afterRm.some((n) => n.node.id === 'extra-cond'));
+  });
+
+  it('places STOP labels below evidence chips and fits the first view without a 0.85 min scale clip', () => {
+    assert.match(routes, /function termHang\(e\)/);
+    assert.match(routes, /y:e\.y\+termHang\(e\.node\)\.termY/);
+    assert.match(routes, /minK=e\.width<640\?\.42:\.7/);
+    assert.match(routes, /\(e\.width-48\)/);
   });
 });

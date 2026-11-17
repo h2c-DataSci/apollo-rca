@@ -98,8 +98,10 @@ export function applyIntakeToChart(analysis, intake) {
   const rows = allEvidenceRows(intake);
   const patch = (node, treeId) => {
     const titleKey = String(node.title || '').trim().toLowerCase();
-    const mine = rows.filter((row) => row.nodeId === node.id
-      || (row.cause || '').trim().toLowerCase() === titleKey);
+    const mine = rows.filter((row) => {
+      if (row.nodeId) return row.nodeId === node.id;
+      return (row.cause || '').trim().toLowerCase() === titleKey;
+    });
     const lead = mine.find((row) => (row.cause || '').trim()) || mine[0];
     let next = { ...node, children: (node.children || []).map((child) => patch(child, treeId)) };
     if (node.kind !== 'primary' && lead) {
@@ -148,15 +150,18 @@ export function ensureNodesForRows(analysis, intake) {
       const parent = (parentKey && find(root, (n) => String(n.title || '').trim().toLowerCase() === parentKey)) || root;
       const kind = row.kind === 'condition' ? 'condition' : 'action';
       const id = row.nodeId || `${kind[0]}-sync-${Math.random().toString(36).slice(2, 8)}`;
+      const placeholder = isPlaceholderTitle(row.cause);
       const child = {
         id,
         kind,
         title: row.cause.trim(),
-        verified: true,
-        evidence: [],
+        verified: !placeholder,
+        evidence: placeholder ? [{ source: '?', missing: true }] : [],
         children: [],
         necessity: true,
-        sufficiency: true
+        sufficiency: !placeholder,
+        placeholder,
+        ...(placeholder ? { terminator: { type: 'question', label: 'Need More Info' } } : {})
       };
       parent.children = [...(parent.children || []), child];
       titles.add(key);
@@ -214,17 +219,120 @@ export function refreshFromIntake(intake, analysis) {
 }
 
 export function valueEvents(fn) {
-  const go = (event) => fn(event);
+  const go = (event) => {
+    const el = event.currentTarget || event.target;
+    const live = (el && el.h2cValFn) || fn;
+    live(event);
+  };
   return {
     onChange: go,
     onInput: go,
-    onPaste: (event) => { queueMicrotask(() => fn(event)); },
+    onPaste: (event) => {
+      const el = event.currentTarget || event.target;
+      queueMicrotask(() => ((el && el.h2cValFn) || fn)(event));
+    },
     ref: (el) => {
-      if (!el || el.h2cValBound) return;
+      if (!el) return;
+      el.h2cValFn = fn;
+      if (el.h2cValBound) return;
       el.h2cValBound = true;
-      el.addEventListener('change', go);
-      el.addEventListener('input', go);
+      // Native change only (date pickers, programmatic). React already fires
+      // onInput/onChange for typing; a one-shot native input listener would
+      // keep the first render's closure and overwrite later state.
+      el.addEventListener('change', (event) => (el.h2cValFn || fn)(event));
     }
+  };
+}
+
+export function isPlaceholderTitle(title) {
+  return /^(action needed|condition needed|new action(?: \d+)?|state exists(?: \d+)?)$/i.test(String(title || '').trim());
+}
+
+export function isPlaceholderNode(node) {
+  return !!(node && (node.placeholder || isPlaceholderTitle(node.title)));
+}
+
+export function parentNodeId(root, id) {
+  let found;
+  walk(root, (node, parent) => {
+    if (node.id === id) found = parent ? parent.id : null;
+  });
+  return found === undefined ? null : found;
+}
+
+export function isRequiredPlaceholder(root, node) {
+  if (!isPlaceholderNode(node) || !root) return false;
+  let parent = null;
+  walk(root, (n, p) => {
+    if (n.id === node.id) parent = p;
+  });
+  if (!parent) return false;
+  const others = (parent.children || []).filter((child) => child.id !== node.id);
+  if (node.kind === 'condition') return !others.some((child) => child.kind === 'condition');
+  return !others.some((child) => child.kind === 'action');
+}
+
+function makePlaceholder(kind) {
+  const id = (globalThis.crypto && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : `${kind[0]}-ph-${Math.random().toString(36).slice(2, 8)}`;
+  return {
+    id,
+    kind,
+    title: kind === 'action' ? 'Action Needed' : 'Condition Needed',
+    verified: false,
+    evidence: [{ source: '?', missing: true }],
+    children: [],
+    necessity: true,
+    sufficiency: true,
+    placeholder: true,
+    terminator: { type: 'question', label: 'Need More Info' }
+  };
+}
+
+function replaceNode(root, id, fn) {
+  if (!root) return root;
+  if (root.id === id) return fn(root);
+  return { ...root, children: (root.children || []).map((child) => replaceNode(child, id, fn)) };
+}
+
+// Remove a cause from one parent only. Required placeholders are left in place.
+// Never walks the rest of the tree adding terminators, GOTO nodes, or placeholders.
+export function removeCauseNode(root, id) {
+  if (!root || root.id === id) {
+    return { root, removed: false, selectedId: root ? root.id : null, requiredPlaceholder: false };
+  }
+  let target = null;
+  let parent = null;
+  walk(root, (node, p) => {
+    if (node.id === id) {
+      target = node;
+      parent = p;
+    }
+  });
+  if (!target || !parent) {
+    return { root, removed: false, selectedId: id, requiredPlaceholder: false };
+  }
+  if (isPlaceholderNode(target) && isRequiredPlaceholder(root, target)) {
+    return { root, removed: false, selectedId: id, requiredPlaceholder: true };
+  }
+  const nextChildren = (parent.children || []).filter((child) => child.id !== id);
+  if (nextChildren.length) {
+    if (!nextChildren.some((child) => child.kind === 'action')) nextChildren.unshift(makePlaceholder('action'));
+    if (!nextChildren.some((child) => child.kind === 'condition')) nextChildren.push(makePlaceholder('condition'));
+  }
+  const patched = {
+    ...parent,
+    children: nextChildren,
+    terminator: nextChildren.length
+      ? undefined
+      : (parent.kind === 'primary' ? parent.terminator : (parent.terminator || { type: 'question', label: 'Need More Info' }))
+  };
+  return {
+    root: replaceNode(root, parent.id, () => patched),
+    removed: true,
+    selectedId: parent.id,
+    requiredPlaceholder: false
   };
 }
 
