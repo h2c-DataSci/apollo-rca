@@ -575,9 +575,9 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
-@media (min-width: 1024px) {
+@media (min-width: 1100px) {
   .h2c-steps-grid {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(8.4rem, 1fr));
   }
 }
 .h2c-step-card {
@@ -622,6 +622,21 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
   border-color: #047857;
   box-shadow: 0 8px 20px rgba(5, 150, 105, 0.2);
 }
+.h2c-step-card.is-current {
+  border-color: #c9a227;
+  background: #fffdf4;
+  box-shadow: 0 0 0 3px rgba(201,162,39,.22), 0 4px 14px rgba(16,32,51,.08);
+}
+.h2c-step-card.is-current .h2c-step-num {
+  background: #c9a227;
+  color: #102033;
+  border-color: #8c6a1a;
+}
+.h2c-step-card.is-todo {
+  background: #fffef9;
+  border-color: #e6d7a8;
+  opacity: .92;
+}
 .h2c-step-bot {
   margin-top: auto;
   padding-top: 5px;
@@ -635,9 +650,10 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
 }
 .h2c-step-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 4px;
+  flex-wrap: wrap;
+  gap: 6px;
   margin-bottom: 6px;
   width: 100%;
 }
@@ -661,14 +677,15 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
   box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .h2c-step-pill {
-  font: 700 10.5px/1.2 system-ui, sans-serif;
-  padding: 3px 6px;
-  border-radius: 5px;
-  white-space: nowrap;
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font: 650 11px/1.3 system-ui, sans-serif;
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  max-width: none;
+  text-align: right;
+  flex: 1 1 auto;
 }
 .h2c-pill-stop {
   background: #fee2e2;
@@ -701,9 +718,9 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
   font: 400 11px/1.2 system-ui, sans-serif;
   color: #5e6b5a;
   margin-top: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 
 /* Color Coded Validation Badges */
@@ -918,7 +935,13 @@ function mountLegalToolbarBtn() {
       <span>⚖️ Legal &amp; Trademarks</span>
     `);
     tb.onclick = scrollToLegal;
-    anchor.parentNode.insertBefore(tb, anchor);
+    const tools = document.querySelector('.h2c-hero-tools');
+    if (tools) {
+      tb.classList.add('h2c-cta-tool');
+      tools.append(tb);
+    } else {
+      anchor.parentNode.insertBefore(tb, anchor);
+    }
 }
 
 function ensureBottomLegalShowcase() {
@@ -1109,7 +1132,8 @@ function updateStepsHub() {
   const grid = hub.querySelector('.h2c-steps-grid');
   for (const s of steps) {
     const card = document.createElement('div');
-    card.className = `h2c-step-card ${s.isReady ? 'is-ready' : ''}`;
+    const firstTodo = steps.findIndex((step) => !step.isReady);
+    card.className = `h2c-step-card ${s.isReady ? 'is-ready is-done' : (s.num === steps[firstTodo]?.num ? 'is-current' : 'is-todo')}`;
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
     card.setAttribute('aria-label', `Step ${s.num}: ${s.name} (${s.status})`);
@@ -1751,7 +1775,7 @@ function ensureBuildLabel() {
   const host = document.querySelector('#legal-disclosure') || document.querySelector('main') || document.body;
   const label = document.createElement('p');
   label.className = 'no-print h2c-build-label';
-  label.textContent = 'App build v60';
+  label.textContent = 'App build v61';
   host.append(label);
 }
 

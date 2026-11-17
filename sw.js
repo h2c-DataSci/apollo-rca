@@ -1,4 +1,4 @@
-const CACHE = 'apollo-rca-shell-v60';
+const CACHE = 'apollo-rca-shell-v61';
 const RUNTIME = 'apollo-rca-runtime-v2';
 const OWN_PREFIX = 'apollo-rca-';
 const RUNTIME_MAX_ENTRIES = 40;
@@ -11,7 +11,7 @@ const SHELL = [
   './index-v13.js',
   './routes-v13.js',
   './rolldown-runtime-v11.js',
-  './h2c-shell.js?v=46',
+  './h2c-shell.js?v=47',
   './h2c-help.js?v=34',
   './help-kb.js?v=28',
   './help-diagrams.js?v=24',
