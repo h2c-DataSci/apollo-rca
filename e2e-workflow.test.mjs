@@ -36,7 +36,7 @@ describe('Phase 3: End-to-End RCA Workflow & Stability Tests', () => {
     assert.match(routes, /trees:\(chartLive\|\|n\)\.trees/);
     assert.match(routes, /Add evidence for this cause/);
     assert.equal(html.includes('<h2 class="text-lg font-semibold">Evidence</h2>'), false);
-    assert.match(routes, /children:`Zoom in`/);
+    assert.match(routes, /"aria-label":`Zoom in`/);
     const timelineAt = html.indexOf('>Timeline<');
     const generateAt = html.indexOf('Generate chart');
     assert.ok(timelineAt > 0 && generateAt > timelineAt);

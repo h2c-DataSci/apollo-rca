@@ -71,7 +71,7 @@ function setSafeHtml(el, html) {
   el.replaceChildren(...doc.body.childNodes);
 }
 
-const KEYS = ['realitychart-intake-v1', 'realitychart-hypotheses-v1', 'realitychart-raw-notes-v1', AUDIT_KEY];
+const KEYS = ['realitychart-intake-v1', 'realitychart-analysis-v1', 'realitychart-hypotheses-v1', 'realitychart-raw-notes-v1', AUDIT_KEY];
 const BACKUP = 'h2c-last-cleared-v1';
 let proceed = false;
 let updating = false;
@@ -566,17 +566,17 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
 }
 .h2c-steps-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 @media (min-width: 640px) {
   .h2c-steps-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 @media (min-width: 1024px) {
   .h2c-steps-grid {
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 }
 .h2c-step-card {
@@ -595,6 +595,8 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
   position: relative;
   width: 100%;
   min-height: 115px;
+  min-width: 0;
+  overflow-wrap: anywhere;
   gap: 4px;
 }
 .h2c-step-card:hover {
@@ -662,6 +664,10 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
   padding: 3px 6px;
   border-radius: 5px;
   white-space: nowrap;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .h2c-pill-stop {
   background: #fee2e2;
