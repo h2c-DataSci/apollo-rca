@@ -222,3 +222,23 @@ input.h-11:focus,select.h-11:focus,textarea:focus,input[type=date]:focus,input[t
 .h2c-refresh-btn{font-weight:600;letter-spacing:.01em}
 .h2c-sync-toast{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);z-index:80;background:#0a5c45;color:#fff;padding:.65rem 1.15rem;border-radius:999px;font-size:.95rem;font-weight:700;box-shadow:0 8px 24px rgba(16,32,51,.2)}
 g[data-evidence],g[data-term]{cursor:pointer}
+
+/* v66: chart uses the full viewport width so the sample first view stays readable. */
+.h2c-chart-landing{
+  box-sizing:border-box;
+  width:100vw;
+  max-width:100vw;
+  margin-left:calc(50% - 50vw);
+  padding-left:max(1rem, env(safe-area-inset-left, 0px));
+  padding-right:max(1rem, env(safe-area-inset-right, 0px));
+}
+.h2c-chart-with-inspector{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:1rem;
+  align-items:start;
+}
+@media (min-width:100rem){
+  .h2c-chart-with-inspector{grid-template-columns:minmax(0,1fr) 20rem}
+}
+html{overflow-x:hidden}
