@@ -14,6 +14,7 @@ function escapeHtml(str) {
 
 import { PROVIDER_PRESETS, LOCAL_PRESETS } from './provider-presets.js';
 import { sessionStore, SESSION_CHANGED, listLegacyData, removeLegacyData, legacyRecoveryPlan } from './session-store.js';
+import './app-build.js';
 
 import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach, isLoopback, executeLocalChat, stripModelThinking } from './local-ai-bridge.js?v=28';
 import { COACH_STEPS, coachIsReady, coachReadyHint, buildStepPrompt, reviewStepEntries } from './coach-steps.js?v=2';
@@ -1775,7 +1776,7 @@ function ensureBuildLabel() {
   const host = document.querySelector('#legal-disclosure') || document.querySelector('main') || document.body;
   const label = document.createElement('p');
   label.className = 'no-print h2c-build-label';
-  label.textContent = 'App build v61';
+  label.textContent = 'App build ' + (globalThis.H2C_APP_BUILD || '');
   host.append(label);
 }
 

@@ -10,7 +10,9 @@ import {
   ensureNodesForRows,
   removeEvidenceRow,
   addEvidenceForNode,
-  patchPrimaryEffect
+  patchPrimaryEffect,
+  refreshFromIntake,
+  reselectNode
 } from './chart-sync.js';
 
 const routes = readFileSync(new URL('./routes-v13.js', import.meta.url), 'utf8');
@@ -110,6 +112,25 @@ describe('chart-sync helpers', () => {
     assert.equal(terms.filter((t) => t.terminator.type === 'stop').length, 1);
     assert.equal(terms.filter((t) => t.terminator.type === 'question').length, 1);
   });
+
+  it('Refresh keeps a newer Problem definition What value instead of reverting to a stale chart title', () => {
+    const sample = getSampleCase();
+    const intake = syncChartToIntake(sample.intake, sample.analysis);
+    intake.effects[0].what = 'Pump Failed';
+    // Stored analysis still has the older title, as after a form edit that is shown live via applyIntakeToChart.
+    assert.equal(sample.analysis.trees[0].root.title, 'Haul Truck Fire');
+    const { intake: next, analysis: anal } = refreshFromIntake(intake, sample.analysis);
+    assert.equal(next.effects[0].what, 'Pump Failed');
+    assert.equal(anal.trees[0].root.title, 'Pump Failed');
+    assert.notEqual(next.effects[0].what, 'Haul Truck Fire');
+  });
+
+  it('reselectNode keeps an existing id and remaps by title when ids change', () => {
+    const sample = getSampleCase();
+    const node = collectNodes(sample.analysis).find((n) => n.node.title === 'Oxygen Present');
+    assert.equal(reselectNode(sample.analysis, node.node.id, 'Oxygen Present'), node.node.id);
+    assert.equal(reselectNode(sample.analysis, 'missing-id', 'Oxygen Present'), node.node.id);
+  });
 });
 
 describe('chart-sync wiring', () => {
@@ -150,7 +171,62 @@ describe('chart-sync wiring', () => {
   });
 
   it('pins the new sync module in the offline shell cache', () => {
-    assert.match(sw, /const CACHE = 'apollo-rca-shell-v63'/);
+    assert.match(sw, /importScripts\('\.\/app-build\.js'\)/);
+    assert.match(sw, /const CACHE = self\.H2C_SHELL_CACHE/);
     assert.match(sw, /'\.\/chart-sync\.js'/);
+  });
+});
+
+describe('live v63 bug fixes', () => {
+  const shell = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
+  const build = readFileSync(new URL('./app-build.js', import.meta.url), 'utf8');
+
+  it('makes STOP and Need More Info glyphs selectable with a hit area and inspector focus', () => {
+    assert.match(routes, /onSelect:sel/);
+    assert.match(routes, /"data-term-node":o/);
+    assert.match(routes, /pointerEvents:`all`/);
+    assert.match(routes, /id:`h2c-leaf-terminator`/);
+    assert.match(routes, /placeholder:`What evidence is needed\?`/);
+    assert.match(routes, /src===`term`&&requestAnimationFrame/);
+    assert.doesNotMatch(routes, /onSelect:\(\)=>s\?\.\(e\.node\.id\)/);
+  });
+
+  it('Refresh uses refreshFromIntake so form PE fields are not overwritten', () => {
+    assert.match(routes, /refreshFromIntake\(e,n\)/);
+    assert.match(readFileSync(new URL('./chart-sync.js', import.meta.url), 'utf8'), /preferIntake/);
+  });
+
+  it('derives the footer build label from the same constant as the service-worker cache', () => {
+    assert.match(build, /var H2C_APP_BUILD = 'v64'/);
+    assert.match(build, /var H2C_SHELL_CACHE = 'apollo-rca-shell-' \+ H2C_APP_BUILD/);
+    assert.match(sw, /importScripts\('\.\/app-build\.js'\)/);
+    assert.match(sw, /const CACHE = self\.H2C_SHELL_CACHE/);
+    assert.match(shell, /import '\.\/app-build\.js'/);
+    assert.match(shell, /App build ' \+ \(globalThis\.H2C_APP_BUILD/);
+    assert.doesNotMatch(shell, /App build v6[123]/);
+  });
+
+  it('Add cause set immediately creates nodes, selects the first new one, and scrolls it into view', () => {
+    assert.match(routes, /ensureNodesForRows\(applyIntakeToChart\(n,next\),next\)/);
+    assert.match(routes, /scrollIntoView\(\{block:`nearest`/);
+    assert.match(routes, /collectNodes\(anal\)\.map\(e=>e\.node\.id\)\.find\(e=>!before\.has\(e\)\)/);
+  });
+
+  it('explains required placeholders and offers Replace with cause instead of a no-op remove', () => {
+    assert.match(routes, /This is a required placeholder/);
+    assert.match(routes, /children:`Replace with cause`/);
+    assert.match(routes, /P\.placeholder\)return/);
+    assert.match(routes, /replacePlaceholder=/);
+  });
+
+  it('keeps the selected node after a cause-type change', () => {
+    assert.match(routes, /keep=P\.id,keepTitle=P\.title/);
+    assert.match(routes, /reselectNode/);
+    assert.match(routes, /queueMicrotask\(\(\)=>c\(keep\)\)/);
+  });
+
+  it('binds form fields to input and change events, not only keystrokes', () => {
+    assert.match(routes, /\.\.\.valueEvents\(e=>r\(t\.id,\{what:e\.target\.value\}\)\)/);
+    assert.match(routes, /valueEvents/);
   });
 });
