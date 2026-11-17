@@ -217,3 +217,8 @@ input.h-11:focus,select.h-11:focus,textarea:focus,input[type=date]:focus,input[t
   #realitychart,#h2c-chart-landing,.h2c-chart-frame{scroll-margin-top:4.25rem}
   .h2c-sample-hint{font-size:.85rem;padding:.7rem .85rem}
 }
+
+.h2c-ev-selected{border-color:#0a5c45!important;box-shadow:0 0 0 2px rgba(10,92,69,.22)}
+.h2c-refresh-btn{font-weight:600;letter-spacing:.01em}
+.h2c-sync-toast{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);z-index:80;background:#0a5c45;color:#fff;padding:.65rem 1.15rem;border-radius:999px;font-size:.95rem;font-weight:700;box-shadow:0 8px 24px rgba(16,32,51,.2)}
+g[data-evidence],g[data-term]{cursor:pointer}
