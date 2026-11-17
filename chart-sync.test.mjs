@@ -201,13 +201,13 @@ describe('live v63 bug fixes', () => {
   });
 
   it('derives the footer build label from the same constant as the service-worker cache', () => {
-    assert.match(build, /var H2C_APP_BUILD = 'v65'/);
+    assert.match(build, /var H2C_APP_BUILD = 'v66'/);
     assert.match(build, /var H2C_SHELL_CACHE = 'apollo-rca-shell-' \+ H2C_APP_BUILD/);
     assert.match(sw, /importScripts\('\.\/app-build\.js'\)/);
     assert.match(sw, /const CACHE = self\.H2C_SHELL_CACHE/);
     assert.match(shell, /import '\.\/app-build\.js'/);
     assert.match(shell, /App build ' \+ \(globalThis\.H2C_APP_BUILD/);
-    assert.doesNotMatch(shell, /App build v6[1-4]/);
+    assert.doesNotMatch(shell, /App build v6[1-5]/);
   });
 
   it('Add cause set immediately creates nodes, selects the first new one, and scrolls it into view', () => {
@@ -367,8 +367,46 @@ describe('live v64 retest fixes', () => {
 
   it('places STOP labels below evidence chips and fits the first view without a 0.85 min scale clip', () => {
     assert.match(routes, /function termHang\(e\)/);
-    assert.match(routes, /y:e\.y\+termHang\(e\.node\)\.termY/);
-    assert.match(routes, /minK=e\.width<640\?\.42:\.7/);
+    assert.match(routes, /termY=e\.y\+hang\.termY/);
+    assert.match(routes, /hang\.kind===`stop`/);
+    assert.match(routes, /minRead=e\.width<640\?\.5:\.82/);
     assert.match(routes, /\(e\.width-48\)/);
+  });
+});
+
+describe('live v65 retest fixes', () => {
+  it('gives the first sample view the full available width and a readable no-clip openView', () => {
+    const styles = readFileSync(new URL('./styles-v13.css', import.meta.url), 'utf8');
+    assert.match(routes, /h2c-chart-landing/);
+    assert.match(routes, /h2c-chart-with-inspector/);
+    assert.match(styles, /\.h2c-chart-landing/);
+    assert.match(styles, /margin-left:calc\(50% - 50vw\)/);
+    assert.match(styles, /min-width:100rem/);
+    assert.match(routes, /minRead=e\.width<640\?\.5:\.82/);
+    assert.match(routes, /if\(fit>=minRead\)return E\(\)/);
+    assert.match(routes, /byW>=floor/);
+    assert.doesNotMatch(routes, /minK=e\.width<640\?\.42:\.7/);
+  });
+
+  it('enlarges node hit areas so a first click at Fit scale still registers', () => {
+    assert.match(routes, /"data-node-hit":a\.id/);
+    assert.match(routes, /x:o-22,y:s-22,width:272,height:116/);
+    assert.match(routes, /pointerEvents:`all`/);
+  });
+
+  it('keeps Need More Info attached to its parent mid-line, not dropped toward the next row', () => {
+    assert.match(routes, /termHang\(e\)/);
+    assert.match(routes, /e\.terminator\.type===`stop`\?\{dx,dy:r\+28/);
+    assert.match(routes, /termY:36,kind:e\.terminator\.type/);
+    assert.match(routes, /hang\.kind===`stop`&&termY>o\+8/);
+  });
+
+  it('debounces cause TitleField commits so the chart updates while typing without caret loss', () => {
+    assert.match(routes, /function TitleField/);
+    assert.match(routes, /setTimeout\(\(\)=>commit\(v,!1\),400\)/);
+    assert.match(routes, /c\.current\|\|r\(e\)/);
+    assert.match(routes, /EvField,\{className:Pe,value:t\.text/);
+    assert.match(routes, /EvField,\{className:`mt-1 \$\{H\}`,value:t\.cause/);
+    assert.match(routes, /setTimeout\(\(\)=>t\(e\),450\)/);
   });
 });

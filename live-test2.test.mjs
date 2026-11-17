@@ -276,7 +276,7 @@ describe('bold design pass 2', () => {
     assert.match(shell, /Before the chart/);
   });
   it('fits the chart to width with a readable min scale and defaults to one primary effect', () => {
-    assert.match(routes, /minK=e\.width<640\?\.42:\.7/);
+    assert.match(routes, /minRead=e.width<640\?\.5:\.82/);
     assert.match(routes, /useState\)\(\(\)=>e\.length>1&&e\[0\]&&e\[0\]\.code\?e\[0\]\.code:`all`\)/);
     assert.match(routes, /fontSize:wrapTitle\(a\.title\)\.length>1\?15:17/);
     assert.match(css, /\.h2c-chart-frame\{min-height:700px/);

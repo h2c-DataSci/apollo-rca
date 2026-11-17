@@ -1,6 +1,6 @@
 // Single source of truth for the visible "App build" label and the service-worker cache name.
 // Loaded as a module side-effect by h2c-shell.js and via importScripts() from sw.js.
-var H2C_APP_BUILD = 'v65';
+var H2C_APP_BUILD = 'v66';
 var H2C_SHELL_CACHE = 'apollo-rca-shell-' + H2C_APP_BUILD;
 if (typeof globalThis !== 'undefined') {
   globalThis.H2C_APP_BUILD = H2C_APP_BUILD;
