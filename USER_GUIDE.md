@@ -8,7 +8,7 @@ Welcome to the **H2C Root Cause Analyst**, an AI-aided, open-source web applicat
 
 1. **Open the App**: Launch your browser and navigate to `http://127.0.0.1:8080/apollo-rca/` (or your deployed URL).
 2. **Standard Mode**: You can begin immediately without downloading any AI models or connecting to any external services.
-3. **Load Sample Case**: Click `Load sample case` in the top toolbar to explore a fully articulated incident (*"Oil Released"*).
+3. **Load Sample Case**: Click `Load sample case` in the top toolbar to explore a finished fictional incident (*"Haul Truck Fire"* at a pit ramp). The chart is interactive: click any node, then press New analysis to start your own.
 4. **New Analysis**: Click `New analysis` anytime to clear the workspace and start fresh (with full 20-second Undo protection).
 
 ---

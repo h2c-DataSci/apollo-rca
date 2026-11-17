@@ -209,3 +209,11 @@ input.h-11:focus,select.h-11:focus,textarea:focus,input[type=date]:focus,input[t
   .h2c-session-notice br{display:none}
   aside.h2c-session-notice{max-height:4.5rem;overflow:hidden}
 }
+
+/* v62: sample showcase hint + stable chart scroll */
+#realitychart,#h2c-chart-landing,.h2c-chart-frame{scroll-margin-top:5.5rem}
+.h2c-sample-hint{margin:0 0 .75rem;padding:.85rem 1.1rem;border:2px solid #c9a227;border-radius:.75rem;background:linear-gradient(180deg,#fffdf6,#f7f0d8);color:#102033;font-size:.95rem;line-height:1.45;box-shadow:0 6px 18px rgba(16,32,51,.08)}
+@media (max-width:420px){
+  #realitychart,#h2c-chart-landing,.h2c-chart-frame{scroll-margin-top:4.25rem}
+  .h2c-sample-hint{font-size:.85rem;padding:.7rem .85rem}
+}

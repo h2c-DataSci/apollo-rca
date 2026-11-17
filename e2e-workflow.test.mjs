@@ -18,7 +18,7 @@ describe('Phase 3: End-to-End RCA Workflow & Stability Tests', () => {
     assert.equal(html.includes('Own timeline and evidence'), false);
     assert.equal(html.includes('>Timeline<'), true);
     assert.match(routes, /e\.effects\.length>1\?\(0,B\.jsxs\)\(`details`/);
-    assert.match(routes, /onClick:\(\)=>\{let n=fe\(ke\)/);
+    assert.match(routes, /onClick:\(\)=>loadSampleCase\(t,r,c\)/);
     assert.match(routes, /part:`evidence`/);
     assert.match(routes, /function applyChartEvidence/);
     assert.match(routes, /function NodeEvidence/);
