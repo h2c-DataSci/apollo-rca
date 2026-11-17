@@ -9,7 +9,7 @@ export const COACH_STEPS = [
   { id: 'define', label: 'Define', section: 'h2c-problem', heading: /problem definition/i, ask: 'Review each primary effect and the what, where, when and significance fields.' },
   { id: 'timeline', label: 'Timeline', section: 'h2c-timeline', heading: /timeline/i, ask: 'Review the timeline rows for order, missing times, and gaps.' },
   { id: 'evidence', label: 'Evidence', section: 'h2c-evidence', heading: /evidence/i, ask: 'Review hypothesized causes, action and condition pairing, and evidence on every cause.' },
-  { id: 'chart', label: 'Chart', section: 'realitychart', heading: /realitychart|h2c chart/i, ask: 'Review the RealityChart: causal sets, evidence, STOP and Need More Info endings.' },
+  { id: 'chart', label: 'Chart', section: 'realitychart', heading: /realitychart|^chart$|h2c chart/i, ask: 'Review the RealityChart: causal sets, evidence, STOP and Need More Info endings.' },
   { id: 'solutions', label: 'Solutions', section: 'h2c-solutions', heading: /solution/i, ask: 'Review solution selection against the matrix criteria.' },
   { id: 'schedule', label: 'Schedule', section: 'solution-matrix', heading: /corrective|schedule/i, ask: 'Review selected solutions for action, owner and due date.' },
   { id: 'download', label: 'Download', section: 'h2c-download', heading: /download/i, ask: 'Review readiness for the report. List remaining gaps only. Do not declare a root cause.' }

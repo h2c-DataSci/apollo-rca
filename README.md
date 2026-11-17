@@ -43,7 +43,7 @@ Seven steps, in page order: Define, Timeline, Evidence, Chart, Solutions, Schedu
 - The downloaded PDF follows problem definition, timeline, evidence, the chart, then the summary, solutions, corrective actions, action items, and causal log. Reports export as PDF, and as ZIP when one file would damage figures.
 - One-click New analysis, with confirm and undo. Open case (JSON) reloads a Cause Chart_Project_State.json export; a project JSON dropped on evidence is offered as an import, not stored as an evidence row.
 - Help knowledge base and a Feedback link next to About the developer.
-- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v59`. Script queries: shell `v=45`, help `v=34`, help knowledge `v=28`, diagrams `v=24`, videos `v=27`, local bridge `v=28`, coach steps `v=1`.
+- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v60`. Script queries: shell `v=46`, help `v=34`, help knowledge `v=28`, diagrams `v=24`, videos `v=27`, local bridge `v=28`, coach steps `v=2`.
 
 ## AI
 

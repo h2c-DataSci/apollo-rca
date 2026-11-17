@@ -18,6 +18,7 @@ const helpKb = readFileSync(new URL('./help-kb.js', import.meta.url), 'utf8');
 const helpDiagrams = readFileSync(new URL('./help-diagrams.js', import.meta.url), 'utf8');
 const videos = readFileSync(new URL('./h2c-videos.js', import.meta.url), 'utf8');
 const sw = readFileSync(new URL('./sw.js', import.meta.url), 'utf8');
+const steps = readFileSync(new URL('./coach-steps.js', import.meta.url), 'utf8');
 const fixture = JSON.parse(readFileSync(new URL('./test/fixtures/Cause Chart_Project_State.json', import.meta.url), 'utf8'));
 
 describe('live-test 2: dates, casing, timelines, placeholders', () => {
@@ -110,6 +111,7 @@ describe('live-test 2: chart chrome, legend, duplicates, performance hooks', () 
 
   it('restores session readiness after paint and debounces intake persistence', () => {
     assert.match(routes, /h2cSessionReady/);
+    assert.match(routes, /if\(globalThis\.h2cSessionReady\)return;globalThis\.h2cSessionReady=!0/);
     assert.match(routes, /setTimeout\(\(\)=>\{try\{sessionStore\.setItem\(qn/);
     assert.match(shell, /h2cSessionReady/);
     assert.match(shell, /Restoring session/);
@@ -129,9 +131,9 @@ describe('live-test 2: help, videos, version label', () => {
 
   it('labels the videos FAB and shows the app build', () => {
     assert.match(videos, /Videos \(7\)/);
-    assert.match(shell, /App build v59/);
-    assert.match(sw, /apollo-rca-shell-v59/);
-    assert.match(sw, /coach-steps\.js\?v=1/);
+    assert.match(shell, /App build v60/);
+    assert.match(sw, /apollo-rca-shell-v60/);
+    assert.match(sw, /coach-steps\.js\?v=2/);
     assert.match(sw, /rca-principles\.js/);
   });
 });
@@ -216,5 +218,33 @@ describe('remember-key stays opt-in and memory-only by default', () => {
     const headers = parseExtraHeaders('X-Good: yes\nBad Name\n: no');
     assert.equal(headers['X-Good'], 'yes');
     assert.ok(!Object.keys(headers).some((key) => key.includes('\n')));
+  });
+});
+
+describe('live-test 2 follow-up: P05 jump, evidence debounce, visual refresh', () => {
+  it('P05 See references are clickable and include a node id when known', () => {
+    assert.match(routes, /function IntegrityStatus\(/);
+    assert.match(routes, /h2c-integrity-ref/);
+    assert.match(routes, /function focusIntegrityRef\(/);
+    assert.match(routes, /data-node/);
+    assert.match(css, /\.h2c-integrity-ref/);
+  });
+  it('evidence text and cause fields debounce parent updates while focused', () => {
+    assert.match(routes, /function EvField\(/);
+    assert.match(routes, /onCommit:e=>a\(t\.id,\{text:e\}\)/);
+    assert.match(routes, /onCommit:e=>a\(t\.id,\{cause:e\}\)/);
+  });
+  it('visual refresh keeps brand gold, focus rings, and mandatory STOP red', () => {
+    assert.match(css, /v60: visual refresh/);
+    assert.match(css, /\.border-gold\{border-color:#c9a227\}/);
+    assert.match(css, /outline:3px solid #0a5c45/);
+    assert.match(css, /#d32f2f/);
+    assert.match(css, /\.h2c-chart-stage\{flex:1 1 auto/);
+    assert.match(shell, /App build v60/);
+    assert.match(sw, /apollo-rca-shell-v60/);
+  });
+  it('Ask-coach buttons attach once to headings and Chart matches the Chart heading', () => {
+    assert.match(shell, /heading.nextElementSibling && heading.nextElementSibling.classList.contains\('h2c-ask-coach'\)/);
+    assert.match(steps, /realitychart\|\^chart\$\|h2c chart/);
   });
 });

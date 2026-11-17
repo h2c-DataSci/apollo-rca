@@ -16,7 +16,7 @@ import { PROVIDER_PRESETS, LOCAL_PRESETS } from './provider-presets.js';
 import { sessionStore, SESSION_CHANGED, listLegacyData, removeLegacyData, legacyRecoveryPlan } from './session-store.js';
 
 import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach, isLoopback, executeLocalChat, stripModelThinking } from './local-ai-bridge.js?v=28';
-import { COACH_STEPS, coachIsReady, coachReadyHint, buildStepPrompt, reviewStepEntries } from './coach-steps.js?v=1';
+import { COACH_STEPS, coachIsReady, coachReadyHint, buildStepPrompt, reviewStepEntries } from './coach-steps.js?v=2';
 import { DEEPER_TASKS, runDeeperReview, briefForReview, presentFinding } from './coach-deeper.js?v=7';
 import { AUDIT_KEY, AUDIT_SECTIONS, isCloudAuditMode, runCloudSectionAudit, saveCoachAudit, loadCoachAudit, clearCoachAudit, auditAsReview, visibleAudit, fingerprint, appendAuditPdf, auditMarkdown, exportableAudit, workflowAnchor, reportAnchor } from './coach-audit.js?v=1';
 
@@ -897,8 +897,9 @@ function updateTopAttributionRibbon() {
     `);
     const btn = ribbon.querySelector('#h2c-ribbon-jump-btn');
     if (btn) btn.onclick = scrollToLegal;
-    sub.parentNode.appendChild(ribbon);
+    sub.before(ribbon);
   }
+  placeChrome();
 
   // Also ensure toolbar button is mounted
   mountLegalToolbarBtn();
@@ -1713,12 +1714,44 @@ function ensureLocalBridgeUI() {
   applyMode(true);
 }
 
+function placeChrome() {
+  const main = document.querySelector('main');
+  if (!main) return;
+  const ribbon = document.querySelector('.h2c-top-ribbon');
+  const foot = document.querySelector('.h2c-devfoot');
+  if (ribbon && ribbon.nextElementSibling !== main) main.before(ribbon);
+  if (foot && main.nextElementSibling !== foot) main.after(foot);
+}
+
+function ensureEmptyHints() {
+  document.querySelectorAll('.h2c-empty-chart-hint').forEach((node) => {
+    if (document.getElementById('realitychart')) node.remove();
+  });
+  const gen = [...document.querySelectorAll('button')].find((b) => /Generate chart/i.test(b.textContent || ''));
+  if (gen && !document.getElementById('realitychart') && !document.querySelector('.h2c-empty-chart-hint')) {
+    const hint = document.createElement('p');
+    hint.className = 'no-print h2c-empty-hint h2c-empty-chart-hint';
+    hint.textContent = 'Fill the primary effect, where, date and a timeline event, then generate the RealityChart. A colour legend appears with the chart.';
+    gen.insertAdjacentElement('afterend', hint);
+  }
+  const ev = document.getElementById('h2c-evidence');
+  if (ev) {
+    ev.querySelectorAll('.h2c-empty-ev-hint').forEach((node) => node.remove());
+    if (!ev.querySelector('.h2c-ev-row')) {
+      const hint = document.createElement('p');
+      hint.className = 'no-print h2c-empty-hint h2c-empty-ev-hint';
+      hint.textContent = 'No observations yet. Add what you saw, read or calculated, and the hypothesized cause it supports.';
+      ev.append(hint);
+    }
+  }
+}
+
 function ensureBuildLabel() {
   if (document.querySelector('.h2c-build-label')) return;
   const host = document.querySelector('#legal-disclosure') || document.querySelector('main') || document.body;
   const label = document.createElement('p');
   label.className = 'no-print h2c-build-label';
-  label.textContent = 'App build v59';
+  label.textContent = 'App build v60';
   host.append(label);
 }
 
@@ -1734,8 +1767,14 @@ function readStoredCase() {
 
 function ensureStepCoachButtons() {
   for (const step of COACH_STEPS) {
-    const section = document.getElementById(step.section) || (step.heading && [...document.querySelectorAll('h2, h3, section')].find((node) => step.heading.test(node.getAttribute('aria-label') || node.textContent || '')));
-    if (!section || section.querySelector('.h2c-ask-coach')) continue;
+    const byId = step.section && document.getElementById(step.section);
+    const byHeading = step.heading && [...document.querySelectorAll('h2, h3')].find((node) => step.heading.test((node.textContent || '').trim()));
+    const section = byId || byHeading;
+    if (!section) continue;
+    if (byId && byId.id === 'h2c-download' && !byHeading) continue;
+    const heading = byHeading || section.querySelector('h2, h3') || section;
+    if (heading.nextElementSibling && heading.nextElementSibling.classList.contains('h2c-ask-coach')) continue;
+    if (section.querySelector && section.querySelector('.h2c-ask-coach')) continue;
     const wrap = document.createElement('div');
     wrap.className = 'no-print h2c-ask-coach';
     wrap.style.cssText = 'margin:8px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center';
@@ -1771,7 +1810,6 @@ function ensureStepCoachButtons() {
       }
     });
     wrap.append(btn, out);
-    const heading = section.querySelector('h2, h3') || section;
     heading.after(wrap);
   }
 }
@@ -1839,7 +1877,7 @@ function refreshAll(mode = 'full') {
   try {
     const steps = mode === 'light'
       ? [updateStepsHub, updateColorCodedValidation]
-      : [updateTopAttributionRibbon, ensureBottomLegalShowcase, updateStepsHub, updateColorCodedValidation, placeOfficialCoach, ensureLocalBridgeUI, ensureBrowserAiButton, enforceChartColors, paintCoachAudit, ensureStepCoachButtons, ensureBuildLabel];
+      : [updateTopAttributionRibbon, ensureBottomLegalShowcase, updateStepsHub, updateColorCodedValidation, placeOfficialCoach, ensureLocalBridgeUI, ensureBrowserAiButton, enforceChartColors, paintCoachAudit, ensureStepCoachButtons, ensureBuildLabel, ensureEmptyHints, placeChrome];
     for (const step of steps) {
       try { step(); } catch (error) { console.error('[h2c]', error); }
     }
