@@ -164,4 +164,46 @@ test('Feedback link sits next to About the developer and opens the form safely',
   assert.match(help, /textContent: 'Feedback'/);
   assert.match(help, /https:\/\/docs\.google\.com\/forms\/d\/e\/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w\/viewform/);
   assert.match(help, /target: '_blank', rel: 'noopener noreferrer', textContent: 'Feedback'/);
+  assert.match(help, /All 15 Apollo RCA principles \(P01–P15\)/);
+});
+
+test('v68 live-audit bug fixes: safe import, secret strip, no raw alert, session safety, Coach feedback, case preservation, blame integrity', async () => {
+  const routes = readFileSync(new URL('./routes-v13.js', import.meta.url), 'utf8');
+  const { parseProjectFile, MAX_IMPORT_BYTES } = await import('./case-import.js');
+  assert.equal(MAX_IMPORT_BYTES, 5 * 1024 * 1024);
+
+  // Malformed analysis falls back to null instead of crashing, and secret keys are stripped + reported
+  const malformedWithKey = {
+    intake: { effects: [{ id: 'pe-1', what: 'Pump Leaked' }], apiKey: 'sk-test-1234567890abcdef' },
+    analysis: { trees: [{}] }
+  };
+  const parsed = parseProjectFile(malformedWithKey);
+  assert.equal(parsed.analysis, null);
+  assert.ok(parsed.strippedSecrets.includes('apiKey'));
+  assert.equal('apiKey' in parsed.intake, false);
+
+  // No raw browser alert() in routes-v13.js; uses inline h2cShowNotice and 5MB cap
+  assert.doesNotMatch(routes, /\balert\(/);
+  assert.match(routes, /h2cShowNotice/);
+  assert.match(routes, /5\*1024\*1024/);
+
+  // Session readiness does not trigger full remount via sessionStore.notify()
+  assert.match(routes, /h2c-session-ready/);
+
+  // Review wording with AI off gives clear status message
+  assert.match(routes, /AI Coach is off \(no connected model or API key\)/);
+
+  // softTitle preserves user capitalization instead of forcing Title Case
+  const softStart = routes.indexOf('function softTitle(');
+  const softEnd = routes.indexOf('var personWords=', softStart);
+  const softFn = new Function(`${routes.slice(softStart, softEnd)}; return softTitle;`)();
+  assert.equal(softFn('PLC failed to trip on high temp'), 'PLC failed to trip on high temp');
+
+  // Blame wording upgrades integrity summary from PASS to warn
+  assert.match(routes, /Blame or person-focused wording detected/);
+  assert.match(routes, /blameWords\.test\(s\|\|``\)\|\|personWords\.test\(s\|\|``\)/);
+
+  // Xn() New analysis reset handler must be block-scoped (let j=), never overwriting top-level function j(e)
+  assert.match(routes, /;let j=\(\)=>\{sessionStore\.removeItem\(qn\)/);
+  assert.doesNotMatch(routes, /;j=\(\)=>\{sessionStore\.removeItem\(qn\)/);
 });

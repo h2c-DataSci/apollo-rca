@@ -2193,7 +2193,29 @@ function initShell() {
   }, true);
   document.addEventListener('change', scheduleRefresh);
   document.addEventListener('click', () => setTimeout(scheduleRefresh, 60));
+  globalThis.h2cShowNotice = (message, kind = 'info') => {
+    const text = String(message || '').trim();
+    if (!text || !document.body) return;
+    document.querySelectorAll('.h2c-notice-toast').forEach((n) => n.remove());
+    const toast = document.createElement('div');
+    toast.className = 'h2c-toast h2c-notice-toast no-print';
+    toast.setAttribute('role', kind === 'error' || kind === 'warn' ? 'alert' : 'status');
+    toast.style.maxWidth = 'min(42rem, calc(100vw - 32px))';
+    if (kind === 'error') { toast.style.background = '#7f1d1d'; toast.style.color = '#fef2f2'; toast.style.borderColor = '#fca5a5'; }
+    else if (kind === 'warn') { toast.style.background = '#78350f'; toast.style.color = '#fef3c7'; toast.style.borderColor = '#f59e0b'; }
+    const span = document.createElement('span');
+    span.textContent = text;
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.textContent = 'Dismiss';
+    closeBtn.onclick = () => toast.remove();
+    toast.append(span, closeBtn);
+    document.body.append(toast);
+    setTimeout(() => { if (toast.isConnected) toast.remove(); }, kind === 'error' || kind === 'warn' ? 10000 : 6000);
+  };
+
   window.addEventListener(SESSION_CHANGED, () => scheduleRefresh());
+  window.addEventListener('h2c-session-ready', () => scheduleRefresh());
 
   if (document.body) {
     new MutationObserver(applyProminent).observe(document.body, { childList: true });
