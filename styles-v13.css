@@ -360,3 +360,20 @@ main section.rounded-lg.border,main article.rounded-lg.border,.print-sheet{
 }
 .h2c-chart-export-pop>button:hover{background:#f4efe2!important;color:#043d2e!important}
 
+/* v69: compact horizontal chart legend & scrollbar-safe left padding so PE-1 is never clipped on first paint */
+.h2c-chart-landing{
+  padding-left:max(1.5rem, env(safe-area-inset-left, 0px))!important;
+  padding-right:max(1.5rem, env(safe-area-inset-right, 0px))!important;
+}
+.h2c-chart-legend{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:4px 16px!important;
+  padding:6px 12px!important;
+}
+.h2c-chart-legend>*{
+  margin:0!important;
+}
+
+
