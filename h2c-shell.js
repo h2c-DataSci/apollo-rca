@@ -21,7 +21,22 @@ import { COACH_STEPS, coachIsReady, coachReadyHint, buildStepPrompt, reviewStepE
 import { DEEPER_TASKS, runDeeperReview, briefForReview, presentFinding } from './coach-deeper.js?v=7';
 import { AUDIT_KEY, AUDIT_SECTIONS, isCloudAuditMode, runCloudSectionAudit, saveCoachAudit, loadCoachAudit, clearCoachAudit, auditAsReview, visibleAudit, fingerprint, appendAuditPdf, auditMarkdown, exportableAudit, workflowAnchor, reportAnchor } from './coach-audit.js?v=1';
 
-const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM']);
+const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM', 'STYLE', 'TEMPLATE', 'MATH', 'FOREIGNOBJECT', 'ANIMATE', 'SET']);
+const ALLOWED_TAGS = new Set([
+  'DIV', 'SPAN', 'P', 'A', 'BUTTON', 'STRONG', 'EM', 'B', 'I', 'U', 'SMALL', 'SUP', 'SUB',
+  'CODE', 'PRE', 'UL', 'OL', 'LI', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BR', 'HR',
+  'SECTION', 'ARTICLE', 'HEADER', 'FOOTER', 'NAV', 'ASIDE', 'MAIN', 'DETAILS', 'SUMMARY',
+  'LABEL', 'INPUT', 'SELECT', 'OPTION', 'OPTGROUP', 'DATALIST', 'TEXTAREA', 'FIELDSET', 'LEGEND',
+  'TABLE', 'THEAD', 'TBODY', 'TR', 'TH', 'TD',
+  'SVG', 'G', 'PATH', 'CIRCLE', 'RECT', 'LINE', 'POLYLINE', 'POLYGON', 'ELLIPSE'
+]);
+const ALLOWED_ATTRS = new Set([
+  'class', 'id', 'style', 'type', 'role', 'tabindex', 'href', 'target', 'rel', 'title',
+  'value', 'placeholder', 'checked', 'disabled', 'selected', 'open', 'for', 'name', 'list',
+  'rows', 'cols', 'min', 'max', 'step', 'autocomplete', 'autocapitalize', 'spellcheck', 'inputmode', 'readonly', 'hidden',
+  'width', 'height', 'viewbox', 'fill', 'stroke', 'stroke-width', 'stroke-linecap',
+  'stroke-linejoin', 'd', 'cx', 'cy', 'r', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'points', 'rx', 'ry'
+]);
 const URL_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'data', 'background', 'srcset']);
 
 function normalizedUrl(value) {
@@ -49,12 +64,18 @@ function blockedUrl(value) {
   return v.startsWith('javascript:') || v.startsWith('vbscript:') || v.startsWith('data:');
 }
 
+function unsafeStyle(value) {
+  const v = normalizedUrl(value);
+  return v.includes('expression(') || v.includes('javascript:') || v.includes('vbscript:') || v.includes('url(') || v.includes('@import');
+}
+
 function setSafeHtml(el, html) {
   const doc = new DOMParser().parseFromString(String(html ?? ''), 'text/html');
   const drop = [];
   const visit = (node) => {
     if (!node || node.nodeType !== 1) return;
-    if (FORBIDDEN_TAGS.has(node.tagName)) {
+    const tag = node.tagName.toUpperCase();
+    if (FORBIDDEN_TAGS.has(tag) || !ALLOWED_TAGS.has(tag)) {
       drop.push(node);
       return;
     }
@@ -64,7 +85,17 @@ function setSafeHtml(el, html) {
         node.removeAttribute(attr.name);
         continue;
       }
-      if (URL_ATTRS.has(name) && blockedUrl(attr.value)) node.removeAttribute(attr.name);
+      if (!ALLOWED_ATTRS.has(name) && !name.startsWith('aria-') && !name.startsWith('data-')) {
+        node.removeAttribute(attr.name);
+        continue;
+      }
+      if (URL_ATTRS.has(name) && blockedUrl(attr.value)) {
+        node.removeAttribute(attr.name);
+        continue;
+      }
+      if (name === 'style' && unsafeStyle(attr.value)) {
+        node.removeAttribute(attr.name);
+      }
     }
     for (const child of [...node.children]) visit(child);
   };
@@ -81,8 +112,29 @@ let updating = false;
 // Injected CSS for the 7-step Workflow Hub and Real-Time Color Coded Validation
 const css = document.createElement('style');
 css.textContent = `
-main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-width:0}#realitychart{min-width:0;max-width:100%}main{padding-bottom:4.5rem}.h2c-nextbar{bottom:4.25rem}@media (max-width:720px){table.h2c-cards thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}table.h2c-cards,table.h2c-cards tbody,table.h2c-cards tr,table.h2c-cards td{display:block;width:100%}table.h2c-cards tr{border:1px solid #d7deea;border-radius:8px;margin:0 0 12px;padding:8px 10px}table.h2c-cards td{border:0;padding:4px 0;white-space:normal}table.h2c-cards td[colspan]::before{content:none}table.h2c-ca td:nth-child(1)::before{content:"Action ID"}table.h2c-ca td:nth-child(2)::before{content:"Primary effect"}table.h2c-ca td:nth-child(3)::before{content:"Target cause"}table.h2c-ca td:nth-child(4)::before{content:"Corrective action"}table.h2c-ca td:nth-child(5)::before{content:"4-criteria"}table.h2c-ca td:nth-child(6)::before{content:"Responsible"}table.h2c-ca td:nth-child(7)::before{content:"Due"}table.h2c-ca td:nth-child(8)::before{content:"Cost / ROI"}table.h2c-ai td:nth-child(1)::before{content:"ID"}table.h2c-ai td:nth-child(2)::before{content:"Primary effect"}table.h2c-ai td:nth-child(3)::before{content:"Node"}table.h2c-ai td:nth-child(4)::before{content:"Gap"}table.h2c-ai td:nth-child(5)::before{content:"Owner"}table.h2c-ai td:nth-child(6)::before{content:"Due"}table.h2c-cards td::before{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#5c6b62}}
+main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-width:0}#realitychart{min-width:0;max-width:100%}main{padding-bottom:4.5rem}@media (max-width:720px){table.h2c-cards thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}table.h2c-cards,table.h2c-cards tbody,table.h2c-cards tr,table.h2c-cards td{display:block;width:100%}table.h2c-cards tr{border:1px solid #d7deea;border-radius:8px;margin:0 0 12px;padding:8px 10px}table.h2c-cards td{border:0;padding:4px 0;white-space:normal}table.h2c-cards td[colspan]::before{content:none}table.h2c-ca td:nth-child(1)::before{content:"Action ID"}table.h2c-ca td:nth-child(2)::before{content:"Primary effect"}table.h2c-ca td:nth-child(3)::before{content:"Target cause"}table.h2c-ca td:nth-child(4)::before{content:"Corrective action"}table.h2c-ca td:nth-child(5)::before{content:"4-criteria"}table.h2c-ca td:nth-child(6)::before{content:"Responsible"}table.h2c-ca td:nth-child(7)::before{content:"Due"}table.h2c-ca td:nth-child(8)::before{content:"Cost / ROI"}table.h2c-ai td:nth-child(1)::before{content:"ID"}table.h2c-ai td:nth-child(2)::before{content:"Primary effect"}table.h2c-ai td:nth-child(3)::before{content:"Node"}table.h2c-ai td:nth-child(4)::before{content:"Gap"}table.h2c-ai td:nth-child(5)::before{content:"Owner"}table.h2c-ai td:nth-child(6)::before{content:"Due"}table.h2c-cards td::before{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#5c6b62}}
 .h2c-new-prominent{background:linear-gradient(180deg,#f6dd7a,#c9a227)!important;color:#043d2e!important;border:2px solid #8c6a1a!important;font-weight:700!important}
+.h2c-tools-menu{position:relative;display:inline-flex;align-items:center}
+.h2c-tools-menu>summary{list-style:none;display:inline-flex;align-items:center;gap:6px;height:2.4rem;padding:0 12px;border-radius:8px;border:1px solid #d4c5a9;background:#fffdfa;color:#3e331c;font:600 13px system-ui,-apple-system,sans-serif;cursor:pointer;white-space:nowrap;transition:background .15s ease,border-color .15s ease}
+.h2c-tools-menu>summary::-webkit-details-marker{display:none}
+.h2c-tools-menu>summary:hover,.h2c-tools-menu[open]>summary{background:#f7f1e3;border-color:#c9a227;color:#043d2e}
+.h2c-tools-menu>summary:focus-visible{outline:3px solid #0a5c45;outline-offset:2px}
+.h2c-tools-popover{position:absolute;top:calc(100% + 6px);right:0;z-index:60;min-width:220px;display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:10px;border:1px solid #c9a227;background:#fffdf8;box-shadow:0 12px 28px rgba(16,32,51,.16)}
+.h2c-tools-popover>button{width:100%!important;justify-content:flex-start!important;text-align:left!important;height:auto!important;min-height:36px!important;padding:7px 10px!important;border-radius:7px!important;border:1px solid transparent!important;background:transparent!important;color:#102033!important;font-size:13px!important;font-weight:600!important;box-shadow:none!important}
+.h2c-tools-popover>button:hover{background:#f4efe2!important;border-color:#d4c5a9!important;color:#043d2e!important}
+@media (max-width:639px){.h2c-tools-popover{left:0;right:auto;min-width:min(240px,86vw)}}
+.h2c-coach-hidden,.h2c-dup-coach-hidden{display:none!important}
+.h2c-coach-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px;padding:4px;border-radius:10px;background:#f4efe2;border:1px solid #e2d6bc}
+.h2c-coach-tab{border:1px solid transparent;background:transparent;color:#4a3d24;font:600 12.5px system-ui,-apple-system,sans-serif;padding:6px 12px;border-radius:7px;cursor:pointer;transition:all .15s ease}
+.h2c-coach-tab:hover{background:#fffdf8;color:#043d2e}
+.h2c-coach-tab.is-active{background:#043d2e;color:#f1d16b;border-color:#043d2e;box-shadow:0 1px 4px rgba(4,61,46,.18)}
+.h2c-coach-tab:focus-visible{outline:3px solid #0a5c45;outline-offset:2px}
+.h2c-ask-coach{margin:6px 0 10px!important;display:flex!important;flex-wrap:wrap!important;gap:8px!important;align-items:center!important}
+.h2c-ask-coach-btn{min-height:34px!important;border:1px solid #c9a227!important;border-radius:999px!important;padding:5px 12px!important;background:#fffef8!important;color:#043d2e!important;font:600 12.5px system-ui,-apple-system,sans-serif!important;cursor:pointer;transition:all .15s ease}
+.h2c-ask-coach-btn:hover{background:#043d2e!important;color:#f1d16b!important;border-color:#043d2e!important}
+.h2c-ask-coach-btn:focus-visible{outline:3px solid #0a5c45;outline-offset:2px}
+.h2c-coach-open-link{border:0;background:transparent;color:#047857;font:600 12px system-ui,-apple-system,sans-serif;text-decoration:underline;cursor:pointer;padding:4px 6px}
+.h2c-coach-open-link:hover{color:#043d2e}
 .h2c-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:10000;background:#043d2e;color:#f1d16b;border:2px solid #c9a227;border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;font:600 14px system-ui;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 .h2c-toast button{background:#f1d16b;color:#043d2e;border:0;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer}.h2c-toast button:focus-visible{outline:3px solid #fff}
 .h2c-browser-ai-dialog{position:fixed;right:16px;bottom:16px;left:auto;top:auto;margin:0;z-index:40;max-width:min(34rem,calc(100vw - 32px));max-height:min(70vh,32rem);overflow:auto;border:2px solid #c9a227;border-radius:12px;padding:0;background:#fffdf8;color:#1c1915;box-shadow:0 12px 40px rgba(0,0,0,.28);pointer-events:auto}
@@ -102,19 +154,20 @@ main{min-width:0}main>div{min-width:0}main .grid{min-width:0}main .grid>*{min-wi
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   background: #fffdf9;
   border: 1px solid #e7ded0;
   border-left: 4px solid #c9a227;
   border-radius: 8px;
-  padding: 8px 14px;
-  margin-top: 10px;
-  margin-bottom: 12px;
+  padding: 6px 12px;
+  margin-top: 6px;
+  margin-bottom: 8px;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 12.5px;
+  font-size: 12px;
   color: #3e331c;
   box-shadow: 0 1px 3px rgba(0,0,0,0.03);
 }
+@media (max-width:639px){.h2c-top-ribbon{padding:6px 10px;gap:4px;font-size:11.5px;margin-top:4px;margin-bottom:6px}.h2c-top-ribbon-badge{display:none}}
 .h2c-top-ribbon-text {
   display: inline-flex;
   align-items: center;
@@ -1538,7 +1591,7 @@ function ensureLocalBridgeUI() {
       <label class="h2c-ai-local-runtime-label">2. Local runtime<br><select class="h2c-ai-local-runtime"></select></label>
       <label class="h2c-bridge-key-label">3. Your API key<br><input type="password" class="h2c-bridge-key" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="Paste key for this session"></label>
     </div>
-    <label class="h2c-ai-remember" style="display:block;margin:8px 0"><input type="checkbox" class="h2c-ai-remember-key"> Remember key on this device (off by default; the key stays in this browser only)</label>
+    <label class="h2c-ai-remember" style="display:block;margin:8px 0"><input type="checkbox" class="h2c-ai-remember-key"> Remember key on this device (off by default — saved in browser localStorage, which browser extensions can read; leave off on shared computers)</label>
     <p class="h2c-ai-steps" style="margin:10px 0"></p>
     <details class="h2c-ai-advanced"><summary>Connection settings</summary><label>Server / API base URL<br><input class="h2c-bridge-endpoint" type="url" spellcheck="false" style="max-width:100%;width:360px"></label>
     <div class="h2c-ai-custom-fields" hidden>
@@ -1896,13 +1949,211 @@ function whenHydrated(run) {
   else tick();
 }
 
+function organizeHeroTools() {
+  const tools = document.querySelector('.h2c-hero-tools');
+  if (!tools) return;
+  let menu = tools.querySelector('details.h2c-tools-menu');
+  if (!menu) {
+    menu = document.createElement('details');
+    menu.className = 'no-print h2c-tools-menu';
+    const summary = document.createElement('summary');
+    summary.setAttribute('aria-label', 'More workspace tools');
+    summary.textContent = 'Tools ▾';
+    const pop = document.createElement('div');
+    pop.className = 'h2c-tools-popover';
+    menu.append(summary, pop);
+    tools.append(menu);
+    document.addEventListener('click', (ev) => {
+      if (menu.open && !menu.contains(ev.target)) menu.open = false;
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && menu.open) menu.open = false;
+    });
+  }
+  const pop = menu.querySelector('.h2c-tools-popover');
+  if (!pop) return;
+  const secondaryRe = /^(QA \/ Stress Test Suite|Load full test case|Browser AI|.*Legal & Trademarks)$/i;
+  for (const btn of [...tools.children]) {
+    if (btn.tagName !== 'BUTTON') continue;
+    const label = (btn.textContent || '').trim().replace(/\s+/g, ' ');
+    if (secondaryRe.test(label) || btn.classList.contains('h2c-tb-legal') || btn.classList.contains('h2c-browser-ai-btn')) {
+      pop.append(btn);
+      if (!btn.dataset.h2cMenuClose) {
+        btn.dataset.h2cMenuClose = '1';
+        btn.addEventListener('click', () => { menu.open = false; });
+      }
+    }
+  }
+}
+
+function dedupeStepCoachButtons() {
+  const dupRe = /^RCA Coach\s*[—-]\s*check (this step|the timeline and evidence|the chart|the solutions)$/i;
+  for (const btn of document.querySelectorAll('main button')) {
+    const label = (btn.textContent || '').trim();
+    if (!dupRe.test(label)) continue;
+    const section = btn.closest('section') || btn.parentElement?.parentElement;
+    if (section && (section.querySelector('.h2c-ask-coach') || document.querySelector('.h2c-ask-coach'))) {
+      btn.classList.add('h2c-dup-coach-hidden');
+      btn.setAttribute('aria-hidden', 'true');
+      btn.tabIndex = -1;
+    }
+  }
+}
+
+const COACH_TASK_GROUPS = [
+  { id: 'wording', label: 'Wording & Timeline', tasks: ['Review wording', 'Suggest rewrite', 'Extract timeline', 'Ask RCA Coach'] },
+  { id: 'evidence', label: 'Evidence & Logic', tasks: ['Check evidence gap', 'Clarifying questions', 'Hypothesis branches', 'Review solution alignment'] },
+  { id: 'narrative', label: 'Narrative & Summary', tasks: ['Summarize', 'Draft narrative'] },
+  { id: 'integrity', label: 'Integrity Audit', tasks: ['Validate analysis integrity', 'Review narrative integrity', 'Detect contradictions', 'Detect unsupported claims'] },
+  { id: 'all', label: 'All (14)', tasks: null },
+];
+
+function enhanceCoachPanelTabs() {
+  const coach = document.querySelector('[aria-label="RCA coach"]');
+  if (!coach) return;
+  const reviewBtn = [...coach.querySelectorAll('button')].find((b) => (b.textContent || '').trim() === 'Review wording');
+  if (!reviewBtn || !reviewBtn.parentElement) return;
+  const grid = reviewBtn.parentElement;
+  let bar = coach.querySelector('.h2c-coach-tabs');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.className = 'no-print h2c-coach-tabs';
+    bar.setAttribute('role', 'tablist');
+    bar.setAttribute('aria-label', 'RCA Coach task categories');
+    bar.dataset.activeGroup = 'wording';
+    for (const grp of COACH_TASK_GROUPS) {
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'h2c-coach-tab' + (grp.id === 'wording' ? ' is-active' : '');
+      tab.setAttribute('role', 'tab');
+      tab.setAttribute('aria-selected', grp.id === 'wording' ? 'true' : 'false');
+      tab.dataset.group = grp.id;
+      tab.textContent = grp.label;
+      tab.addEventListener('click', () => {
+        bar.dataset.activeGroup = grp.id;
+        for (const t of bar.querySelectorAll('.h2c-coach-tab')) {
+          const active = t.dataset.group === grp.id;
+          t.classList.toggle('is-active', active);
+          t.setAttribute('aria-selected', active ? 'true' : 'false');
+        }
+        applyCoachGroupFilter(grid, grp.id);
+      });
+      bar.append(tab);
+    }
+    grid.before(bar);
+  }
+  applyCoachGroupFilter(grid, bar.dataset.activeGroup || 'wording');
+}
+
+function applyCoachGroupFilter(grid, groupId) {
+  const grp = COACH_TASK_GROUPS.find((g) => g.id === groupId);
+  const allowed = grp && grp.tasks ? new Set(grp.tasks) : null;
+  for (const btn of grid.querySelectorAll('button')) {
+    const label = (btn.textContent || '').trim();
+    const show = !allowed || allowed.has(label);
+    btn.classList.toggle('h2c-coach-hidden', !show);
+  }
+}
+
+function enhanceChartToolbar() {
+  const bar = document.querySelector('.h2c-chart-toolbar');
+  if (!bar) return;
+  let menu = bar.querySelector('details.h2c-chart-export');
+  if (!menu) {
+    menu = document.createElement('details');
+    menu.className = 'no-print h2c-chart-export';
+    const summary = document.createElement('summary');
+    summary.setAttribute('aria-label', 'Export RealityChart');
+    summary.textContent = 'Export ▾';
+    const pop = document.createElement('div');
+    pop.className = 'h2c-chart-export-pop';
+    menu.append(summary, pop);
+    bar.append(menu);
+    document.addEventListener('click', (ev) => {
+      if (menu.open && !menu.contains(ev.target)) menu.open = false;
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && menu.open) menu.open = false;
+    });
+  }
+  const pop = menu.querySelector('.h2c-chart-export-pop');
+  if (!pop) return;
+  const exportRe = /^(PNG|SVG|JSON)$/i;
+  for (const btn of [...bar.children]) {
+    if (btn.tagName !== 'BUTTON') continue;
+    const label = (btn.textContent || '').trim().replace(/\s+/g, ' ');
+    if (exportRe.test(label)) {
+      pop.append(btn);
+      if (!btn.dataset.h2cExportClose) {
+        btn.dataset.h2cExportClose = '1';
+        btn.addEventListener('click', () => { menu.open = false; });
+      }
+    }
+  }
+}
+
+let focusModeOn = false;
+let focusStepIndex = 0;
+
+function applyStepFocusState() {
+  const sections = [...document.querySelectorAll('main > div.grid > section, main section#realitychart')].filter((s) => !s.matches('[aria-label="RCA coach"], #legal-disclosure'));
+  if (!focusModeOn) {
+    for (const sec of sections) sec.classList.remove('h2c-focus-collapsed');
+    return;
+  }
+  const target = sections[Math.min(focusStepIndex, Math.max(0, sections.length - 1))];
+  for (const sec of sections) {
+    sec.classList.toggle('h2c-focus-collapsed', sec !== target);
+  }
+}
+
+function enhanceStepFocusMode() {
+  const hub = document.querySelector('.h2c-workflow-hub');
+  if (!hub) return;
+  const head = hub.querySelector('.h2c-workflow-header');
+  if (head && !head.querySelector('.h2c-focus-toggle')) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'h2c-focus-toggle';
+    btn.setAttribute('aria-pressed', focusModeOn ? 'true' : 'false');
+    btn.textContent = focusModeOn ? 'Focus mode: On' : 'Focus mode';
+    btn.addEventListener('click', () => {
+      focusModeOn = !focusModeOn;
+      btn.setAttribute('aria-pressed', focusModeOn ? 'true' : 'false');
+      btn.textContent = focusModeOn ? 'Focus mode: On' : 'Focus mode';
+      applyStepFocusState();
+    });
+    head.append(btn);
+  }
+  const cards = [...hub.querySelectorAll('.h2c-step-card')];
+  cards.forEach((card, idx) => {
+    if (!card.dataset.h2cFocusBound) {
+      card.dataset.h2cFocusBound = '1';
+      card.addEventListener('click', () => {
+        focusStepIndex = idx;
+        if (focusModeOn) applyStepFocusState();
+      });
+    }
+  });
+  applyStepFocusState();
+}
+
+function ensureAccessibilityLabels() {
+  for (const input of document.querySelectorAll('input[placeholder="14:32"]')) {
+    if (!input.getAttribute('aria-label')) input.setAttribute('aria-label', 'Event time (24-hour)');
+  }
+  for (const input of document.querySelectorAll('input[placeholder="Seal temperature rose"]')) {
+    if (!input.getAttribute('aria-label')) input.setAttribute('aria-label', 'Event description');
+  }
+}
+
 function refreshAll(mode = 'full') {
   if (updating) return;
   updating = true;
   try {
     const steps = mode === 'light'
       ? [updateStepsHub, updateColorCodedValidation]
-      : [updateTopAttributionRibbon, ensureBottomLegalShowcase, updateStepsHub, updateColorCodedValidation, placeOfficialCoach, ensureLocalBridgeUI, ensureBrowserAiButton, enforceChartColors, paintCoachAudit, ensureStepCoachButtons, ensureBuildLabel, ensureEmptyHints, placeChrome];
+      : [updateTopAttributionRibbon, ensureBottomLegalShowcase, updateStepsHub, updateColorCodedValidation, placeOfficialCoach, ensureLocalBridgeUI, ensureBrowserAiButton, organizeHeroTools, ensureAccessibilityLabels, enforceChartColors, enhanceChartToolbar, enhanceStepFocusMode, paintCoachAudit, ensureStepCoachButtons, dedupeStepCoachButtons, enhanceCoachPanelTabs, ensureBuildLabel, ensureEmptyHints, placeChrome];
     for (const step of steps) {
       try { step(); } catch (error) { console.error('[h2c]', error); }
     }

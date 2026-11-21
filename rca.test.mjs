@@ -138,7 +138,7 @@ test('shell sanitizer drops nested forbidden tags and normalized javascript URLs
   const shell = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
   const start = shell.indexOf('function normalizedUrl');
   const end = shell.indexOf('function setSafeHtml');
-  const api = new Function(`${shell.slice(start, end)}; return { normalizedUrl, blockedUrl };`)();
+  const api = new Function(`${shell.slice(start, end)}; return { normalizedUrl, blockedUrl, unsafeStyle };`)();
   assert.equal(api.blockedUrl(' javascript:alert(1)'), true);
   assert.equal(api.blockedUrl('java\nscript:alert(1)'), true);
   assert.equal(api.blockedUrl('JaVaScRiPt:alert(1)'), true);
@@ -146,8 +146,15 @@ test('shell sanitizer drops nested forbidden tags and normalized javascript URLs
   assert.equal(api.blockedUrl('&#106;avascript:alert(1)'), true);
   assert.equal(api.blockedUrl('https://www.haroldhenrycabanilla.com'), false);
   assert.equal(api.blockedUrl('https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform'), false);
+  assert.equal(api.unsafeStyle('background:url(https://evil.example/x)'), true);
+  assert.equal(api.unsafeStyle('width:expression(alert(1))'), true);
+  assert.equal(api.unsafeStyle('padding: 3px 8px; font-size: 11px;'), false);
   assert.match(shell, /for \(const child of \[\.\.\.node\.children\]\) visit\(child\)/);
   assert.match(shell, /FORBIDDEN_TAGS/);
+  assert.match(shell, /ALLOWED_TAGS/);
+  assert.match(shell, /ALLOWED_ATTRS/);
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  assert.match(html, /<meta name="referrer" content="no-referrer"/);
 });
 test('Feedback link sits next to About the developer and opens the form safely', () => {
   const help = readFileSync(new URL('./h2c-help.js', import.meta.url), 'utf8');
