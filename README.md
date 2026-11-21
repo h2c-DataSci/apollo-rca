@@ -43,7 +43,7 @@ Seven steps, in page order: Define, Timeline, Evidence, Chart, Solutions, Schedu
 - The downloaded PDF follows problem definition, timeline, evidence, the chart, then the summary, solutions, corrective actions, action items, and causal log. Reports export as PDF, and as ZIP when one file would damage figures.
 - One-click New analysis, with confirm and undo. Open case (JSON) reloads a Cause Chart_Project_State.json export; a project JSON dropped on evidence is offered as an import, not stored as an evidence row.
 - Help knowledge base and a Feedback link next to About the developer.
-- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v66`. Script queries: shell `v=47`, help `v=35`, help knowledge `v=29`, diagrams `v=24`, videos `v=27`, local bridge `v=28`, coach steps `v=2`.
+- Offline shell via `sw.js` (`apollo-rca-` caches only). The current shell cache is `apollo-rca-shell-v67`. Script queries: shell `v=49`, help `v=35`, help knowledge `v=29`, diagrams `v=24`, videos `v=27`, local bridge `v=28`, coach steps `v=2`. Secondary workspace tools (`QA / Stress Test Suite`, `Load full test case`, `Browser AI`, `Legal & Trademarks`) sit in the header `Tools ▾` menu; the Workflow Navigator offers an optional `Focus mode` toggle; RealityChart exports (`PNG`, `SVG`, `JSON`) sit in an `Export ▾` dropdown; RCA Coach tasks are grouped into category tabs; and `setSafeHtml` enforces a strict tag/attribute allowlist.
 
 ## AI
 
