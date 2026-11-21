@@ -2235,7 +2235,7 @@ function ensureSessionNotice() {
   const main = document.querySelector('main'); if (!main) return;
   const note = document.createElement('aside'); note.className = 'h2c-session-notice no-print';
   note.style.cssText = 'margin:12px 0;padding:10px 12px;border:1px solid #e7ded0;border-radius:6px;font:12px/1.5 system-ui;background:#fffdf8';
-  note.textContent = 'Private session: work stays in this tab. Download your report before closing or reloading. ';
+  note.textContent = 'Private session: work stays in this tab. Reloading keeps your draft; closing the tab drops it — download your report before closing. ';
   const plan = legacyRecoveryPlan(listLegacyData());
   if (plan.offer) {
     note.append(document.createTextNode('Older saved data was found on this device. Download a recovery copy now. It is not loaded into this case and is not sent to AI. '));

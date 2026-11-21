@@ -91,7 +91,7 @@ test('cache quota failures do not replace a successful network response', async 
 
 test('offline fetch falls back to the shell cache without a rejected lifetime promise', async () => {
   const h = harness();
-  await h.cacheFor('apollo-rca-shell-v68').put(BASE + 'asset.js', new Response('offline copy'));
+  await h.cacheFor('apollo-rca-shell-v69').put(BASE + 'asset.js', new Response('offline copy'));
   const e = h.event(new Request(BASE + 'asset.js'));
   h.listeners.get('fetch')(e.value);
   assert.equal(await (await e.response()).text(), 'offline copy');

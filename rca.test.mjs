@@ -207,3 +207,33 @@ test('v68 live-audit bug fixes: safe import, secret strip, no raw alert, session
   assert.match(routes, /;let j=\(\)=>\{sessionStore\.removeItem\(qn\)/);
   assert.doesNotMatch(routes, /;j=\(\)=>\{sessionStore\.removeItem\(qn\)/);
 });
+
+test('v69 live-audit re-test fixes: sample solution metadata, null-safe PDF/CSV, P05 blame, PE-2 knownIds, no PASS concat, consistent reload copy', async () => {
+  const routes = readFileSync(new URL('./routes-v13.js', import.meta.url), 'utf8');
+  const shell = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
+  const { getSampleCase } = await import('./sample-case.js');
+
+  // High #1: Every sample solution has effectCode, targetId, targetKind + st/U are null-safe
+  const sample = getSampleCase();
+  assert.ok(sample.analysis.solutions.length >= 16);
+  for (const sol of sample.analysis.solutions) {
+    assert.ok(typeof sol.effectCode === 'string' && /^PE-\d+$/.test(sol.effectCode), `${sol.id} missing effectCode`);
+    assert.ok(typeof sol.targetId === 'string' && sol.targetId.length > 0, `${sol.id} missing targetId`);
+    assert.ok(sol.targetKind === 'action' || sol.targetKind === 'condition', `${sol.id} missing targetKind`);
+  }
+  assert.match(routes, /function st\(e\)\{return`"\$\{String\(e\?\?``\)\.replace/);
+  assert.match(routes, /function U\(e\)\{return String\(e\?\?``\)\.replace/);
+
+  // Medium #3: PE-2 knownIds & P05 blame on "operator was careless"
+  assert.match(routes, /careless\\w\*\|negligen\\w\*/);
+  assert.match(routes, /allCaseCauses:/);
+  assert.match(routes, /`PE-\$\{i\+1\}`/);
+
+  // Low #4: Mt() returns empty on zero violations; PE roots use softTitle
+  assert.match(routes, /:t\.length\?e:``\}/);
+  assert.match(routes, /a\.title=softTitle\(e\.what\),a\.code=n/);
+
+  // Low #5: Consistent reload copy in h2c-shell.js
+  assert.match(shell, /Reloading keeps your draft; closing the tab drops it/);
+  assert.doesNotMatch(shell, /before closing or reloading/);
+});

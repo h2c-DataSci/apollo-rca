@@ -210,8 +210,25 @@ export function getSampleCase(now) {
     ]
   });
 
+  const trees = [
+    { id: 'pe-1', code: 'PE-1', root: pe1 },
+    { id: 'pe-2', code: 'PE-2', root: pe2 },
+    { id: 'pe-3', code: 'PE-3', root: pe3 }
+  ];
+  const nodeMeta = new Map();
+  for (const tree of trees) {
+    const walk = (nd) => {
+      if (!nd) return;
+      nodeMeta.set(nd.title, { targetId: nd.id, targetKind: nd.kind, effectCode: tree.code });
+      for (const child of nd.children || []) walk(child);
+    };
+    walk(tree.root);
+  }
+  const metaFor = (title) => nodeMeta.get(title) || { targetId: '', targetKind: 'condition', effectCode: 'PE-1' };
+
   const selected = (id, targetTitle, action, owner, due, cost) => ({
     id,
+    ...metaFor(targetTitle),
     targetTitle,
     action,
     owner,
@@ -231,6 +248,7 @@ export function getSampleCase(now) {
   });
   const unused = (id, targetTitle) => ({
     id,
+    ...metaFor(targetTitle),
     targetTitle,
     action: '',
     owner: '',
@@ -250,11 +268,7 @@ export function getSampleCase(now) {
   });
 
   const analysis = {
-    trees: [
-      { id: 'pe-1', code: 'PE-1', root: pe1 },
-      { id: 'pe-2', code: 'PE-2', root: pe2 },
-      { id: 'pe-3', code: 'PE-3', root: pe3 }
-    ],
+    trees,
     root: pe1,
     solutions: [
       selected('CA-01', 'Clamp Missing', 'Install clamps every 2 m on hydraulic hoses that run beside the frame, and add the clamp to the hose-install standard.', 'Maintenance Supervisor', dueClamp, '$4,800'),
