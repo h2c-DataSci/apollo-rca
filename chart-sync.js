@@ -190,7 +190,10 @@ export function addEvidenceForNode(intake, node, treeId) {
     pe: treeId
   };
   const pe = (intake.effects || []).find((effect) => effect.id === treeId);
-  const peHasOwn = pe && (pe.evidence || []).some((e) => (e.text || '').trim() || (e.source || '').trim() || (e.cause || '').trim());
+  const peHasOwn = pe && (pe.evidence || []).some((e) => (e.text || '').trim() || (e.source || '').trim());
+  const pool = peHasOwn ? (pe.evidence || []) : (intake.evidence || []);
+  const hasBlank = pool.some((e) => e && e.nodeId === node.id && !(e.text || '').trim() && !(e.source || '').trim());
+  if (hasBlank) return intake;
   if (peHasOwn) {
     return {
       ...intake,

@@ -71,11 +71,20 @@ function open() {
   vidBanner.append(vidLabel, vidBadge);
   vidBanner.onclick = () => { close(); window.h2cOpenVideoDrawer?.(); };
   panel.append(head, vidBanner, s, body, dev); document.body.append(back, panel); s.focus();
-  const show = (a) => { body.replaceChildren(); const back2 = el('button', { className: 'h2ch-item', type: 'button', textContent: '← All topics' }); back2.onclick = () => list(s.value); body.append(back2, el('div', { className: 'h2ch-art' }, el('div', { className: 'h2ch-cat', textContent: a.cat }), el('h3', { textContent: a.title }), ...(DIAGRAMS[DIAGRAM_FOR[a.id]] ? [DIAGRAMS[DIAGRAM_FOR[a.id]]()] : []), el('p', { textContent: a.body }))); back2.focus(); };
+  const formatBody = (a) => {
+    if (a.id === 'principles') {
+      const items = a.body.split(/(?=\bP\d{2}\s)/).map((s) => s.trim()).filter(Boolean);
+      const ul = el('ul', { style: 'margin:8px 0 0;padding-left:18px;display:grid;gap:6px;font:13.5px/1.45 system-ui;color:#102033' });
+      for (const item of items) ul.append(el('li', { textContent: item }));
+      return ul;
+    }
+    return el('p', { textContent: a.body });
+  };
+  const show = (a) => { body.replaceChildren(); const back2 = el('button', { className: 'h2ch-item', type: 'button', textContent: '← All topics' }); back2.onclick = () => list(s.value); body.append(back2, el('div', { className: 'h2ch-art' }, el('div', { className: 'h2ch-cat', textContent: a.cat }), el('h3', { textContent: a.title }), ...(DIAGRAMS[DIAGRAM_FOR[a.id]] ? [DIAGRAMS[DIAGRAM_FOR[a.id]]()] : []), formatBody(a))); back2.focus(); };
   const list = (q) => { body.replaceChildren(); const terms = q.toLowerCase().split(/\s+/).filter(Boolean); let items = KB; if (terms.length) items = KB.map((a) => [a, score(a, terms)]).filter((r) => r[1] > 0).sort((a, b) => b[1] - a[1]).map((r) => r[0]);
     if (!items.length) { body.append(el('p', { textContent: 'No help topic matches "' + q + '". Try a shorter word.' })); return; }
     if (!terms.length) { body.append(el('div', { className: 'h2ch-cat', textContent: 'Visual quick start' }), DIAGRAMS.steps(), DIAGRAMS.causeSet()); }
-    let cat = ''; for (const a of items) { if (!terms.length && a.cat !== cat) { cat = a.cat; body.append(el('div', { className: 'h2ch-cat', textContent: cat })); } const b = el('button', { className: 'h2ch-item', type: 'button' }, a.title, el('small', { textContent: a.body.slice(0, 90) + '…' })); b.onclick = () => show(a); body.append(b); } };
+    let cat = ''; for (const a of items) { if (!terms.length && a.cat !== cat) { cat = a.cat; body.append(el('div', { className: 'h2ch-cat', textContent: cat })); } const preview = a.id === 'principles' ? 'All 15 Apollo RCA principles (P01–P15) — click to read all 15.' : a.body.slice(0, 90) + '…'; const b = el('button', { className: 'h2ch-item', type: 'button' }, a.title, el('small', { textContent: preview })); b.onclick = () => show(a); body.append(b); } };
   s.oninput = () => list(s.value); list('');
   panel.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); if (e.key === 'Tab') { const f = [...panel.querySelectorAll('button,input,a')]; const i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f.at(-1).focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } } });
 }
