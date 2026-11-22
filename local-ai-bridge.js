@@ -115,11 +115,37 @@ export function resolveApiStyle(cfg) {
 
 export function usesChatProtocol(cfg) {
   if (resolveApiStyle(cfg) !== 'openai') return true;
-  if (cfg?.provider === 'openai' || cfg?.preset === 'custom' || cfg?.preset === 'lmstudio' || cfg?.preset === 'mistral' || cfg?.preset === 'huggingface' || cfg?.preset === 'anthropic') return true;
+  if (cfg?.provider === 'openai' || cfg?.provider === 'freellmapi' || cfg?.preset === 'freellmapi' || cfg?.preset === 'custom' || cfg?.preset === 'lmstudio' || cfg?.preset === 'mistral' || cfg?.preset === 'huggingface' || cfg?.preset === 'anthropic') return true;
   try {
     const path = new URL(String(cfg?.endpoint || '').trim()).pathname.replace(/\/$/, '');
     return path === '/v1' || path.endsWith('/v1') || path.includes('/openai');
   } catch { return false; }
+}
+
+export function extractApiKeyFromText(raw) {
+  const text = String(raw || '').slice(0, 65536).trim();
+  if (!text) throw new Error('The key file is empty.');
+  if (text.startsWith('{')) {
+    try {
+      const obj = JSON.parse(text);
+      for (const field of ['apiKey', 'api_key', 'unifiedKey', 'unified_key', 'FREELMAPI_API_KEY', 'FREELM_API_KEY', 'key', 'token']) {
+        if (typeof obj?.[field] === 'string' && obj[field].trim()) return obj[field].trim();
+      }
+    } catch {}
+  }
+  const unified = text.match(/\bfreellmapi-[A-Za-z0-9._-]{8,}\b/);
+  if (unified) return unified[0];
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#') || line.startsWith('//')) continue;
+    const kv = line.match(/^(?:export\s+)?[A-Za-z0-9_.-]+\s*[:=]\s*["']?([^\s"']+)["']?/);
+    if (kv && kv[1]) return kv[1].replace(/^Bearer\s+/i, '').trim();
+    const bearer = line.match(/^Bearer\s+([^\s'"]+)/i);
+    if (bearer && bearer[1]) return bearer[1].trim();
+    const token = line.split(/\s+/)[0].replace(/^["']|["']$/g, '').trim();
+    if (token) return token;
+  }
+  throw new Error('Could not find an API key in that file.');
 }
 
 export const RECOMMENDED_LOCAL_MODELS = [
@@ -184,9 +210,12 @@ export function clearBridgeSession() { abortActiveGeneration(); globalThis[share
 
 export function validateCloudConfig(cfg, requireConsent = true) {
   const url = apiEndpoint(cfg.endpoint);
+  if (cfg.preset === 'freellmapi' && !isLoopback(url)) throw new Error('FreeLLMAPI router URL must stay on loopback (127.0.0.1 or localhost).');
   if (!isLoopback(url) && requireConsent && cfg.cloudConsent !== true) throw new Error('Confirm cloud processing before sending investigation information.');
   if (cfg.mode === 'free') {
-    if (cfg.preset === 'custom') {
+    if (cfg.preset === 'freellmapi') {
+      if (requireConsent && !String(cfg.model || '').trim()) throw new Error('Choose a model first.');
+    } else if (cfg.preset === 'custom') {
       if (!String(cfg.model || '').trim()) throw new Error('Choose a model first.');
     } else {
       const preset = PROVIDER_PRESETS.find((item) => item.id === cfg.preset && item.free);
@@ -330,8 +359,10 @@ async function testOpenAi(cfg) {
   let url;
   try { url = validateCloudConfig(cfg, false); }
   catch (error) { return offline(cfg.endpoint, error.message); }
-  if (!isLoopback(url) && !String(cfg.apiKey || '').trim()) {
-    return offline(url, 'Add your API key. This app does not include one.');
+  if ((!isLoopback(url) || cfg?.preset === 'freellmapi' || cfg?.provider === 'freellmapi') && !String(cfg.apiKey || '').trim()) {
+    return offline(url, cfg?.preset === 'freellmapi' || cfg?.provider === 'freellmapi'
+      ? 'Add your FreeLLMAPI unified key (or load keys_FreeLLMAPI.txt).'
+      : 'Add your API key. This app does not include one.');
   }
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 5000);
@@ -777,7 +808,11 @@ function cloudRequestBody(cfg, messages, url) {
 
 async function openAiChat(cfg, messages) {
   const url = validateCloudConfig(cfg);
-  if (!isLoopback(url) && !String(cfg.apiKey || '').trim()) throw new Error('Add your API key. This app does not include one.');
+  if ((!isLoopback(url) || cfg?.preset === 'freellmapi' || cfg?.provider === 'freellmapi') && !String(cfg.apiKey || '').trim()) {
+    throw new Error(cfg?.preset === 'freellmapi' || cfg?.provider === 'freellmapi'
+      ? 'Add your FreeLLMAPI unified key (or load keys_FreeLLMAPI.txt).'
+      : 'Add your API key. This app does not include one.');
+  }
   const ms = timeoutMs(cfg, 25000);
   const generation = beginGeneration(ms);
   const request = buildChatRequest(cfg, messages);

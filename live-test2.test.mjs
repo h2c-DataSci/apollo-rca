@@ -136,7 +136,7 @@ describe('live-test 2: help, videos, version label', () => {
     assert.doesNotMatch(shell, /App build v6[123]/);
     assert.match(sw, /importScripts\('\.\/app-build\.js'\)/);
     assert.match(sw, /const CACHE = self\.H2C_SHELL_CACHE/);
-    assert.match(sw, /coach-steps\.js\?v=2/);
+    assert.match(sw, /coach-steps\.js\?v=3/);
     assert.match(sw, /rca-principles\.js/);
   });
 });
@@ -170,8 +170,15 @@ describe('RC Coach and providers', () => {
       assert.ok(ids.includes(id), id);
     }
     assert.equal(PROVIDER_PRESETS.find((p) => p.id === 'custom').label.includes('custom provider'), true);
-    assert.deepEqual(LOCAL_PRESETS.map((p) => p.id), ['ollama', 'lmstudio']);
+    assert.deepEqual(LOCAL_PRESETS.map((p) => p.id), ['ollama', 'lmstudio', 'freellmapi']);
     assert.ok(presetModelIds({ models: ['a', { id: 'b', label: 'B' }] }).includes('b'));
+  });
+
+  it('extracts unified keys from .txt, .env, and JSON key files without echoing secrets', async () => {
+    const { extractApiKeyFromText } = await import('./local-ai-bridge.js');
+    assert.equal(extractApiKeyFromText('freellmapi-synthetic0001\n'), 'freellmapi-synthetic0001');
+    assert.equal(extractApiKeyFromText('# FreeLLMAPI key\nFREELMAPI_API_KEY="freellmapi-synthetic0002"\n'), 'freellmapi-synthetic0002');
+    assert.equal(extractApiKeyFromText('{"apiKey":"freellmapi-synthetic0003"}'), 'freellmapi-synthetic0003');
   });
 
   it('builds OpenAI, Anthropic and Gemini-style custom requests and redacts keys', () => {

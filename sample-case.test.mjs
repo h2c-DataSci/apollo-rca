@@ -162,6 +162,6 @@ describe('Load sample case wiring and interactivity guards', () => {
     assert.match(sw, /importScripts\('\.\/app-build\.js'\)/);
     assert.match(sw, /const CACHE = self\.H2C_SHELL_CACHE/);
     assert.match(sw, /sample-case\.js/);
-    assert.match(sw, /help-kb\.js\?v=29/);
+    assert.match(sw, /help-kb\.js\?v=30/);
   });
 });
