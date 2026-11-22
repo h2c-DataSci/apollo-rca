@@ -1,4 +1,4 @@
-import { KB, KB_VERSION } from './help-kb.js?v=29';
+import { KB, KB_VERSION } from './help-kb.js?v=30';
 import { DIAGRAMS, DIAGRAM_FOR } from './help-diagrams.js?v=24';
 import './app-build.js';
 import './h2c-videos.js?v=27';

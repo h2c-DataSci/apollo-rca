@@ -13,7 +13,8 @@ export const PROVIDER_PRESETS = [
 
 export const LOCAL_PRESETS = [
   { id: 'ollama', label: 'Ollama (local)', endpoint: 'http://127.0.0.1:11434', model: 'qwen3:2b', setup: 'Start the installed Ollama app or run ollama serve. Test connection lists installed tags. No API key is required.' },
-  { id: 'lmstudio', label: 'LM Studio (local)', endpoint: 'http://127.0.0.1:1234/v1', model: '', setup: 'Start LM Studio, enable the local server, then Test connection. The default address is http://127.0.0.1:1234/v1. No API key is required for a local server.' }
+  { id: 'lmstudio', label: 'LM Studio (local)', endpoint: 'http://127.0.0.1:1234/v1', model: '', setup: 'Start LM Studio, enable the local server, then Test connection. The default address is http://127.0.0.1:1234/v1. No API key is required for a local server.' },
+  { id: 'freellmapi', label: 'FreeLLMAPI (unified key / router)', endpoint: 'http://127.0.0.1:31415/v1', model: 'auto', models: ['auto'], requiresKey: true, apiStyle: 'openai', setup: 'Start FreeLLMAPI Unified LLM Router (default http://127.0.0.1:31415/v1), paste your unified API key or load your key file (e.g. keys_FreeLLMAPI.txt), then Test connection to list routed models.' }
 ];
 
 export function presetModelIds(preset) {

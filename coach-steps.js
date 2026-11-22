@@ -3,7 +3,7 @@
 // (a key, or a keyless loopback endpoint such as Ollama or LM Studio).
 
 import { PRINCIPLES } from './rca-principles.js';
-import { getBridgeConfig, isLoopback } from './local-ai-bridge.js?v=28';
+import { getBridgeConfig, isLoopback } from './local-ai-bridge.js?v=29';
 
 export const COACH_STEPS = [
   { id: 'define', label: 'Define', section: 'h2c-problem', heading: /problem definition/i, ask: 'Review each primary effect and the what, where, when and significance fields.' },
@@ -22,12 +22,13 @@ export function coachIsReady(cfg = getBridgeConfig()) {
   const endpoint = String(cfg.endpoint || '').trim();
   const key = String(cfg.apiKey || '').trim();
   if (key) return true;
+  if (cfg.preset === 'freellmapi' || cfg.provider === 'freellmapi') return false;
   if (!endpoint) return false;
   try { return isLoopback(endpoint); } catch { return false; }
 }
 
 export function coachReadyHint() {
-  return 'Add a provider key, or connect Local AI (Ollama or LM Studio on this computer), to enable the coach. The rest of the app stays fully usable without it.';
+  return 'Add a provider key, or connect Local AI (Ollama, LM Studio, or FreeLLMAPI unified router on this computer), to enable the coach. The rest of the app stays fully usable without it.';
 }
 
 function stripSecrets(value) {

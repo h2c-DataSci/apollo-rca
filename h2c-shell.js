@@ -16,10 +16,10 @@ import { PROVIDER_PRESETS, LOCAL_PRESETS } from './provider-presets.js';
 import { sessionStore, SESSION_CHANGED, listLegacyData, removeLegacyData, legacyRecoveryPlan } from './session-store.js';
 import './app-build.js';
 
-import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach, isLoopback, executeLocalChat, stripModelThinking } from './local-ai-bridge.js?v=28';
-import { COACH_STEPS, coachIsReady, coachReadyHint, buildStepPrompt, reviewStepEntries } from './coach-steps.js?v=2';
-import { DEEPER_TASKS, runDeeperReview, briefForReview, presentFinding } from './coach-deeper.js?v=7';
-import { AUDIT_KEY, AUDIT_SECTIONS, isCloudAuditMode, runCloudSectionAudit, saveCoachAudit, loadCoachAudit, clearCoachAudit, auditAsReview, visibleAudit, fingerprint, appendAuditPdf, auditMarkdown, exportableAudit, workflowAnchor, reportAnchor } from './coach-audit.js?v=1';
+import { getBridgeConfig, saveBridgeConfig, testConfiguredConnection, pickInstalledQwen, installExternalCoach, isLoopback, executeLocalChat, stripModelThinking, extractApiKeyFromText } from './local-ai-bridge.js?v=29';
+import { COACH_STEPS, coachIsReady, coachReadyHint, buildStepPrompt, reviewStepEntries } from './coach-steps.js?v=3';
+import { DEEPER_TASKS, runDeeperReview, briefForReview, presentFinding } from './coach-deeper.js?v=8';
+import { AUDIT_KEY, AUDIT_SECTIONS, isCloudAuditMode, runCloudSectionAudit, saveCoachAudit, loadCoachAudit, clearCoachAudit, auditAsReview, visibleAudit, fingerprint, appendAuditPdf, auditMarkdown, exportableAudit, workflowAnchor, reportAnchor } from './coach-audit.js?v=2';
 
 const FORBIDDEN_TAGS = new Set(['SCRIPT', 'OBJECT', 'EMBED', 'LINK', 'META', 'IFRAME', 'BASE', 'FRAME', 'FRAMESET', 'FORM', 'STYLE', 'TEMPLATE', 'MATH', 'FOREIGNOBJECT', 'ANIMATE', 'SET']);
 const ALLOWED_TAGS = new Set([
@@ -32,7 +32,7 @@ const ALLOWED_TAGS = new Set([
 ]);
 const ALLOWED_ATTRS = new Set([
   'class', 'id', 'style', 'type', 'role', 'tabindex', 'href', 'target', 'rel', 'title',
-  'value', 'placeholder', 'checked', 'disabled', 'selected', 'open', 'for', 'name', 'list',
+  'value', 'placeholder', 'checked', 'disabled', 'selected', 'open', 'for', 'name', 'list', 'accept',
   'rows', 'cols', 'min', 'max', 'step', 'autocomplete', 'autocapitalize', 'spellcheck', 'inputmode', 'readonly', 'hidden',
   'width', 'height', 'viewbox', 'fill', 'stroke', 'stroke-width', 'stroke-linecap',
   'stroke-linejoin', 'd', 'cx', 'cy', 'r', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'points', 'rx', 'ry'
@@ -1589,7 +1589,7 @@ function ensureLocalBridgeUI() {
       <label>Model<br><select class="h2c-ai-model-choice" aria-label="Choose model"></select><input class="h2c-bridge-model" list="h2c-bridge-models" autocomplete="off" spellcheck="false" aria-label="Model ID" placeholder="Enter model ID"></label>
       <datalist id="h2c-bridge-models"></datalist>
       <label class="h2c-ai-local-runtime-label">2. Local runtime<br><select class="h2c-ai-local-runtime"></select></label>
-      <label class="h2c-bridge-key-label">3. Your API key<br><input type="password" class="h2c-bridge-key" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="Paste key for this session"></label>
+      <label class="h2c-bridge-key-label">3. Your API key<br><span style="display:inline-flex;gap:6px;flex-wrap:wrap;align-items:center"><input type="password" class="h2c-bridge-key" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="Paste key for this session"><button type="button" class="h2c-ai-keyfile-btn" aria-label="Load API key from file">Load key file (.txt)</button><input type="file" class="h2c-ai-keyfile" accept=".txt,.key,.env,.json" hidden></span></label>
     </div>
     <label class="h2c-ai-remember" style="display:block;margin:8px 0"><input type="checkbox" class="h2c-ai-remember-key"> Remember key on this device (off by default — saved in browser localStorage, which browser extensions can read; leave off on shared computers)</label>
     <p class="h2c-ai-steps" style="margin:10px 0"></p>
@@ -1599,7 +1599,7 @@ function ensureLocalBridgeUI() {
       <label>API style<br><select class="h2c-bridge-api-style"><option value="openai">OpenAI-compatible</option><option value="anthropic">Anthropic-style</option><option value="gemini">Gemini-style</option></select></label>
       <label>Extra headers (optional, one Name: value per line)<br><textarea class="h2c-bridge-extra-headers" rows="3" spellcheck="false" placeholder="X-Custom: value"></textarea></label>
     </div>
-    <p class="h2c-ai-local-help">Default: http://127.0.0.1:11434 for Ollama, or http://127.0.0.1:1234/v1 for LM Studio. Test connection lists installed models. No model folder is needed. If the runtime is stopped, start the installed app, then retry. A website cannot start programs or inspect folders. Browser local-network permission or origin settings may be needed; do not disable browser security.</p></details>
+    <p class="h2c-ai-local-help">Default: http://127.0.0.1:11434 for Ollama, http://127.0.0.1:1234/v1 for LM Studio, or http://127.0.0.1:31415/v1 for FreeLLMAPI. Test connection lists installed or routed models. No model folder is needed. If the runtime is stopped, start the installed app, then retry. A website cannot start programs or inspect folders. Browser local-network permission or origin settings may be needed; do not disable browser security.</p></details>
     <label class="h2c-ai-consent" style="display:block;margin:10px 0"><input type="checkbox" class="h2c-ai-allow"> I authorize sending selected investigation context to this provider. I have checked its privacy and billing settings.</label>
     <p class="h2c-ai-risk" style="font-size:12px;margin:8px 0"></p>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="h2c-bridge-test-btn">Test connection</button><button type="button" class="h2c-ai-forget">Disconnect &amp; clear key</button></div>
@@ -1652,30 +1652,33 @@ function ensureLocalBridgeUI() {
   const $ = (q) => bridge.querySelector(q);
   const mode = $('.h2c-ai-mode'), preset = $('.h2c-ai-preset'), model = $('.h2c-bridge-model');
   const choice = $('.h2c-ai-model-choice');
-  const key = $('.h2c-bridge-key'), endpoint = $('.h2c-bridge-endpoint'), consent = $('.h2c-ai-allow');
+  const key = $('.h2c-bridge-key'), keyfile = $('.h2c-ai-keyfile'), keyfileBtn = $('.h2c-ai-keyfile-btn'), endpoint = $('.h2c-bridge-endpoint'), consent = $('.h2c-ai-allow');
   const remember = $('.h2c-ai-remember-key'), localRuntime = $('.h2c-ai-local-runtime'), providerName = $('.h2c-bridge-provider-name'), apiStyle = $('.h2c-bridge-api-style'), extraHeaders = $('.h2c-bridge-extra-headers');
   const feedback = $('.h2c-bridge-feedback'), pill = $('.h2c-bridge-status-pill'), test = $('.h2c-bridge-test-btn');
   let revision = 0;
   const presets = () => Array.isArray(PROVIDER_PRESETS) ? PROVIDER_PRESETS : Object.values(PROVIDER_PRESETS);
   const currentPreset = () => presets().find((p) => p.id === preset.value);
   const resetStatus = () => { revision++; pill.textContent = 'Not connected'; feedback.textContent = ''; globalThis.h2cExternalAbort?.(); };
+  const activeRuntime = () => LOCAL_PRESETS.find((item) => item.id === (localRuntime.value || 'ollama')) || LOCAL_PRESETS[0];
   const save = () => {
     const local = mode.value === 'local';
     const custom = !local && preset.value === 'custom';
-    const runtime = local ? (localRuntime.value || 'ollama') : '';
+    const rt = local ? activeRuntime() : null;
+    const runtime = local ? (rt?.id || 'ollama') : '';
+    const keepKey = !local ? !(custom && isLoopback(endpoint.value.trim()) && !key.value.trim()) : !!rt?.requiresKey;
     saveBridgeConfig({
       provider: local ? runtime : (custom ? 'custom' : (currentPreset()?.apiStyle === 'gemini' ? 'google' : currentPreset()?.apiStyle === 'anthropic' ? 'anthropic' : 'openai')),
       mode: mode.value,
       preset: local ? runtime : preset.value,
       endpoint: endpoint.value.trim(),
       model: model.value.trim(),
-      apiKey: (local || (custom && isLoopback(endpoint.value.trim()) && !key.value.trim())) ? '' : key.value.trim(),
+      apiKey: keepKey ? key.value.trim() : '',
       cloudConsent: !local && consent.checked,
-      rememberKey: !local && remember.checked === true,
-      apiStyle: custom ? (apiStyle.value || 'openai') : (currentPreset()?.apiStyle || ''),
+      rememberKey: keepKey && remember.checked === true,
+      apiStyle: local ? (rt?.apiStyle || '') : (custom ? (apiStyle.value || 'openai') : (currentPreset()?.apiStyle || '')),
       extraHeaders: custom ? extraHeaders.value : {},
       providerName: custom ? providerName.value.trim() : '',
-      numPredict: local ? 384 : 1536,
+      numPredict: local && !rt?.requiresKey ? 384 : 1536,
       timeoutMs: local ? 90000 : 60000,
       enabled: true
     });
@@ -1688,12 +1691,14 @@ function ensureLocalBridgeUI() {
   };
   const applyPreset = (restore = false) => {
     const local = mode.value === 'local', p = currentPreset();
-    key.value = restore ? cfg.apiKey || '' : ''; consent.checked = restore && cfg.cloudConsent === true;
-    remember.checked = restore && cfg.rememberKey === true;
-    $('.h2c-ai-preset-label').hidden = local; $('.h2c-bridge-key-label').hidden = local; $('.h2c-ai-consent').hidden = local;
-    $('.h2c-ai-remember').hidden = local; $('.h2c-ai-local-runtime-label').hidden = !local; $('.h2c-ai-local-help').hidden = !local;
     const runtime = LOCAL_PRESETS.find((item) => item.id === (restore ? cfg.preset || cfg.provider : localRuntime.value)) || LOCAL_PRESETS[0];
     if (local && !restore) localRuntime.value = runtime.id;
+    const needsKey = !local || !!runtime?.requiresKey;
+    key.value = restore ? cfg.apiKey || '' : ''; consent.checked = restore && cfg.cloudConsent === true;
+    remember.checked = restore && cfg.rememberKey === true;
+    key.placeholder = local && runtime?.requiresKey ? 'Paste freellmapi-... key or load .txt' : 'Paste key for this session';
+    $('.h2c-ai-preset-label').hidden = local; $('.h2c-bridge-key-label').hidden = !needsKey; $('.h2c-ai-consent').hidden = local;
+    $('.h2c-ai-remember').hidden = !needsKey; $('.h2c-ai-local-runtime-label').hidden = !local; $('.h2c-ai-local-help').hidden = !local;
     endpoint.value = local ? (restore && isLoopback(cfg.endpoint || '') ? cfg.endpoint : (runtime?.endpoint || 'http://127.0.0.1:11434')) : (restore && preset.value === 'custom' ? cfg.endpoint : p?.endpoint || '');
     endpoint.readOnly = !local && preset.value !== 'custom';
     const customBox = $('.h2c-ai-custom-fields');
@@ -1708,11 +1713,11 @@ function ensureLocalBridgeUI() {
       }
     }
     model.value = restore ? cfg.model : local ? (runtime?.model || 'qwen3:2b') : (p?.models?.[0]?.id || p?.models?.[0] || '');
-    models(local ? [] : p?.models || []);
+    models(local ? (runtime?.models || []) : p?.models || []);
     choice.value = model.value;
     const steps = $('.h2c-ai-steps'); steps.replaceChildren();
     const externalLink = (href, text) => { const link = document.createElement('a'); link.href = href; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = text; return link; };
-    if (local) steps.textContent = 'Start Ollama, then Test connection to find your installed models. Use Enable assistant in the Coach when connected.';
+    if (local) steps.textContent = runtime?.requiresKey ? (runtime.setup || 'Start your local router, paste or load your unified key, then Test connection.') : 'Start Ollama, then Test connection to find your installed models. Use Enable assistant in the Coach when connected.';
     else if (mode.value === 'free') {
       const title = document.createElement('strong');
       title.textContent = 'Set up your own free key';
@@ -1742,7 +1747,7 @@ function ensureLocalBridgeUI() {
       if (p?.privacyUrl) steps.append(externalLink(p.privacyUrl, ' · Privacy policy ↗'));
       if (p?.setup) { const note = document.createElement('p'); note.className = 'h2c-key-note'; note.textContent = p.setup; steps.append(note); }
     }
-    $('.h2c-ai-risk').textContent = local ? 'Local mode stays on loopback. A folder path does not start or import a model.' : mode.value === 'free' ? 'Free models use your provider account and its quota. Confirm billing is disabled or capped. Availability and provider retention settings can change. No automatic paid fallback. OpenRouter may route to different underlying free providers.' : 'Your provider may charge you. The app cannot guarantee the final cost or verify account billing settings. Only use a provider you trust.';
+    $('.h2c-ai-risk').textContent = local ? (runtime?.requiresKey ? 'FreeLLMAPI connects to your local router on loopback (127.0.0.1:31415/v1) using your unified key; the router forwards requests to the upstream providers you configured inside FreeLLMAPI.' : 'Local mode stays on loopback. A folder path does not start or import a model.') : mode.value === 'free' ? 'Free models use your provider account and its quota. Confirm billing is disabled or capped. Availability and provider retention settings can change. No automatic paid fallback. OpenRouter may route to different underlying free providers.' : 'Your provider may charge you. The app cannot guarantee the final cost or verify account billing settings. Only use a provider you trust.';
     resetStatus(); save();
   };
   const applyMode = (restore = false) => {
@@ -1759,11 +1764,31 @@ function ensureLocalBridgeUI() {
   localRuntime.addEventListener('change', () => applyPreset());
   choice.addEventListener('change', () => { model.value = choice.value; resetStatus(); save(); });
   endpoint.addEventListener('input', () => { key.value = ''; consent.checked = false; remember.checked = false; resetStatus(); save(); });
+  if (keyfileBtn && keyfile) {
+    keyfileBtn.addEventListener('click', () => keyfile.click());
+    keyfile.addEventListener('change', async () => {
+      const file = keyfile.files && keyfile.files[0];
+      keyfile.value = '';
+      if (!file) return;
+      if (file.size > 65536) { feedback.textContent = 'Key file is too large (limit 64 KB). Paste the key instead.'; return; }
+      try {
+        const extracted = extractApiKeyFromText(await file.text());
+        key.value = extracted;
+        resetStatus();
+        save();
+        feedback.textContent = `Loaded key from ${file.name} for this session. Press Test connection.`;
+      } catch (err) {
+        feedback.textContent = (err && err.message) || 'Could not read an API key from that file.';
+      }
+    });
+  }
   for (const el of [model, key, consent, remember, providerName, apiStyle, extraHeaders]) el.addEventListener('input', () => { resetStatus(); save(); });
   $('.h2c-ai-forget').onclick = () => { key.value = ''; consent.checked = false; remember.checked = false; saveBridgeConfig({ enabled: false, apiKey: '', cloudConsent: false, rememberKey: false }); resetStatus(); feedback.textContent = 'Disconnected. Key cleared from this session and from this device. Standard Mode still works.'; };
   test.onclick = async () => {
     save(); const ticket = ++revision;
     const loopback = isLoopback(endpoint.value.trim());
+    const rt = mode.value === 'local' ? activeRuntime() : null;
+    if (mode.value === 'local' && rt?.requiresKey && !key.value.trim()) { feedback.textContent = 'Paste your FreeLLMAPI unified key (or load keys_FreeLLMAPI.txt) first. No request was sent.'; return; }
     if (mode.value !== 'local' && !loopback && (!key.value.trim() || !consent.checked)) { feedback.textContent = 'Paste your key and authorize this provider first. No request was sent.'; return; }
     test.disabled = true; test.textContent = 'Checking…'; pill.textContent = 'Checking…';
     try {
@@ -1772,12 +1797,13 @@ function ensureLocalBridgeUI() {
       pill.textContent = status.online ? 'Connected' : 'Not connected';
       feedback.textContent = status.message || status.error || 'Connection failed.';
       if (status.online) {
-        const names = status.models || [];
+        const rawNames = status.models || [];
+        const names = rt?.id === 'freellmapi' && !rawNames.includes('auto') ? ['auto', ...rawNames] : rawNames;
         if (mode.value === 'local') {
           models(names);
-          if (names.length && !names.includes(model.value)) model.value = pickInstalledQwen(names) || names[0];
+          if (names.length && !names.includes(model.value)) model.value = rt?.id === 'freellmapi' ? 'auto' : (pickInstalledQwen(names) || names[0]);
           choice.value = model.value;
-          feedback.textContent += names.length ? ' Choose an installed model, then Enable assistant in the Coach.' : ' No installed models found. Install a model in Ollama before enabling the assistant.';
+          feedback.textContent += names.length ? (rt?.requiresKey ? ' Choose a routed model (or keep auto), then Enable assistant in the Coach.' : ' Choose an installed model, then Enable assistant in the Coach.') : ' No installed models found. Install a model in Ollama before enabling the assistant.';
         }
         if (mode.value === 'paid') {
           models(names);

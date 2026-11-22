@@ -231,3 +231,46 @@ test('free Google AI lists the five text models and does not switch on quota', a
     assert.equal(urls.length, 2);
   } finally { globalThis.fetch = original; clearBridgeSession(); }
 });
+
+test('FreeLLMAPI unified router tests /v1/models and chats with Bearer key on loopback without hardcoded secrets', async () => {
+  const { LOCAL_PRESETS } = await import('./provider-presets.js');
+  const { coachIsReady } = await import('./coach-steps.js');
+  const freeLlm = LOCAL_PRESETS.find((item) => item.id === 'freellmapi');
+  assert.ok(freeLlm);
+  assert.equal(freeLlm.endpoint, 'http://127.0.0.1:31415/v1');
+  assert.equal(freeLlm.model, 'auto');
+  assert.equal(freeLlm.requiresKey, true);
+
+  assert.equal(coachIsReady({ mode: 'local', provider: 'freellmapi', preset: 'freellmapi', endpoint: freeLlm.endpoint, model: 'auto', apiKey: '', enabled: true }), false);
+  assert.equal(coachIsReady({ mode: 'local', provider: 'freellmapi', preset: 'freellmapi', endpoint: freeLlm.endpoint, model: 'auto', apiKey: 'freellmapi-synthetic-key', enabled: true }), true);
+
+  const missingKey = await testConfiguredConnection({ mode: 'local', provider: 'freellmapi', preset: 'freellmapi', endpoint: freeLlm.endpoint, model: 'auto', apiKey: '' });
+  assert.equal(missingKey.online, false);
+  assert.match(missingKey.error, /FreeLLMAPI unified key/);
+
+  const calls = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), method: init.method, headers: init.headers, body: init.body ? JSON.parse(init.body) : null });
+    if (String(url).endsWith('/v1/models')) {
+      return new Response(JSON.stringify({ data: [{ id: 'auto' }, { id: 'qwen3-free' }] }), { status: 200 });
+    }
+    return new Response(JSON.stringify({ choices: [{ message: { content: '{"summary":"Router ok"}' }, finish_reason: 'stop' }] }), { status: 200 });
+  };
+  try {
+    const status = await testConfiguredConnection({ mode: 'local', provider: 'freellmapi', preset: 'freellmapi', endpoint: freeLlm.endpoint, model: 'auto', apiKey: 'freellmapi-synthetic-key' });
+    assert.equal(status.online, true);
+    assert.deepEqual(status.models, ['auto', 'qwen3-free']);
+    assert.equal(calls[0].url, 'http://127.0.0.1:31415/v1/models');
+    assert.equal(calls[0].headers.Authorization, 'Bearer freellmapi-synthetic-key');
+
+    const reply = await executeLocalChat([{ role: 'user', content: 'Review summary' }], { mode: 'local', provider: 'freellmapi', preset: 'freellmapi', endpoint: freeLlm.endpoint, model: 'auto', apiKey: 'freellmapi-synthetic-key' });
+    assert.equal(reply, '{"summary":"Router ok"}');
+    assert.equal(calls[1].url, 'http://127.0.0.1:31415/v1/chat/completions');
+    assert.equal(calls[1].body.model, 'auto');
+    assert.equal(calls[1].headers.Authorization, 'Bearer freellmapi-synthetic-key');
+  } finally {
+    globalThis.fetch = original;
+    clearBridgeSession();
+  }
+});
