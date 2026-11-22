@@ -170,7 +170,7 @@ export function getSampleCase(now) {
           node('c-10', 'condition', 'Rebuild Pack List Unknown', {
             verified: false,
             sufficiency: false,
-            terminator: { type: 'question', label: 'Need More Info' }
+            terminator: { type: 'question', label: 'Need More Info', userSet: true }
           })
         ]
       }),

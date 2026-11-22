@@ -266,3 +266,50 @@ test('v70 two-way sync, reload persistence, off-screen clone cleanup, deep Fit, 
   assert.match(routes, /Solution assigned/);
   assert.match(styles, /\.h2c-chart-legend:not\(\.hidden\)/);
 });
+
+test('v71 Fit left-edge bounds & scroll reset, solution marker assignment, and immediate PE live sync', async () => {
+  const routes = readFileSync(new URL('./routes-v13.js', import.meta.url), 'utf8');
+  const styles = readFileSync(new URL('./styles-v13.css', import.meta.url), 'utf8');
+  const { applyIntakeToChart } = await import('./chart-sync.js');
+
+  // LOW 1: Fit resets scroll offsets, accounts for leftmost PE x + horizontal padding, and CSS prevents hidden scrollLeft drift
+  assert.match(routes, /b\.current&&\(b\.current\.scrollLeft=0,b\.current\.scrollTop=0\)/);
+  assert.match(routes, /padX=Math\.min\(36,Math\.max\(24,Math\.round\(e\.width\*\.03\)\)\)/);
+  assert.match(routes, /x=Math\.max\(padX-minX\*t,\(e\.width-v\.w\*t\)\/2\)/);
+  assert.match(styles, /\.h2c-chart-frame,\.h2c-chart-stage\{overflow:clip!important\}/);
+  assert.match(styles, /html\{overflow-x:clip\}/);
+
+  // LOW 2: Solution marker badge appears as soon as a cause is selected or covered by another CA (not N/A)
+  assert.match(routes, /solSelected\(s\)\|\|s\.coveredBy&&s\.coveredBy!==`N\/A`/);
+
+  // PE live sync: immediate bidirectional commit between Problem "What" and Node Inspector #node-title + treeIndex fallback
+  assert.match(routes, /EvField,\{className:H,value:t\.what,placeholder:`Oil Released`,immediate:!0/);
+  assert.match(routes, /TitleField,\{value:P\.title,immediate:P\.kind===`primary`/);
+  const patched = applyIntakeToChart(
+    { trees: [{ id: 'legacy-tree-id', code: 'PE-1', root: { id: 'p-1', kind: 'primary', title: 'old title', children: [] } }] },
+    { effects: [{ id: 'pe-1', what: 'pump seal split' }], evidence: [] }
+  );
+  assert.equal(patched.trees[0].root.title, 'pump seal split');
+
+  // Unknown ("?") color unified to #fbc02d everywhere (CSS tokens, chart nodes, legend, PNG/SVG/PDF export), zero #f5c518
+  const shell = readFileSync(new URL('./h2c-shell.js', import.meta.url), 'utf8');
+  const help = readFileSync(new URL('./h2c-help.js', import.meta.url), 'utf8');
+  const sampleSrc = readFileSync(new URL('./sample-case.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(routes, /#f5c518/i);
+  assert.doesNotMatch(styles, /#f5c518/i);
+  assert.match(routes, /ln=`#fbc02d`/);
+  assert.match(routes, /className:`fill-unknown`/);
+  assert.match(styles, /--color-warn:#fbc02d;--color-unknown:#fbc02d/);
+  assert.match(styles, /\.fill-unknown\{fill:var\(--color-unknown,#fbc02d\)\}/);
+  assert.match(sampleSrc, /terminator: \{ type: 'question', label: 'Need More Info', userSet: true \}/);
+  assert.match(routes, /e\.type===`question`&&sampleMatch\(n\)/);
+
+  // Single H2C_APP_BUILD version constant wired to footer, About/Help panel, SW, and export metadata
+  assert.match(shell, /App build ' \+ \(globalThis\.H2C_APP_BUILD/);
+  assert.match(help, /import '\.\/app-build\.js'/);
+  assert.match(help, /App build ' \+ \(globalThis\.H2C_APP_BUILD/);
+  assert.match(routes, /import"\.\/app-build\.js"/);
+  assert.match(routes, /data-app-build`,globalThis\.H2C_APP_BUILD/);
+  assert.match(routes, /o\.setCreator\(/);
+  assert.match(routes, /appBuild:globalThis\.H2C_APP_BUILD/);
+});

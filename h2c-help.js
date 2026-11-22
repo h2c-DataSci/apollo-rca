@@ -1,5 +1,6 @@
 import { KB, KB_VERSION } from './help-kb.js?v=29';
 import { DIAGRAMS, DIAGRAM_FOR } from './help-diagrams.js?v=24';
+import './app-build.js';
 import './h2c-videos.js?v=27';
 const SITE = 'https://www.haroldhenrycabanilla.com';
 const FEEDBACK = 'https://docs.google.com/forms/d/e/1FAIpQLSedUpS-6ERmkio3noR_o1nS1UO0nf3sO48BH9t3AbLXvKv19w/viewform';
@@ -59,7 +60,7 @@ function open() {
     'Disclaimer: Apollo RCA™ and RealityCharting® are trademarks of Dean L. Gano / Apollonian Publications, LLC. Not affiliated with or endorsed by them. Official software: ',
     el('a', { href: 'https://realitycharting.com/home/', target: '_blank', rel: 'noopener noreferrer', style: 'color: #0a5c45; font-weight: 700; text-decoration: underline;' }, 'realitycharting.com')
   );
-  dev.append(el('strong', { textContent: 'About the developer: ' }), devLine(), ' · ', feedbackLink(), el('div', { textContent: 'Help text is original summary guidance (' + KB_VERSION + '), not a copy of any book.' }), dNotice);
+  dev.append(el('strong', { textContent: 'About the developer: ' }), devLine(), ' · ', feedbackLink(), el('div', { textContent: 'Help text is original summary guidance (' + KB_VERSION + ') · App build ' + (globalThis.H2C_APP_BUILD || '') + ', not a copy of any book.' }), dNotice);
   
   const vidBanner = el('button', {
     type: 'button',

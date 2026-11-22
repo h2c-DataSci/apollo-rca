@@ -96,25 +96,25 @@ export function syncChartToIntake(intake, analysis, opts = {}) {
 export function applyIntakeToChart(analysis, intake) {
   if (!analysis) return analysis;
   const rows = allEvidenceRows(intake);
-  const patch = (node, treeId) => {
+  const patch = (node, treeId, treeIndex) => {
     const titleKey = String(node.title || '').trim().toLowerCase();
     const mine = rows.filter((row) => {
       if (row.nodeId) return row.nodeId === node.id;
       return (row.cause || '').trim().toLowerCase() === titleKey;
     });
     const lead = mine.find((row) => (row.cause || '').trim()) || mine[0];
-    let next = { ...node, children: (node.children || []).map((child) => patch(child, treeId)) };
+    let next = { ...node, children: (node.children || []).map((child) => patch(child, treeId, treeIndex)) };
     if (node.kind !== 'primary' && lead) {
       if ((lead.cause || '').trim()) next.title = String(lead.cause).trim();
       if (lead.kind === 'condition' || lead.kind === 'action') next.kind = lead.kind;
     }
     if (node.kind === 'primary') {
-      const pe = (intake.effects || []).find((effect) => effect.id === treeId);
+      const pe = (intake.effects || []).find((effect) => effect.id === treeId) || (intake.effects || [])[treeIndex];
       if (pe && (pe.what || '').trim()) next.title = pe.what.trim();
     }
     return next;
   };
-  const trees = (analysis.trees || []).map((tree) => ({ ...tree, root: patch(tree.root, tree.id) }));
+  const trees = (analysis.trees || []).map((tree, treeIndex) => ({ ...tree, root: patch(tree.root, tree.id, treeIndex) }));
   return { ...analysis, trees, root: trees[0]?.root ?? analysis.root };
 }
 
