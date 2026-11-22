@@ -201,7 +201,7 @@ describe('live v63 bug fixes', () => {
   });
 
   it('derives the footer build label from the same constant as the service-worker cache', () => {
-    assert.match(build, /var H2C_APP_BUILD = 'v69'/);
+    assert.match(build, /var H2C_APP_BUILD = 'v70'/);
     assert.match(build, /var H2C_SHELL_CACHE = 'apollo-rca-shell-' \+ H2C_APP_BUILD/);
     assert.match(sw, /importScripts\('\.\/app-build\.js'\)/);
     assert.match(sw, /const CACHE = self\.H2C_SHELL_CACHE/);

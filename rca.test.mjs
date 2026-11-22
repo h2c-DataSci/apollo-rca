@@ -237,3 +237,32 @@ test('v69 live-audit re-test fixes: sample solution metadata, null-safe PDF/CSV,
   assert.match(shell, /Reloading keeps your draft; closing the tab drops it/);
   assert.doesNotMatch(shell, /before closing or reloading/);
 });
+
+test('v70 two-way sync, reload persistence, off-screen clone cleanup, deep Fit, and solution markers', () => {
+  const routes = readFileSync(new URL('./routes-v13.js', import.meta.url), 'utf8');
+  const styles = readFileSync(new URL('./styles-v13.css', import.meta.url), 'utf8');
+
+  // MEDIUM 1: PE What included in chartEvidenceKey, inspector P derived from chartLive, functional updater on PE rename
+  assert.match(routes, /`pe:\$\{e\.id\}:\$\{e\.what\|\|``\}`/);
+  assert.match(routes, /let src=chartLive\|\|n;if\(!src\|\|!i\)return null/);
+  assert.match(routes, /t\(prev=>\(\{\.\.\.prev,effects:prev\.effects\.map/);
+
+  // MEDIUM 1 & 2: Synchronous qn persistence + beforeunload/pagehide flush in EvField & TitleField + nodeId preserved
+  assert.match(routes, /if\(!l\)return;try\{sessionStore\.setItem\(qn,JSON\.stringify\(Jn\(e\)\)\)\}catch\{\}let id=setTimeout/);
+  assert.match(routes, /window\.addEventListener\(`pagehide`,fl\)/);
+  assert.doesNotMatch(routes, /Object\.hasOwn\(fields,`text`\)\?\{\.\.\.fields,nodeId:void 0\}:fields/);
+
+  // MEDIUM 3: Export SVG omits data-node & data-node-hit; setPointerCapture only on drag >5px; downHit fallback
+  assert.match(routes, /isView\?\(0,B\.jsx\)\(`rect`,\{x:o-22,y:s-22,width:272,height:116,rx:12,fill:`transparent`,pointerEvents:`all`,"data-node-hit":a\.id\}\):null/);
+  assert.match(routes, /svg\.h2c-chart-view \[data-node=/);
+  assert.match(routes, /downHit=e\.target&&e\.target\.closest/);
+
+  // LOW 4: Fit scales down to 0.03 and never pushes y negative
+  assert.match(routes, /Math\.max\(\.03,Math\.min\(1\.2,Math\.min\(byW,byH\)\)\)/);
+  assert.match(routes, /y=v\.h\*t<=e\.height-32\?Math\.max\(16,\(e\.height-v\.h\*t\)\/2\):16/);
+
+  // LOW 5: Solution marker badge on solved cause nodes + legend entry + Hide legend CSS safe
+  assert.match(routes, /"data-solution-badge":a\.id/);
+  assert.match(routes, /Solution assigned/);
+  assert.match(styles, /\.h2c-chart-legend:not\(\.hidden\)/);
+});
