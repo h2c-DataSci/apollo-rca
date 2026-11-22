@@ -12,7 +12,7 @@ const SHELL = [
   './index-v13.js',
   './routes-v13.js',
   './rolldown-runtime-v11.js',
-  './h2c-shell.js?v=52',
+  './h2c-shell.js?v=53',
   './h2c-help.js?v=37',
   './help-kb.js?v=30',
   './help-diagrams.js?v=24',

@@ -350,3 +350,130 @@ export function reselectNode(analysis, id, title) {
   const hit = collectNodes(analysis).find((entry) => String(entry.node.title || '').trim().toLowerCase() === key);
   return hit ? hit.node.id : id || null;
 }
+
+// Nov 22: insert a new cause between the selected node and its parent.
+// The new cause takes the selected node's kind; the selected node becomes its child.
+export function insertCauseAbove(root, id, opts = {}) {
+  const parentId = parentNodeId(root, id);
+  if (!root || root.id === id || !parentId) return { root, inserted: false, newId: null };
+  let target = null;
+  walk(root, (node) => { if (node.id === id) target = node; });
+  if (!target) return { root, inserted: false, newId: null };
+  const kind = opts.kind === 'condition' || opts.kind === 'action' ? opts.kind : (target.kind === 'condition' ? 'condition' : 'action');
+  const newId = opts.id || ((globalThis.crypto && crypto.randomUUID) ? crypto.randomUUID() : `${kind[0]}-above-${Math.random().toString(36).slice(2, 8)}`);
+  const node = {
+    id: newId,
+    kind,
+    title: String(opts.title || 'New Cause Above').trim(),
+    verified: false,
+    evidence: [{ source: '?', missing: true }],
+    children: [target],
+    necessity: true,
+    sufficiency: true
+  };
+  const next = replaceNode(root, parentId, (parent) => ({
+    ...parent,
+    children: (parent.children || []).map((child) => (child.id === id ? node : child))
+  }));
+  return { root: next, inserted: true, newId };
+}
+
+// Matching evidence-row change: new row explains the old parent; the selected
+// cause (and everything under it) moves one layer down and now explains the new row.
+export function insertCauseAboveRows(intake, causeTitle, opts = {}) {
+  if (!intake) return intake;
+  const key = String(causeTitle || '').trim().toLowerCase();
+  if (!key) return intake;
+  const rows = allEvidenceRows(intake);
+  const hit = rows.find((row) => String(row.cause || '').trim().toLowerCase() === key && (!opts.pe || !row.pe || row.pe === opts.pe));
+  const title = String(opts.title || 'New Cause Above').trim();
+  const below = new Set([key]);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const row of rows) {
+      const c = String(row.cause || '').trim().toLowerCase();
+      if (!below.has(c) && below.has(String(row.explains || '').trim().toLowerCase())) { below.add(c); grew = true; }
+    }
+  }
+  const moved = mapPools(intake, (row) => {
+    const c = String(row.cause || '').trim().toLowerCase();
+    if (opts.pe && row.pe && row.pe !== opts.pe) return row;
+    if (!below.has(c)) return row;
+    const out = { ...row, layer: (Number(row.layer) || 1) + 1 };
+    if (c === key) out.explains = title;
+    return out;
+  });
+  const newRow = {
+    id: (globalThis.crypto && crypto.randomUUID) ? crypto.randomUUID() : `ev-${Math.random().toString(36).slice(2, 8)}`,
+    text: '',
+    tier: 'Inferred',
+    source: '',
+    cause: title,
+    layer: hit ? (Number(hit.layer) || 1) : 1,
+    kind: opts.kind || (hit && hit.kind === 'condition' ? 'condition' : 'action'),
+    explains: hit ? (hit.explains || '') : '',
+    ...(opts.pe ? { pe: opts.pe } : (hit && hit.pe ? { pe: hit.pe } : {})),
+    ...(opts.nodeId ? { nodeId: opts.nodeId } : {})
+  };
+  return { ...moved, evidence: [...(moved.evidence || []), newRow] };
+}
+
+// Nov 22: hide or show a branch. Collapsed ids live on the analysis, not the tree,
+// so collapsing never deletes causes or evidence.
+export function toggleCollapsed(collapsed, id) {
+  const set = new Set(collapsed || []);
+  if (set.has(id)) set.delete(id); else set.add(id);
+  return [...set];
+}
+
+export function visibleTree(root, collapsed) {
+  const set = new Set(collapsed || []);
+  const clip = (node) => {
+    if (!node) return node;
+    if ((set.has(node.id) || node.h2cFold) && (node.children || []).length) {
+      const hidden = countDescendants(node);
+      return { ...node, title: `${node.title} (+${hidden} hidden)`, children: [], collapsedCount: hidden, h2cCollapsed: true };
+    }
+    return { ...node, children: (node.children || []).map(clip) };
+  };
+  return clip(root);
+}
+
+export function countDescendants(node) {
+  let n = -1;
+  walk(node, () => { n += 1; });
+  return Math.max(0, n);
+}
+
+// Nov 22: timeline order. Known clock/date times first in time order; unknown or
+// blank times ("?", "unknown", "") keep the order they were typed in, at the end.
+export function timeKey(value) {
+  const s = String(value || '').trim();
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  if (m) return Number(m[1]) * 60 + Number(m[2]);
+  const d = Date.parse(s);
+  return Number.isNaN(d) ? null : d;
+}
+
+export function sortTimeline(rows) {
+  return (rows || [])
+    .map((row, index) => ({ row, index, key: timeKey(row && row.time) }))
+    .sort((a, b) => {
+      if (a.key === null && b.key === null) return a.index - b.index;
+      if (a.key === null) return 1;
+      if (b.key === null) return -1;
+      return a.key - b.key || a.index - b.index;
+    })
+    .map((entry) => entry.row);
+}
+
+// Nov 22: link a timeline event to one evidence row (by id). Pass null to unlink.
+export function linkTimelineEvidence(timeline, eventIndex, evidenceId) {
+  return (timeline || []).map((row, index) => {
+    if (index !== eventIndex) return row;
+    const out = { ...row };
+    if (evidenceId) out.evidenceId = evidenceId; else delete out.evidenceId;
+    return out;
+  });
+}
