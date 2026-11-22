@@ -1657,17 +1657,19 @@ function ensureLocalBridgeUI() {
   const feedback = $('.h2c-bridge-feedback'), pill = $('.h2c-bridge-status-pill'), test = $('.h2c-bridge-test-btn');
   let revision = 0;
   const presets = () => Array.isArray(PROVIDER_PRESETS) ? PROVIDER_PRESETS : Object.values(PROVIDER_PRESETS);
-  const currentPreset = () => presets().find((p) => p.id === preset.value);
+  const freeExtraPresets = () => LOCAL_PRESETS.filter((item) => item.requiresKey);
+  const currentPreset = () => presets().find((p) => p.id === preset.value) || freeExtraPresets().find((p) => p.id === preset.value);
   const resetStatus = () => { revision++; pill.textContent = 'Not connected'; feedback.textContent = ''; globalThis.h2cExternalAbort?.(); };
   const activeRuntime = () => LOCAL_PRESETS.find((item) => item.id === (localRuntime.value || 'ollama')) || LOCAL_PRESETS[0];
   const save = () => {
     const local = mode.value === 'local';
     const custom = !local && preset.value === 'custom';
+    const p = !local ? currentPreset() : null;
     const rt = local ? activeRuntime() : null;
     const runtime = local ? (rt?.id || 'ollama') : '';
     const keepKey = !local ? !(custom && isLoopback(endpoint.value.trim()) && !key.value.trim()) : !!rt?.requiresKey;
     saveBridgeConfig({
-      provider: local ? runtime : (custom ? 'custom' : (currentPreset()?.apiStyle === 'gemini' ? 'google' : currentPreset()?.apiStyle === 'anthropic' ? 'anthropic' : 'openai')),
+      provider: local ? runtime : (preset.value === 'freellmapi' ? 'freellmapi' : custom ? 'custom' : (p?.apiStyle === 'gemini' ? 'google' : p?.apiStyle === 'anthropic' ? 'anthropic' : 'openai')),
       mode: mode.value,
       preset: local ? runtime : preset.value,
       endpoint: endpoint.value.trim(),
@@ -1675,7 +1677,7 @@ function ensureLocalBridgeUI() {
       apiKey: keepKey ? key.value.trim() : '',
       cloudConsent: !local && consent.checked,
       rememberKey: keepKey && remember.checked === true,
-      apiStyle: local ? (rt?.apiStyle || '') : (custom ? (apiStyle.value || 'openai') : (currentPreset()?.apiStyle || '')),
+      apiStyle: local ? (rt?.apiStyle || '') : (custom ? (apiStyle.value || 'openai') : (p?.apiStyle || '')),
       extraHeaders: custom ? extraHeaders.value : {},
       providerName: custom ? providerName.value.trim() : '',
       numPredict: local && !rt?.requiresKey ? 384 : 1536,
@@ -1686,21 +1688,23 @@ function ensureLocalBridgeUI() {
   const models = (values) => {
     const list = $('#h2c-bridge-models'); list.replaceChildren(); choice.replaceChildren();
     for (const value of values) { const name = typeof value === 'string' ? value : value.id; const label = typeof value === 'string' ? value : (value.label || value.id); const o = document.createElement('option'); o.value = name; list.append(o); const c = document.createElement('option'); c.value = name; c.textContent = label; choice.append(c); }
-    choice.hidden = !values.length; model.hidden = values.length > 0 && preset.value !== 'custom';
+    const activeP = mode.value === 'local' ? activeRuntime() : currentPreset();
+    choice.hidden = !values.length; model.hidden = values.length > 0 && preset.value !== 'custom' && !activeP?.requiresKey;
     if (values.length && [...choice.options].some((o) => o.value === model.value)) choice.value = model.value;
   };
   const applyPreset = (restore = false) => {
     const local = mode.value === 'local', p = currentPreset();
     const runtime = LOCAL_PRESETS.find((item) => item.id === (restore ? cfg.preset || cfg.provider : localRuntime.value)) || LOCAL_PRESETS[0];
     if (local && !restore) localRuntime.value = runtime.id;
+    const isUnifiedRouter = (local ? runtime?.id : p?.id) === 'freellmapi';
     const needsKey = !local || !!runtime?.requiresKey;
     key.value = restore ? cfg.apiKey || '' : ''; consent.checked = restore && cfg.cloudConsent === true;
     remember.checked = restore && cfg.rememberKey === true;
-    key.placeholder = local && runtime?.requiresKey ? 'Paste freellmapi-... key or load .txt' : 'Paste key for this session';
-    $('.h2c-ai-preset-label').hidden = local; $('.h2c-bridge-key-label').hidden = !needsKey; $('.h2c-ai-consent').hidden = local;
-    $('.h2c-ai-remember').hidden = !needsKey; $('.h2c-ai-local-runtime-label').hidden = !local; $('.h2c-ai-local-help').hidden = !local;
-    endpoint.value = local ? (restore && isLoopback(cfg.endpoint || '') ? cfg.endpoint : (runtime?.endpoint || 'http://127.0.0.1:11434')) : (restore && preset.value === 'custom' ? cfg.endpoint : p?.endpoint || '');
-    endpoint.readOnly = !local && preset.value !== 'custom';
+    key.placeholder = isUnifiedRouter ? 'Paste freellmapi-... key or load .txt' : 'Paste key for this session';
+    $('.h2c-ai-preset-label').hidden = local; $('.h2c-bridge-key-label').hidden = !needsKey; $('.h2c-ai-consent').hidden = local || isUnifiedRouter;
+    $('.h2c-ai-remember').hidden = !needsKey; $('.h2c-ai-local-runtime-label').hidden = !local; $('.h2c-ai-local-help').hidden = !local && !isUnifiedRouter;
+    endpoint.value = local ? (restore && isLoopback(cfg.endpoint || '') ? cfg.endpoint : (runtime?.endpoint || 'http://127.0.0.1:11434')) : (restore && (preset.value === 'custom' || p?.requiresKey) ? cfg.endpoint : p?.endpoint || '');
+    endpoint.readOnly = !local && preset.value !== 'custom' && !p?.requiresKey;
     const customBox = $('.h2c-ai-custom-fields');
     if (customBox) {
       customBox.hidden = local || preset.value !== 'custom';
@@ -1718,6 +1722,22 @@ function ensureLocalBridgeUI() {
     const steps = $('.h2c-ai-steps'); steps.replaceChildren();
     const externalLink = (href, text) => { const link = document.createElement('a'); link.href = href; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = text; return link; };
     if (local) steps.textContent = runtime?.requiresKey ? (runtime.setup || 'Start your local router, paste or load your unified key, then Test connection.') : 'Start Ollama, then Test connection to find your installed models. Use Enable assistant in the Coach when connected.';
+    else if (isUnifiedRouter) {
+      const title = document.createElement('strong');
+      title.textContent = 'Connect FreeLLMAPI unified router';
+      const list = document.createElement('ol');
+      list.className = 'h2c-key-steps';
+      for (const line of [
+        'Start FreeLLMAPI Unified LLM Router on your computer (default http://127.0.0.1:31415/v1).',
+        'Paste your freellmapi-... key above or click Load key file (.txt) to load keys_FreeLLMAPI.txt for this tab.',
+        'Press Test connection to fetch routed models (or keep auto), then Enable assistant in the Coach.'
+      ]) {
+        const item = document.createElement('li');
+        item.textContent = line;
+        list.append(item);
+      }
+      steps.append(title, list);
+    }
     else if (mode.value === 'free') {
       const title = document.createElement('strong');
       title.textContent = 'Set up your own free key';
@@ -1747,12 +1767,14 @@ function ensureLocalBridgeUI() {
       if (p?.privacyUrl) steps.append(externalLink(p.privacyUrl, ' · Privacy policy ↗'));
       if (p?.setup) { const note = document.createElement('p'); note.className = 'h2c-key-note'; note.textContent = p.setup; steps.append(note); }
     }
-    $('.h2c-ai-risk').textContent = local ? (runtime?.requiresKey ? 'FreeLLMAPI connects to your local router on loopback (127.0.0.1:31415/v1) using your unified key; the router forwards requests to the upstream providers you configured inside FreeLLMAPI.' : 'Local mode stays on loopback. A folder path does not start or import a model.') : mode.value === 'free' ? 'Free models use your provider account and its quota. Confirm billing is disabled or capped. Availability and provider retention settings can change. No automatic paid fallback. OpenRouter may route to different underlying free providers.' : 'Your provider may charge you. The app cannot guarantee the final cost or verify account billing settings. Only use a provider you trust.';
+    $('.h2c-ai-risk').textContent = isUnifiedRouter ? 'FreeLLMAPI connects to your local router on loopback (127.0.0.1:31415/v1) using your unified key; the router forwards requests to the upstream providers you configured inside FreeLLMAPI.' : local ? 'Local mode stays on loopback. A folder path does not start or import a model.' : mode.value === 'free' ? 'Free models use your provider account and its quota. Confirm billing is disabled or capped. Availability and provider retention settings can change. No automatic paid fallback. OpenRouter may route to different underlying free providers.' : 'Your provider may charge you. The app cannot guarantee the final cost or verify account billing settings. Only use a provider you trust.';
     resetStatus(); save();
   };
   const applyMode = (restore = false) => {
     preset.replaceChildren();
-    for (const p of presets().filter((p) => p.id === 'custom' || (mode.value === 'free' ? p.free : !p.free))) { const o = document.createElement('option'); o.value = p.id; o.textContent = p.label; preset.append(o); }
+    const list = presets().filter((p) => p.id === 'custom' || (mode.value === 'free' ? p.free : !p.free));
+    const ordered = mode.value === 'free' ? [...list.filter((p) => p.id !== 'custom'), ...freeExtraPresets(), ...list.filter((p) => p.id === 'custom')] : list;
+    for (const p of ordered) { const o = document.createElement('option'); o.value = p.id; o.textContent = p.label; preset.append(o); }
     if (restore && [...preset.options].some((o) => o.value === cfg.preset)) preset.value = cfg.preset;
     localRuntime.replaceChildren();
     for (const item of LOCAL_PRESETS) { const o = document.createElement('option'); o.value = item.id; o.textContent = item.label; localRuntime.append(o); }
@@ -1787,8 +1809,8 @@ function ensureLocalBridgeUI() {
   test.onclick = async () => {
     save(); const ticket = ++revision;
     const loopback = isLoopback(endpoint.value.trim());
-    const rt = mode.value === 'local' ? activeRuntime() : null;
-    if (mode.value === 'local' && rt?.requiresKey && !key.value.trim()) { feedback.textContent = 'Paste your FreeLLMAPI unified key (or load keys_FreeLLMAPI.txt) first. No request was sent.'; return; }
+    const activeP = mode.value === 'local' ? activeRuntime() : currentPreset();
+    if (activeP?.id === 'freellmapi' && !key.value.trim()) { feedback.textContent = 'Paste your FreeLLMAPI unified key (or load keys_FreeLLMAPI.txt) first. No request was sent.'; return; }
     if (mode.value !== 'local' && !loopback && (!key.value.trim() || !consent.checked)) { feedback.textContent = 'Paste your key and authorize this provider first. No request was sent.'; return; }
     test.disabled = true; test.textContent = 'Checking…'; pill.textContent = 'Checking…';
     try {
@@ -1798,14 +1820,13 @@ function ensureLocalBridgeUI() {
       feedback.textContent = status.message || status.error || 'Connection failed.';
       if (status.online) {
         const rawNames = status.models || [];
-        const names = rt?.id === 'freellmapi' && !rawNames.includes('auto') ? ['auto', ...rawNames] : rawNames;
-        if (mode.value === 'local') {
+        const names = activeP?.id === 'freellmapi' && !rawNames.includes('auto') ? ['auto', ...rawNames] : rawNames;
+        if (mode.value === 'local' || activeP?.id === 'freellmapi') {
           models(names);
-          if (names.length && !names.includes(model.value)) model.value = rt?.id === 'freellmapi' ? 'auto' : (pickInstalledQwen(names) || names[0]);
+          if (names.length && !names.includes(model.value)) model.value = activeP?.id === 'freellmapi' ? 'auto' : (pickInstalledQwen(names) || names[0]);
           choice.value = model.value;
-          feedback.textContent += names.length ? (rt?.requiresKey ? ' Choose a routed model (or keep auto), then Enable assistant in the Coach.' : ' Choose an installed model, then Enable assistant in the Coach.') : ' No installed models found. Install a model in Ollama before enabling the assistant.';
-        }
-        if (mode.value === 'paid') {
+          feedback.textContent += names.length ? (activeP?.requiresKey ? ' Choose a routed model (or keep auto), then Enable assistant in the Coach.' : ' Choose an installed model, then Enable assistant in the Coach.') : ' No installed models found. Install a model in Ollama before enabling the assistant.';
+        } else if (mode.value === 'paid') {
           models(names);
           if (!model.value.trim() && names.length) { const blank = document.createElement('option'); blank.value = ''; blank.textContent = 'Choose a model'; choice.prepend(blank); choice.value = ''; }
           if (!model.value.trim() && names.length) feedback.textContent += ' Choose a model from the Model field before enabling the assistant.';

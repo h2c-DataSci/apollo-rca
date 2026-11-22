@@ -1,6 +1,6 @@
 // Structured section audit for a Free or Paid API only. Local models are not called.
 // The result is advice. It is stored in this tab's memory, never in localStorage.
-import { executeLocalChat, getBridgeConfig, stripModelThinking } from './local-ai-bridge.js?v=29';
+import { executeLocalChat, getBridgeConfig, isLoopback, stripModelThinking } from './local-ai-bridge.js?v=29';
 import { sessionStore } from './session-store.js';
 
 export const AUDIT_KEY = 'h2c-coach-api-audit-v1';
@@ -199,7 +199,7 @@ export function clearCoachAudit(store = sessionStore) {
 
 export async function runCloudSectionAudit(brief, chat = executeLocalChat, cfg = getBridgeConfig()) {
   if (!isCloudAuditMode(cfg)) throw new Error('This section audit runs only on a Free or Paid API. Local AI is unchanged. No request was sent.');
-  if (!cfg.cloudConsent) throw new Error('Authorize this provider before a longer review. No request was sent.');
+  if (!isLoopback(cfg.endpoint) && !cfg.cloudConsent) throw new Error('Authorize this provider before a longer review. No request was sent.');
   if (!brief || brief === '{}' || brief.length < 3) throw new Error('Add a primary effect or notes first. No request was sent.');
   const raw = await chat([
     { role: 'system', content: CLOUD_AUDIT_RULES },

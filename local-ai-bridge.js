@@ -210,9 +210,12 @@ export function clearBridgeSession() { abortActiveGeneration(); globalThis[share
 
 export function validateCloudConfig(cfg, requireConsent = true) {
   const url = apiEndpoint(cfg.endpoint);
+  if (cfg.preset === 'freellmapi' && !isLoopback(url)) throw new Error('FreeLLMAPI router URL must stay on loopback (127.0.0.1 or localhost).');
   if (!isLoopback(url) && requireConsent && cfg.cloudConsent !== true) throw new Error('Confirm cloud processing before sending investigation information.');
   if (cfg.mode === 'free') {
-    if (cfg.preset === 'custom') {
+    if (cfg.preset === 'freellmapi') {
+      if (requireConsent && !String(cfg.model || '').trim()) throw new Error('Choose a model first.');
+    } else if (cfg.preset === 'custom') {
       if (!String(cfg.model || '').trim()) throw new Error('Choose a model first.');
     } else {
       const preset = PROVIDER_PRESETS.find((item) => item.id === cfg.preset && item.free);
