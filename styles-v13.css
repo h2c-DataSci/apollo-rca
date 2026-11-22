@@ -376,4 +376,8 @@ main section.rounded-lg.border,main article.rounded-lg.border,.print-sheet{
   margin:0!important;
 }
 
+/* v71: prevent programmatic scrollLeft drift on overflow-hidden containers so Fit never clips PE-1 on the left */
+html{overflow-x:clip}
+.h2c-chart-frame,.h2c-chart-stage{overflow:clip!important}
+
 
