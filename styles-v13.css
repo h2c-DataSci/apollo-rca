@@ -365,7 +365,7 @@ main section.rounded-lg.border,main article.rounded-lg.border,.print-sheet{
   padding-left:max(1.5rem, env(safe-area-inset-left, 0px))!important;
   padding-right:max(1.5rem, env(safe-area-inset-right, 0px))!important;
 }
-.h2c-chart-legend{
+.h2c-chart-legend:not(.hidden){
   display:flex!important;
   flex-wrap:wrap!important;
   align-items:center!important;
