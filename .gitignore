@@ -2,6 +2,8 @@
 venv/
 .venv/
 env/
+.env*
+!.env.example
 __pycache__/
 *.pyc
 
@@ -10,6 +12,15 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Secrets and keys
+*.pem
+*.key
+
+# Logs and caches
+*.log
+logs/
+.cache/
 
 # System and editor files
 .DS_Store
